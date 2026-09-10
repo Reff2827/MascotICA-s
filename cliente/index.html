@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo · MascotICA's</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+
+</head>
+
+<body>
+
+<div id="navbar"></div>
+<div id="alertas"></div>
+
+<div class="container-fluid px-4 pb-5">
+
+<h3 class="fw-bold mb-3">
+    <i class="bi bi-heart"></i>
+    Mascotas disponibles para adopción
+</h3>
+
+<div class="row g-3 mb-5" id="listaMascotas"></div>
+
+<h3 class="fw-bold mb-3">
+    <i class="bi bi-box-seam"></i>
+    Productos: Alimento e higiene
+</h3>
+
+<div class="row g-3" id="listaProductos"></div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="../js/storage.js"></script>
+
+<script src="../js/auth.js"></script>
+
+<script src="../js/ui.js"></script>
+
+<script>
+
+    const usuario = Auth.requireCliente();
+
+    if (usuario) {
+        UI.navbarCliente(usuario);
+        UI.mostrarFlash();
+        pintarMascotas();
+        pintarProductos();
+    }
+
+    function pintarMascotas() {
+
+        const mascotas = Mascotas.listarPorEstado('DISPONIBLE');
+        const cont = document.getElementById('listaMascotas');
+
+        if (mascotas.length === 0) {
+
+            cont.innerHTML = `
+                <div class="col-12">
+                    <p class="text-muted">
+                        No hay mascotas disponibles por el momento.
+                    </p>
+                </div>`;
+
+            return;
+        }
+
+        cont.innerHTML = mascotas.map(m => `
+
+            <div class="col-md-3 col-sm-6">
+
+                <div class="card card-mascota h-100">
+
+                    <img
+                        src="${UI.imagenOPlaceholder(m.imagenUrl, m.nombre)}"
+                        class="img-top"
+                        alt="Foto de ${UI.esc(m.nombre)}"
+                    >
+
+                    <div class="card-body">
+
+                        <h5 class="card-title mb-1">
+                            ${UI.esc(m.nombre)}
+                        </h5>
+
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-paw"></i>
+                            ${UI.esc(m.especie)}
+                        </p>
+
+                        <p class="text-muted mb-3">
+                            <strong>Raza / tipo:</strong>
+                            ${UI.esc(m.raza || 'No especificado')}
+                            <br>
+                            <strong>Edad:</strong>
+                            ${UI.esc(m.edad)}
+                        </p>
+
+                        <button
+                            class="btn btn-sm w-100 text-white"
+                            style="background-color:#ff8c42;"
+                            data-id="${m.idMascota}"
+                            data-nombre="${UI.esc(m.nombre)}"
+                            data-action="adoptar">
+
+                            <i class="bi bi-heart-fill"></i>
+                            Solicitar adopcion
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `).join('');
+
+
+        cont.querySelectorAll('[data-action="adoptar"]').forEach(btn => {
+
+            btn.addEventListener('click', () => {
+
+                if (!confirm(
+                    `¿Enviar solicitud de adopcion para ${btn.dataset.nombre}?`
+                )) {
+                    return;
+                }
+
+                const error = Solicitudes.crearSolicitudAdopcion(
+                    usuario,
+                    btn.dataset.id
+                );
+
+                UI.setFlash(
+                    error ? 'error' : 'exito',
+                    error ||
+                    'Tu solicitud de adopcion fue enviada. Un administrador la revisara pronto.'
+                );
+
+                window.location.reload();
+
+            });
+
+        });
+
+    }
+
+    function pintarProductos() {
+
+        const productos = Productos.listarConStock();
+        const cont = document.getElementById('listaProductos');
+
+        if (productos.length === 0) {
+
+            cont.innerHTML = `
+                <div class="col-12">
+                    <p class="text-muted">
+                        No hay productos con stock disponible.
+                    </p>
+                </div>`;
+
+            return;
+        }
+
+        cont.innerHTML = productos.map(p => `
+
+            <div class="col-md-3 col-sm-6">
+
+                <div class="card card-producto h-100">
+
+                    <img
+                        src="${UI.imagenOPlaceholder(p.imagenUrl, p.nombre)}"
+                        class="img-top"
+                        alt="Foto de ${UI.esc(p.nombre)}"
+                    >
+
+                    <div class="card-body">
+
+                        <span class="badge bg-secondary mb-2">
+                            ${p.categoria}
+                        </span>
+
+                        <h5 class="card-title mb-1">
+                            ${UI.esc(p.nombre)}
+                        </h5>
+
+                        <p class="mb-1 fw-bold">
+                            S/ ${Number(p.precio).toFixed(2)}
+                        </p>
+
+                        <p class="text-muted small mb-2">
+                            Stock: ${p.stock}
+                        </p>
+
+                        <div class="d-flex gap-1">
+
+                            <input
+                                type="number"
+                                value="1"
+                                min="1"
+                                max="${p.stock}"
+                                class="form-control form-control-sm"
+                                style="width:70px;"
+                                id="cant-${p.idProducto}"
+                            >
+
+                            <button
+                                class="btn btn-sm btn-primary flex-fill"
+                                data-id="${p.idProducto}"
+                                data-action="comprar">
+
+                                <i class="bi bi-cart-plus"></i>
+                                Solicitar compra
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `).join('');
+
+
+        cont.querySelectorAll('[data-action="comprar"]').forEach(btn => {
+
+            btn.addEventListener('click', () => {
+
+                const cantidad =
+                    document.getElementById(
+                        `cant-${btn.dataset.id}`
+                    ).value;
+
+                const error = Solicitudes.crearSolicitudCompra(
+                    usuario,
+                    btn.dataset.id,
+                    cantidad
+                );
+
+                UI.setFlash(
+                    error ? 'error' : 'exito',
+                    error ||
+                    'Tu solicitud de compra fue enviada. Un administrador la revisara pronto.'
+                );
+
+                window.location.reload();
+
+            });
+
+        });
+
+    }
+
+</script>
+
+</body>
+</html>

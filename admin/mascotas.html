@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mascotas · MascotICA's Admin</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+
+</head>
+
+<body>
+
+<div id="navbar"></div>
+<div id="alertas"></div>
+
+<div class="container-fluid px-4 pb-5">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+    <h3 class="fw-bold mb-0">
+        <i class="bi bi-heart"></i>
+        Gestion de mascotas
+    </h3>
+
+    <a
+        href="mascota-form.html"
+        class="btn text-white"
+        style="background-color:#ff8c42;">
+
+        <i class="bi bi-plus-lg"></i>
+        Registrar mascota
+
+    </a>
+
+</div>
+
+<div class="mb-3">
+
+    <div class="btn-group" id="filtroEstado"></div>
+
+</div>
+
+<div class="row g-3" id="listaMascotas"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="../js/storage.js"></script>
+
+<script src="../js/auth.js"></script>
+
+<script src="../js/ui.js"></script>
+
+<script>
+
+    const usuario = Auth.requireAdmin();
+    const ESTADOS = [
+        'DISPONIBLE',
+        'EN_PROCESO',
+        'ADOPTADO'
+    ];
+
+    if (usuario) {
+        UI.navbarAdmin(usuario);
+        UI.mostrarFlash();
+        pintarFiltro();
+        pintarLista();
+    }
+
+    function filtroActivo() {
+        return new URLSearchParams(
+            window.location.search
+        ).get('estado');
+    }
+
+    function pintarFiltro() {
+        const activo = filtroActivo();
+        const botones = [
+            `<a
+                href="mascotas.html"
+                class="btn btn-sm ${!activo ? 'btn-dark' : 'btn-outline-dark'}">
+                Todas
+            </a>`
+        ].concat(
+            ESTADOS.map(e => `
+                <a
+                    href="mascotas.html?estado=${e}"
+                    class="btn btn-sm ${
+                        activo === e
+                            ? 'btn-dark'
+                            : 'btn-outline-dark'
+                    }">
+                    ${e}
+                </a>
+            `)
+        );
+        document.getElementById(
+            'filtroEstado'
+        ).innerHTML = botones.join('');
+
+    }
+
+    function pintarLista() {
+        const activo = filtroActivo();
+        const mascotas = activo
+            ? Mascotas.listarPorEstado(activo)
+            : Mascotas.listar();
+        const cont =
+            document.getElementById('listaMascotas');
+        if (mascotas.length === 0) {
+            cont.innerHTML = `
+                <div class="col-12">
+                    <p class="text-muted">
+                        No hay mascotas registradas con ese filtro.
+                    </p>
+                </div>`;
+            return;
+        }
+        cont.innerHTML = mascotas.map(m => `
+            <div class="col-md-3 col-sm-6">
+                <div class="card card-mascota h-100">
+                    <img
+                        src="${UI.imagenOPlaceholder(
+                            m.imagenUrl,
+                            m.nombre
+                        )}"
+                        class="img-top"
+                        alt="Foto de ${UI.esc(m.nombre)}"
+                    >
+                    <div class="card-body">
+                        <!-- Nombre y estado -->
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="card-title mb-1">
+                                ${UI.esc(m.nombre)}
+                            </h5>
+                            <span class="badge badge-estado-${m.estado}">
+                                ${m.estado}
+                            </span>
+                        </div>
+                        <!-- Información -->
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-paw"></i>
+                            ${UI.esc(m.especie)}
+                        </p>
+                        <p class="text-muted small mb-3">
+                            <strong>Raza / tipo:</strong>
+                            ${UI.esc(
+                                m.raza || 'No especificado'
+                            )}
+                            <br>
+                            <strong>Edad:</strong>
+                            ${UI.esc(m.edad)}
+                        </p>
+                        <!-- Cambiar estado -->
+                        <div class="d-flex gap-1 mb-2">
+                            <select
+                                class="form-select form-select-sm"
+                                data-id="${m.idMascota}"
+                                data-action="cambiar-estado">
+
+                                ${ESTADOS.map(e => `
+
+                                    <option
+                                        value="${e}"
+                                        ${e === m.estado
+                                            ? 'selected'
+                                            : ''}>
+
+                                        ${e}
+                                    </option>
+                                `).join('')}
+                            </select>
+                            <button
+                                class="btn btn-sm btn-outline-secondary"
+                                data-id="${m.idMascota}"
+                                data-action="aplicar-estado">
+
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                        </div>
+                        <!-- Acciones -->
+                        <div class="d-flex gap-2">
+                            <a
+                                href="mascota-form.html?id=${m.idMascota}"
+                                class="btn btn-sm btn-outline-primary flex-fill">
+
+                                <i class="bi bi-pencil"></i>
+                                Editar
+                            </a>
+                            <button
+                                class="btn btn-sm btn-outline-danger"
+                                data-id="${m.idMascota}"
+                                data-nombre="${UI.esc(m.nombre)}"
+                                data-action="eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        cont.querySelectorAll(
+            '[data-action="aplicar-estado"]'
+        ).forEach(btn => {
+
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                const select = cont.querySelector(
+                    `select[data-id="${id}"]`
+                );
+                Mascotas.cambiarEstado(
+                    id,
+                    select.value
+                );
+                UI.setFlash(
+                    'exito',
+                    'Estado actualizado.'
+                );
+                window.location.reload();
+            });
+        });
+
+        cont.querySelectorAll(
+            '[data-action="eliminar"]'
+        ).forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (
+                    confirm(
+                        `¿Eliminar a ${btn.dataset.nombre}?`
+                    )
+                ) {
+                    Mascotas.eliminar(
+                        btn.dataset.id
+                    );
+                    UI.setFlash(
+                        'exito',
+                        'Mascota eliminada.'
+                    );
+                    window.location.reload();
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>
