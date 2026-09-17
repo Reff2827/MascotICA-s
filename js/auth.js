@@ -1,16 +1,62 @@
 const SESSION_KEY = 'ps_session';
 
 const Auth = {
-    login(correo, password) {
-        const usuario = Usuarios.buscarPorCorreo(correo);
-        if (!usuario || usuario.password !== password) {
-            return null;
-        }
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(usuario));
-        return usuario;
+    async registrar(nombre, correo, password) {
+        const { error } = await db.auth.signUp({
+            email: correo,
+            password: password,
+            options: { data: { nombre: nombre } }
+        });
+        if (error) return error.message;
+        await db.auth.signOut();
+        return null;
     },
 
-    logout() {
+    async validarPassword(correo, password) {
+        const { error } = await db.auth.signInWithPassword({
+            email: correo,
+            password: password
+        });
+        if (error) return false;
+        await db.auth.signOut();
+        return true;
+    },
+
+    async enviarPin(correo) {
+        const { error } = await db.auth.signInWithOtp({
+            email: correo,
+            options: { shouldCreateUser: false }
+        });
+        return error ? error.message : null;
+    },
+
+    async verificarPin(correo, codigo) {
+        const { data, error } = await db.auth.verifyOtp({
+            email: correo,
+            token: codigo,
+            type: 'email'
+        });
+        if (error) return { error: error.message };
+
+        const perfil = await db.from('perfiles')
+            .select('id, nombre, rol')
+            .eq('id', data.user.id)
+            .single();
+
+        if (perfil.error) return { error: 'No se pudo cargar el perfil del usuario.' };
+
+        const usuario = {
+            idUsuario: perfil.data.id,
+            nombre: perfil.data.nombre,
+            rol: perfil.data.rol,
+            correo: correo
+        };
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(usuario));
+        return { usuario: usuario };
+    },
+
+    async logout() {
+        await db.auth.signOut();
         sessionStorage.removeItem(SESSION_KEY);
     },
 

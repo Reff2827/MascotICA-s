@@ -71,9 +71,9 @@
         document.getElementById('filtroCategoria').innerHTML = botones.join('');
     }
 
-    function pintarTabla() {
+    async function pintarTabla() {
         const activo = filtroActivo();
-        const productos = activo ? Productos.listarPorCategoria(activo) : Productos.listar();
+        const productos = activo ? await Productos.listarPorCategoria(activo) : await Productos.listar();
         const tbody = document.getElementById('filasProductos');
         document.getElementById('sinProductos').classList.toggle('d-none', productos.length > 0);
 
@@ -129,9 +129,9 @@
             </tr>`).join('');
 
         tbody.querySelectorAll('[data-action="eliminar"]').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 if (confirm('¿Eliminar este producto?')) {
-                    Productos.eliminar(btn.dataset.id);
+                    await Productos.eliminar(btn.dataset.id);
                     UI.setFlash('exito', 'Producto eliminado.');
                     window.location.reload();
                 }

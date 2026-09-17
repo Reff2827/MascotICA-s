@@ -63,19 +63,20 @@
         document.getElementById('filtroEstado').innerHTML = botones.join('');
     }
 
-    function pintarTabla() {
+    async function pintarTabla() {
         const activo = filtroActivo();
-        const solicitudes = activo ? Solicitudes.listarPorEstado(activo) : Solicitudes.listar();
+        const solicitudes = activo ? await Solicitudes.listarPorEstado(activo) : await Solicitudes.listar();
+        const descripciones = await Promise.all(solicitudes.map(s => Solicitudes.descripcion(s)));
         const tbody = document.getElementById('filasSolicitudes');
         document.getElementById('sinSolicitudes').classList.toggle('d-none', solicitudes.length > 0);
 
-        tbody.innerHTML = solicitudes.map(s => `
+        tbody.innerHTML = solicitudes.map((s, i) => `
             <tr>
                 <td>${s.idSolicitud}</td>
                 <td>${s.tipo === 'ADOPCION'
                     ? '<span class="text-danger"><i class="bi bi-heart-fill"></i> Adopcion</span>'
                     : '<span class="text-primary"><i class="bi bi-cart-fill"></i> Compra</span>'}</td>
-                <td>${UI.esc(Solicitudes.descripcion(s))}</td>
+                <td>${UI.esc(descripciones[i])}</td>
                 <td>${UI.esc(s.nombreUsuario)}</td>
                 <td>${s.cantidad}</td>
                 <td>${UI.formatoFecha(s.fecha)}</td>
@@ -90,15 +91,15 @@
             </tr>`).join('');
 
         tbody.querySelectorAll('[data-action="aprobar"]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const error = Solicitudes.aprobar(btn.dataset.id);
+            btn.addEventListener('click', async () => {
+                const error = await Solicitudes.aprobar(btn.dataset.id);
                 UI.setFlash(error ? 'error' : 'exito', error || 'Solicitud aprobada.');
                 window.location.reload();
             });
         });
         tbody.querySelectorAll('[data-action="rechazar"]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const error = Solicitudes.rechazar(btn.dataset.id);
+            btn.addEventListener('click', async () => {
+                const error = await Solicitudes.rechazar(btn.dataset.id);
                 UI.setFlash(error ? 'error' : 'exito', error || 'Solicitud rechazada.');
                 window.location.reload();
             });

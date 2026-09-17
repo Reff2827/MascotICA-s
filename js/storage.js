@@ -1,211 +1,258 @@
-const DB_KEYS = {
-    usuarios: 'ps_usuarios',
-    mascotas: 'ps_mascotas',
-    productos: 'ps_productos',
-    solicitudes: 'ps_solicitudes',
-    seeded: 'ps_seeded'
-};
-
-function datosDePrueba() {
-return {
-usuarios: [
-{ idUsuario: 1, nombre: 'Administrador', correo: 'admin@albergue.com', password: 'admin123', rol: 'ADMIN' },
-{ idUsuario: 2, nombre: 'Usuario Demo', correo: 'cliente@correo.com', password: '123456', rol: 'CLIENTE' }
-],
-mascotas: [
-{ idMascota: 1, nombre: 'Rocky', especie: 'Perro', raza: 'Pastor Aleman', edad: '1 año', estado: 'DISPONIBLE', imagenUrl: '/img/mascotas/rocky.jpeg' },
-{ idMascota: 2, nombre: 'Max', especie: 'Perro', raza: 'Labrador', edad: '3 años', estado: 'DISPONIBLE', imagenUrl: '/img/mascotas/max.jpeg' },
-{ idMascota: 3, nombre: 'Toby', especie: 'Perro', raza: 'Siberiano', edad: '2 años', estado: 'EN_PROCESO', imagenUrl: '/img/mascotas/toby.jpg' },
-{ idMascota: 4, nombre: 'Luna', especie: 'Gato', raza: 'Persa', edad: '6 meses', estado: 'DISPONIBLE', imagenUrl: '/img/mascotas/luna.jpg' },
-{ idMascota: 5, nombre: 'Nala', especie: 'Gato', raza: 'Siamés', edad: '1 año', estado: 'DISPONIBLE', imagenUrl: '/img/mascotas/nala.jpg' }
-],
-productos: [
-{ idProducto: 1, nombre: 'Comida Perro Adulto 3kg', categoria: 'ALIMENTO', precio: 45.00, stock: 20, imagenUrl: '/img/productos/comida-perro.jpg' },
-{ idProducto: 2, nombre: 'Comida Gato Adulto 1.5kg', categoria: 'ALIMENTO', precio: 38.50, stock: 12, imagenUrl: '/img/productos/comida-gato.jpg' },
-{ idProducto: 3, nombre: 'Snacks de Pollo para Perro', categoria: 'ALIMENTO', precio: 18.90, stock: 25, imagenUrl: '/img/productos/snacks.jpg' },
-{ idProducto: 4, nombre: 'Arena Sanitaria para Gato 10kg', categoria: 'HIGIENE', precio: 32.00, stock: 10, imagenUrl: '/img/productos/arena.jpg' },
-{ idProducto: 5, nombre: 'Shampoo Antipulgas 500ml', categoria: 'HIGIENE', precio: 25.50, stock: 15, imagenUrl: '/img/productos/shampoo.jpeg' }
-],
-solicitudes: []
-};
-}
-
-function initDB() {
-    if (localStorage.getItem(DB_KEYS.seeded)) return;
-    const seed = datosDePrueba();
-    localStorage.setItem(DB_KEYS.usuarios, JSON.stringify(seed.usuarios));
-    localStorage.setItem(DB_KEYS.mascotas, JSON.stringify(seed.mascotas));
-    localStorage.setItem(DB_KEYS.productos, JSON.stringify(seed.productos));
-    localStorage.setItem(DB_KEYS.solicitudes, JSON.stringify(seed.solicitudes));
-    localStorage.setItem(DB_KEYS.seeded, '1');
-}
-
-function leer(key) {
-    return JSON.parse(localStorage.getItem(key) || '[]');
-}
-function escribir(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
-}
-function siguienteId(lista, campoId) {
-    return lista.reduce((max, item) => Math.max(max, item[campoId] || 0), 0) + 1;
-}
-
-const Usuarios = {
-    listar: () => leer(DB_KEYS.usuarios),
-    buscarPorCorreo: (correo) => Usuarios.listar().find(u => u.correo.toLowerCase() === (correo || '').toLowerCase())
-};
-
 const Mascotas = {
-    listar: () => leer(DB_KEYS.mascotas),
-    listarPorEstado: (estado) => Mascotas.listar().filter(m => m.estado === estado),
-    buscarPorId: (id) => Mascotas.listar().find(m => m.idMascota === Number(id)),
-    guardar: (mascota) => {
-        const lista = Mascotas.listar();
+    async listar() {
+        const { data, error } = await db.from('mascotas')
+            .select('idMascota:id_mascota, nombre, especie, raza, edad, estado, imagenUrl:imagen_url')
+            .order('id_mascota');
+        if (error) { console.error(error); return []; }
+        return data;
+    },
+    async listarPorEstado(estado) {
+        const { data, error } = await db.from('mascotas')
+            .select('idMascota:id_mascota, nombre, especie, raza, edad, estado, imagenUrl:imagen_url')
+            .eq('estado', estado)
+            .order('id_mascota');
+        if (error) { console.error(error); return []; }
+        return data;
+    },
+    async buscarPorId(id) {
+        const { data, error } = await db.from('mascotas')
+            .select('idMascota:id_mascota, nombre, especie, raza, edad, estado, imagenUrl:imagen_url')
+            .eq('id_mascota', Number(id))
+            .maybeSingle();
+        if (error) { console.error(error); return null; }
+        return data;
+    },
+    async guardar(mascota) {
+        const fila = {
+            nombre: mascota.nombre,
+            especie: mascota.especie,
+            raza: mascota.raza || null,
+            edad: mascota.edad,
+            estado: mascota.estado || 'DISPONIBLE',
+            imagen_url: mascota.imagenUrl || null
+        };
+        const columnas = 'idMascota:id_mascota, nombre, especie, raza, edad, estado, imagenUrl:imagen_url';
         if (mascota.idMascota) {
-            const idx = lista.findIndex(m => m.idMascota === Number(mascota.idMascota));
-            if (idx >= 0) lista[idx] = { ...lista[idx], ...mascota, idMascota: Number(mascota.idMascota) };
-        } else {
-            mascota.idMascota = siguienteId(lista, 'idMascota');
-            if (!mascota.estado) mascota.estado = 'DISPONIBLE';
-            lista.push(mascota);
+            const { data, error } = await db.from('mascotas')
+                .update(fila)
+                .eq('id_mascota', Number(mascota.idMascota))
+                .select(columnas)
+                .single();
+            if (error) { console.error(error); return null; }
+            return data;
         }
-        escribir(DB_KEYS.mascotas, lista);
-        return mascota;
+        const { data, error } = await db.from('mascotas')
+            .insert(fila)
+            .select(columnas)
+            .single();
+        if (error) { console.error(error); return null; }
+        return data;
     },
-    cambiarEstado: (id, nuevoEstado) => {
-        const lista = Mascotas.listar();
-        const m = lista.find(x => x.idMascota === Number(id));
-        if (m) { m.estado = nuevoEstado; escribir(DB_KEYS.mascotas, lista); }
+    async cambiarEstado(id, nuevoEstado) {
+        const { error } = await db.from('mascotas')
+            .update({ estado: nuevoEstado })
+            .eq('id_mascota', Number(id));
+        if (error) console.error(error);
     },
-    eliminar: (id) => {
-        escribir(DB_KEYS.mascotas, Mascotas.listar().filter(m => m.idMascota !== Number(id)));
+    async eliminar(id) {
+        const { error } = await db.from('mascotas').delete().eq('id_mascota', Number(id));
+        if (error) console.error(error);
     }
 };
 
 const Productos = {
-    listar: () => leer(DB_KEYS.productos),
-    listarPorCategoria: (categoria) => Productos.listar().filter(p => p.categoria === categoria),
-    listarConStock: () => Productos.listar().filter(p => p.stock > 0),
-    buscarPorId: (id) => Productos.listar().find(p => p.idProducto === Number(id)),
-    guardar: (producto) => {
-        const lista = Productos.listar();
-        producto.precio = Number(producto.precio);
-        producto.stock = Number(producto.stock);
+    async listar() {
+        const { data, error } = await db.from('productos')
+            .select('idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url')
+            .order('id_producto');
+        if (error) { console.error(error); return []; }
+        return data;
+    },
+    async listarPorCategoria(categoria) {
+        const { data, error } = await db.from('productos')
+            .select('idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url')
+            .eq('categoria', categoria)
+            .order('id_producto');
+        if (error) { console.error(error); return []; }
+        return data;
+    },
+    async listarConStock() {
+        const { data, error } = await db.from('productos')
+            .select('idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url')
+            .gt('stock', 0)
+            .order('id_producto');
+        if (error) { console.error(error); return []; }
+        return data;
+    },
+    async buscarPorId(id) {
+        const { data, error } = await db.from('productos')
+            .select('idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url')
+            .eq('id_producto', Number(id))
+            .maybeSingle();
+        if (error) { console.error(error); return null; }
+        return data;
+    },
+    async guardar(producto) {
+        const fila = {
+            nombre: producto.nombre,
+            categoria: producto.categoria,
+            precio: Number(producto.precio),
+            stock: Number(producto.stock),
+            imagen_url: producto.imagenUrl || null
+        };
+        const columnas = 'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url';
         if (producto.idProducto) {
-            const idx = lista.findIndex(p => p.idProducto === Number(producto.idProducto));
-            if (idx >= 0) lista[idx] = { ...lista[idx], ...producto, idProducto: Number(producto.idProducto) };
-        } else {
-            producto.idProducto = siguienteId(lista, 'idProducto');
-            lista.push(producto);
+            const { data, error } = await db.from('productos')
+                .update(fila)
+                .eq('id_producto', Number(producto.idProducto))
+                .select(columnas)
+                .single();
+            if (error) { console.error(error); return null; }
+            return data;
         }
-        escribir(DB_KEYS.productos, lista);
-        return producto;
+        const { data, error } = await db.from('productos')
+            .insert(fila)
+            .select(columnas)
+            .single();
+        if (error) { console.error(error); return null; }
+        return data;
     },
-    actualizarStock: (id, nuevoStock) => {
-        const lista = Productos.listar();
-        const p = lista.find(x => x.idProducto === Number(id));
-        if (p) { p.stock = nuevoStock; escribir(DB_KEYS.productos, lista); }
+    async actualizarStock(id, nuevoStock) {
+        const { error } = await db.from('productos')
+            .update({ stock: nuevoStock })
+            .eq('id_producto', Number(id));
+        if (error) console.error(error);
     },
-    eliminar: (id) => {
-        escribir(DB_KEYS.productos, Productos.listar().filter(p => p.idProducto !== Number(id)));
+    async eliminar(id) {
+        const { error } = await db.from('productos').delete().eq('id_producto', Number(id));
+        if (error) console.error(error);
     }
 };
 
-const Solicitudes = {
-    listar: () => leer(DB_KEYS.solicitudes).sort((a, b) => new Date(b.fecha) - new Date(a.fecha)),
-    listarPorEstado: (estado) => Solicitudes.listar().filter(s => s.estado === estado),
-    listarPorUsuario: (idUsuario) => Solicitudes.listar().filter(s => s.idUsuario === Number(idUsuario)),
-    buscarPorId: (id) => leer(DB_KEYS.solicitudes).find(s => s.idSolicitud === Number(id)),
+function mapSolicitud(row) {
+    return {
+        idSolicitud: row.idSolicitud,
+        idUsuario: row.idUsuario,
+        nombreUsuario: row.perfiles ? row.perfiles.nombre : 'Usuario eliminado',
+        tipo: row.tipo,
+        refId: row.refId,
+        cantidad: row.cantidad,
+        fecha: row.fecha,
+        estado: row.estado
+    };
+}
 
-    crear: (solicitud) => {
-        const lista = leer(DB_KEYS.solicitudes);
-        solicitud.idSolicitud = siguienteId(lista, 'idSolicitud');
-        solicitud.fecha = new Date().toISOString();
-        solicitud.estado = 'PENDIENTE';
-        lista.push(solicitud);
-        escribir(DB_KEYS.solicitudes, lista);
-        return solicitud;
+const Solicitudes = {
+    async listar() {
+        const { data, error } = await db.from('solicitudes')
+            .select('idSolicitud:id_solicitud, idUsuario:id_usuario, tipo, refId:ref_id, cantidad, fecha, estado, perfiles(nombre)')
+            .order('fecha', { ascending: false });
+        if (error) { console.error(error); return []; }
+        return data.map(mapSolicitud);
+    },
+    async listarPorEstado(estado) {
+        const todas = await Solicitudes.listar();
+        return todas.filter(s => s.estado === estado);
+    },
+    async listarPorUsuario(idUsuario) {
+        const { data, error } = await db.from('solicitudes')
+            .select('idSolicitud:id_solicitud, idUsuario:id_usuario, tipo, refId:ref_id, cantidad, fecha, estado, perfiles(nombre)')
+            .eq('id_usuario', idUsuario)
+            .order('fecha', { ascending: false });
+        if (error) { console.error(error); return []; }
+        return data.map(mapSolicitud);
+    },
+    async buscarPorId(id) {
+        const { data, error } = await db.from('solicitudes')
+            .select('idSolicitud:id_solicitud, idUsuario:id_usuario, tipo, refId:ref_id, cantidad, fecha, estado, perfiles(nombre)')
+            .eq('id_solicitud', Number(id))
+            .maybeSingle();
+        if (error) { console.error(error); return null; }
+        return data ? mapSolicitud(data) : null;
     },
 
-    descripcion: (solicitud) => {
+    async descripcion(solicitud) {
         if (solicitud.tipo === 'ADOPCION') {
-            const m = Mascotas.buscarPorId(solicitud.refId);
-            return m ? `${m.nombre} (${m.especie})` : 'Mascota eliminada';
+            const m = await Mascotas.buscarPorId(solicitud.refId);
+            return m ? m.nombre + ' (' + m.especie + ')' : 'Mascota eliminada';
         }
-        const p = Productos.buscarPorId(solicitud.refId);
+        const p = await Productos.buscarPorId(solicitud.refId);
         return p ? p.nombre : 'Producto eliminado';
     },
 
-    crearSolicitudAdopcion: (usuario, idMascota) => {
-        const mascota = Mascotas.buscarPorId(idMascota);
+    async crearSolicitudAdopcion(usuario, idMascota) {
+        const mascota = await Mascotas.buscarPorId(idMascota);
         if (!mascota) return 'La mascota no existe.';
         if (mascota.estado !== 'DISPONIBLE') return 'Esa mascota ya no esta disponible.';
 
-        Solicitudes.crear({
-            idUsuario: usuario.idUsuario,
-            nombreUsuario: usuario.nombre,
+        const { error } = await db.from('solicitudes').insert({
+            id_usuario: usuario.idUsuario,
             tipo: 'ADOPCION',
-            refId: Number(idMascota),
+            ref_id: Number(idMascota),
             cantidad: 1
         });
-        Mascotas.cambiarEstado(idMascota, 'EN_PROCESO');
+        if (error) { console.error(error); return 'No se pudo registrar la solicitud.'; }
+
+        await Mascotas.cambiarEstado(idMascota, 'EN_PROCESO');
         return null;
     },
 
-    crearSolicitudCompra: (usuario, idProducto, cantidad) => {
-        const producto = Productos.buscarPorId(idProducto);
+    async crearSolicitudCompra(usuario, idProducto, cantidad) {
+        const producto = await Productos.buscarPorId(idProducto);
         if (!producto) return 'El producto no existe.';
         cantidad = Number(cantidad);
         if (!cantidad || cantidad < 1) return 'La cantidad debe ser al menos 1.';
-        if (producto.stock < cantidad) return `No hay stock suficiente (disponible: ${producto.stock}).`;
+        if (producto.stock < cantidad) return 'No hay stock suficiente (disponible: ' + producto.stock + ').';
 
-        Solicitudes.crear({
-            idUsuario: usuario.idUsuario,
-            nombreUsuario: usuario.nombre,
+        const { error } = await db.from('solicitudes').insert({
+            id_usuario: usuario.idUsuario,
             tipo: 'COMPRA',
-            refId: Number(idProducto),
-            cantidad
+            ref_id: Number(idProducto),
+            cantidad: cantidad
         });
+        if (error) { console.error(error); return 'No se pudo registrar la solicitud.'; }
         return null;
     },
 
-    aprobar: (idSolicitud) => {
-        const lista = leer(DB_KEYS.solicitudes);
-        const solicitud = lista.find(s => s.idSolicitud === Number(idSolicitud));
+    async aprobar(idSolicitud) {
+        const solicitud = await Solicitudes.buscarPorId(idSolicitud);
         if (!solicitud) return 'La solicitud no existe.';
         if (solicitud.estado !== 'PENDIENTE') return 'Esta solicitud ya fue procesada.';
 
         if (solicitud.tipo === 'ADOPCION') {
-            const mascota = Mascotas.buscarPorId(solicitud.refId);
+            const mascota = await Mascotas.buscarPorId(solicitud.refId);
             if (!mascota) return 'La mascota ya no existe.';
-            Mascotas.cambiarEstado(solicitud.refId, 'ADOPTADO');
+            await Mascotas.cambiarEstado(solicitud.refId, 'ADOPTADO');
         } else {
-            const producto = Productos.buscarPorId(solicitud.refId);
+            const producto = await Productos.buscarPorId(solicitud.refId);
             if (!producto) return 'El producto ya no existe.';
             if (producto.stock < solicitud.cantidad) return 'No hay stock suficiente para aprobar esta compra.';
-            Productos.actualizarStock(solicitud.refId, producto.stock - solicitud.cantidad);
+            await Productos.actualizarStock(solicitud.refId, producto.stock - solicitud.cantidad);
         }
-        solicitud.estado = 'APROBADA';
-        escribir(DB_KEYS.solicitudes, lista);
+
+        const { error } = await db.from('solicitudes')
+            .update({ estado: 'APROBADA' })
+            .eq('id_solicitud', Number(idSolicitud));
+        if (error) { console.error(error); return 'No se pudo aprobar la solicitud.'; }
         return null;
     },
 
-    rechazar: (idSolicitud) => {
-        const lista = leer(DB_KEYS.solicitudes);
-        const solicitud = lista.find(s => s.idSolicitud === Number(idSolicitud));
+    async rechazar(idSolicitud) {
+        const solicitud = await Solicitudes.buscarPorId(idSolicitud);
         if (!solicitud) return 'La solicitud no existe.';
         if (solicitud.estado !== 'PENDIENTE') return 'Esta solicitud ya fue procesada.';
 
         if (solicitud.tipo === 'ADOPCION') {
-            const mascota = Mascotas.buscarPorId(solicitud.refId);
+            const mascota = await Mascotas.buscarPorId(solicitud.refId);
             if (mascota && mascota.estado === 'EN_PROCESO') {
-                Mascotas.cambiarEstado(solicitud.refId, 'DISPONIBLE');
+                await Mascotas.cambiarEstado(solicitud.refId, 'DISPONIBLE');
             }
         }
-        solicitud.estado = 'RECHAZADA';
-        escribir(DB_KEYS.solicitudes, lista);
+
+        const { error } = await db.from('solicitudes')
+            .update({ estado: 'RECHAZADA' })
+            .eq('id_solicitud', Number(idSolicitud));
+        if (error) { console.error(error); return 'No se pudo rechazar la solicitud.'; }
         return null;
     }
 };
-
-initDB();

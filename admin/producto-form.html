@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -76,7 +75,7 @@
                 <div id="contenedorArchivo" class="d-none">
                     <input type="file" id="imagenArchivo" class="form-control" accept="image/*">
                     <small class="text-muted">
-                        La imagen solo se mostrará como vista previa temporal.
+                        La imagen se sube al almacenamiento del proyecto al guardar.
                     </small>
                 </div>
             </div>
@@ -91,8 +90,10 @@
                 </div>
             </div>
 
+            <div id="estadoSubida" class="mb-3 text-muted small"></div>
+
             <div class="d-flex gap-2">
-                <button type="submit" class="btn text-white" style="background-color:#ff8c42;">
+                <button type="submit" id="btnGuardar" class="btn text-white" style="background-color:#ff8c42;">
                     <i class="bi bi-save"></i> Guardar
                 </button>
 
@@ -116,18 +117,16 @@
 <script>
     const usuario = Auth.requireAdmin();
 
-    let imagenTemporal = '';
-
     if (usuario) {
         UI.navbarAdmin(usuario);
         cargarSiEsEdicion();
     }
 
-    function cargarSiEsEdicion() {
+    async function cargarSiEsEdicion() {
         const id = new URLSearchParams(window.location.search).get('id');
         if (!id) return;
 
-        const producto = Productos.buscarPorId(id);
+        const producto = await Productos.buscarPorId(id);
 
         if (!producto) {
             UI.setFlash('error', 'El producto indicado no existe.');
@@ -170,7 +169,6 @@
         document.getElementById('contenedorArchivo').classList.add('d-none');
 
         document.getElementById('imagenArchivo').value = '';
-        imagenTemporal = '';
 
         const url = document.getElementById('imagenUrl').value.trim();
 
@@ -203,7 +201,6 @@
         const archivo = this.files[0];
 
         if (!archivo) {
-            imagenTemporal = '';
             ocultarPreview();
             return;
         }
@@ -211,7 +208,6 @@
         if (!archivo.type.startsWith('image/')) {
             alert('Selecciona un archivo de imagen válido.');
             this.value = '';
-            imagenTemporal = '';
             ocultarPreview();
             return;
         }
@@ -219,14 +215,13 @@
         const lector = new FileReader();
 
         lector.onload = function (e) {
-            imagenTemporal = e.target.result;
-            mostrarPreview(imagenTemporal);
+            mostrarPreview(e.target.result);
         };
 
         lector.readAsDataURL(archivo);
     });
 
-    document.getElementById('formProducto').addEventListener('submit', function (e) {
+    document.getElementById('formProducto').addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const nombre = document.getElementById('nombre').value.trim();
@@ -251,16 +246,47 @@
 
         if (!valido) return;
 
+        const boton = document.getElementById('btnGuardar');
+        const estado = document.getElementById('estadoSubida');
+        let imagenUrl = document.getElementById('imagenUrl').value.trim();
+
+        const archivo = document.getElementById('imagenArchivo').files[0];
+
+        if (archivo) {
+            boton.disabled = true;
+            estado.textContent = 'Subiendo imagen...';
+
+            const nombreArchivo = Date.now() + '-' + archivo.name;
+
+            const { error: errorSubida } = await db.storage
+                .from('productos')
+                .upload(nombreArchivo, archivo);
+
+            if (errorSubida) {
+                estado.textContent = '';
+                boton.disabled = false;
+                alert('No se pudo subir la imagen: ' + errorSubida.message);
+                return;
+            }
+
+            const { data: publica } = db.storage
+                .from('productos')
+                .getPublicUrl(nombreArchivo);
+
+            imagenUrl = publica.publicUrl;
+            estado.textContent = '';
+        }
+
         const producto = {
             idProducto: document.getElementById('idProducto').value || null,
             nombre,
             categoria,
             precio: Number(precio),
             stock: Number(stock),
-            imagenUrl: document.getElementById('imagenUrl').value.trim()
+            imagenUrl
         };
 
-        Productos.guardar(producto);
+        await Productos.guardar(producto);
 
         UI.setFlash('exito', 'Producto guardado correctamente.');
         window.location.href = 'productos.html';

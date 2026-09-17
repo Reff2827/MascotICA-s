@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -113,12 +112,12 @@
         cargarSiEsEdicion();
     }
 
-    function cargarSiEsEdicion() {
+    async function cargarSiEsEdicion() {
         const id = new URLSearchParams(window.location.search).get('id');
 
         if (!id) return;
 
-        const mascota = Mascotas.buscarPorId(id);
+        const mascota = await Mascotas.buscarPorId(id);
 
         if (!mascota) {
             UI.setFlash('error', 'La mascota indicada no existe.');
@@ -154,7 +153,7 @@
             mascota.imagenUrl || '';
     }
 
-    document.getElementById('formMascota').addEventListener('submit', function (e) {
+    document.getElementById('formMascota').addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const nombre = document.getElementById('nombre').value.trim();
@@ -191,7 +190,7 @@
             imagenUrl: document.getElementById('imagenUrl').value.trim()
         };
 
-        Mascotas.guardar(mascota);
+        await Mascotas.guardar(mascota);
 
         UI.setFlash('exito', 'Mascota guardada correctamente.');
 

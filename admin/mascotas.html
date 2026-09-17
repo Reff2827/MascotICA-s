@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -27,7 +26,7 @@
         Gestion de mascotas
     </h3>
 
-    <a
+    
         href="mascota-form.html"
         class="btn text-white"
         style="background-color:#ff8c42;">
@@ -80,14 +79,14 @@
     function pintarFiltro() {
         const activo = filtroActivo();
         const botones = [
-            `<a
+            `
                 href="mascotas.html"
                 class="btn btn-sm ${!activo ? 'btn-dark' : 'btn-outline-dark'}">
                 Todas
             </a>`
         ].concat(
             ESTADOS.map(e => `
-                <a
+                
                     href="mascotas.html?estado=${e}"
                     class="btn btn-sm ${
                         activo === e
@@ -104,11 +103,11 @@
 
     }
 
-    function pintarLista() {
+    async function pintarLista() {
         const activo = filtroActivo();
         const mascotas = activo
-            ? Mascotas.listarPorEstado(activo)
-            : Mascotas.listar();
+            ? await Mascotas.listarPorEstado(activo)
+            : await Mascotas.listar();
         const cont =
             document.getElementById('listaMascotas');
         if (mascotas.length === 0) {
@@ -132,7 +131,6 @@
                         alt="Foto de ${UI.esc(m.nombre)}"
                     >
                     <div class="card-body">
-                        <!-- Nombre y estado -->
                         <div class="d-flex justify-content-between align-items-start">
                             <h5 class="card-title mb-1">
                                 ${UI.esc(m.nombre)}
@@ -141,7 +139,6 @@
                                 ${m.estado}
                             </span>
                         </div>
-                        <!-- Información -->
                         <p class="text-muted mb-1">
                             <i class="bi bi-paw"></i>
                             ${UI.esc(m.especie)}
@@ -155,7 +152,6 @@
                             <strong>Edad:</strong>
                             ${UI.esc(m.edad)}
                         </p>
-                        <!-- Cambiar estado -->
                         <div class="d-flex gap-1 mb-2">
                             <select
                                 class="form-select form-select-sm"
@@ -182,9 +178,8 @@
                                 <i class="bi bi-arrow-repeat"></i>
                             </button>
                         </div>
-                        <!-- Acciones -->
                         <div class="d-flex gap-2">
-                            <a
+                            
                                 href="mascota-form.html?id=${m.idMascota}"
                                 class="btn btn-sm btn-outline-primary flex-fill">
 
@@ -208,12 +203,12 @@
             '[data-action="aplicar-estado"]'
         ).forEach(btn => {
 
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 const id = btn.dataset.id;
                 const select = cont.querySelector(
                     `select[data-id="${id}"]`
                 );
-                Mascotas.cambiarEstado(
+                await Mascotas.cambiarEstado(
                     id,
                     select.value
                 );
@@ -228,13 +223,13 @@
         cont.querySelectorAll(
             '[data-action="eliminar"]'
         ).forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 if (
                     confirm(
                         `¿Eliminar a ${btn.dataset.nombre}?`
                     )
                 ) {
-                    Mascotas.eliminar(
+                    await Mascotas.eliminar(
                         btn.dataset.id
                     );
                     UI.setFlash(
