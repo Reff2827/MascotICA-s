@@ -50,8 +50,8 @@ const UI = {
         document.getElementById('btnLogout').addEventListener('click', () => UI.logout());
     },
 
-    logout() {
-        Auth.logout();
+    async logout() {
+        await Auth.logout();
         window.location.href = Auth.raiz() + 'login.html';
     },
 

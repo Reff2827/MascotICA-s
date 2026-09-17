@@ -42,13 +42,13 @@
 
         <div id="panelPin" style="display:none;">
             <p class="small text-muted">
-                Enviamos un codigo de 6 digitos a <strong id="correoPin"></strong>.
+                Enviamos un codigo de 8 digitos a <strong id="correoPin"></strong>.
                 Revisa tu bandeja de entrada.
             </p>
             <form id="formPin">
                 <div class="mb-3">
                     <label class="form-label">Codigo de verificacion</label>
-                    <input type="text" id="codigoPin" class="form-control text-center" maxlength="6" placeholder="000000" required>
+                    <input type="text" id="codigoPin" class="form-control text-center" maxlength="8" placeholder="00000000" inputmode="numeric" required>
                 </div>
                 <button type="submit" id="btnVerificar" class="btn w-100 text-white" style="background-color:#ff8c42;">
                     <i class="bi bi-shield-check"></i> Verificar codigo
@@ -173,12 +173,19 @@
         const boton = document.getElementById('btnVerificar');
         const codigo = document.getElementById('codigoPin').value.trim();
 
+        if (!/^\d{8}$/.test(codigo)) {
+            mostrar('error', 'El codigo debe tener exactamente 8 digitos.');
+            return;
+        }
+
         boton.disabled = true;
         limpiarMensaje();
 
         const resultado = await Auth.verificarPin(correoPendiente, codigo);
+
         if (resultado.error) {
-            mostrar('error', 'Codigo invalido o expirado.');
+            mostrar('error', 'Error de Supabase: ' + resultado.error);
+            console.log('Error Supabase:', resultado.error);
             boton.disabled = false;
             return;
         }

@@ -42,17 +42,18 @@
         pintarTabla();
     }
 
-    function pintarTabla() {
-        const solicitudes = Solicitudes.listarPorUsuario(usuario.idUsuario);
+    async function pintarTabla() {
+        const solicitudes = await Solicitudes.listarPorUsuario(usuario.idUsuario);
+        const descripciones = await Promise.all(solicitudes.map(s => Solicitudes.descripcion(s)));
         const tbody = document.getElementById('filasSolicitudes');
         document.getElementById('sinSolicitudes').classList.toggle('d-none', solicitudes.length > 0);
 
-        tbody.innerHTML = solicitudes.map(s => `
+        tbody.innerHTML = solicitudes.map((s, i) => `
             <tr>
                 <td>${s.tipo === 'ADOPCION'
                     ? '<span class="text-danger"><i class="bi bi-heart-fill"></i> Adopcion</span>'
                     : '<span class="text-primary"><i class="bi bi-cart-fill"></i> Compra</span>'}</td>
-                <td>${UI.esc(Solicitudes.descripcion(s))}</td>
+                <td>${UI.esc(descripciones[i])}</td>
                 <td>${s.cantidad}</td>
                 <td>${UI.formatoFecha(s.fecha)}</td>
                 <td><span class="badge badge-estado-${s.estado}">${s.estado}</span></td>

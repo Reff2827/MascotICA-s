@@ -85,12 +85,15 @@
         cargarDashboard();
     }
 
-    function cargarDashboard() {
-        const mascotas = Mascotas.listar();
+    async function cargarDashboard() {
+        const [mascotas, productos, pendientes] = await Promise.all([
+            Mascotas.listar(),
+            Productos.listar(),
+            Solicitudes.listarPorEstado('PENDIENTE')
+        ]);
+
         const disponibles = mascotas.filter(m => m.estado === 'DISPONIBLE').length;
         const adoptadas = mascotas.filter(m => m.estado === 'ADOPTADO').length;
-        const productos = Productos.listar();
-        const pendientes = Solicitudes.listarPorEstado('PENDIENTE');
 
         document.getElementById('statTotalMascotas').textContent = mascotas.length;
         document.getElementById('statDisponiblesAdoptadas').textContent = `${disponibles} / ${adoptadas}`;
