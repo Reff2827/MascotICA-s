@@ -26,7 +26,7 @@
         Gestion de mascotas
     </h3>
 
-    
+    <a
         href="mascota-form.html"
         class="btn text-white"
         style="background-color:#ff8c42;">
@@ -80,13 +80,13 @@
         const activo = filtroActivo();
         const botones = [
             `
-                href="mascotas.html"
+                <a href="mascotas.html"
                 class="btn btn-sm ${!activo ? 'btn-dark' : 'btn-outline-dark'}">
                 Todas
             </a>`
         ].concat(
             ESTADOS.map(e => `
-                
+                <a
                     href="mascotas.html?estado=${e}"
                     class="btn btn-sm ${
                         activo === e
@@ -179,7 +179,7 @@
                             </button>
                         </div>
                         <div class="d-flex gap-2">
-                            
+                            <a
                                 href="mascota-form.html?id=${m.idMascota}"
                                 class="btn btn-sm btn-outline-primary flex-fill">
 
