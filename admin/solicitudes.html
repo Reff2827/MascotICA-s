@@ -36,6 +36,21 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalVerEvaluacion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-clipboard-heart"></i> Evaluación de adopción responsable</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="contenidoEvaluacion"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabaseClient.js"></script>
@@ -45,6 +60,8 @@
 <script>
     const usuario = Auth.requireAdmin();
     const ESTADOS = ['PENDIENTE', 'APROBADA', 'RECHAZADA'];
+    let solicitudesActuales = [];
+    const modalVerEvaluacion = new bootstrap.Modal(document.getElementById('modalVerEvaluacion'));
 
     if (usuario) {
         UI.navbarAdmin(usuario);
@@ -64,9 +81,19 @@
         document.getElementById('filtroEstado').innerHTML = botones.join('');
     }
 
+    const ETIQUETAS_EVAL = {
+        vivienda: 'Tipo de vivienda',
+        espacioAdecuado: 'Espacio adecuado',
+        horasDisponibles: 'Horas disponibles al dia',
+        experienciaPrevia: 'Experiencia previa con mascotas',
+        acuerdoHogar: 'Acuerdo de todo el hogar',
+        motivo: 'Motivo de la adopcion'
+    };
+
     async function pintarTabla() {
         const activo = filtroActivo();
         const solicitudes = activo ? await Solicitudes.listarPorEstado(activo) : await Solicitudes.listar();
+        solicitudesActuales = solicitudes;
         const descripciones = await Promise.all(solicitudes.map(s => Solicitudes.descripcion(s)));
         const tbody = document.getElementById('filasSolicitudes');
         document.getElementById('sinSolicitudes').classList.toggle('d-none', solicitudes.length > 0);
@@ -83,13 +110,35 @@
                 <td>${UI.formatoFecha(s.fecha)}</td>
                 <td><span class="badge badge-estado-${s.estado}">${s.estado}</span></td>
                 <td class="text-end">
-                    ${s.estado === 'PENDIENTE' ? `
-                        <div class="d-flex gap-1 justify-content-end">
+                    <div class="d-flex gap-1 justify-content-end flex-wrap">
+                        ${s.tipo === 'ADOPCION' ? `
+                            <button class="btn btn-sm btn-outline-secondary" data-id="${s.idSolicitud}" data-action="ver-evaluacion">
+                                <i class="bi bi-clipboard-heart"></i> Evaluacion
+                            </button>` : ''}
+                        ${s.estado === 'PENDIENTE' ? `
                             <button class="btn btn-sm btn-success" data-id="${s.idSolicitud}" data-action="aprobar"><i class="bi bi-check-lg"></i> Aprobar</button>
                             <button class="btn btn-sm btn-outline-danger" data-id="${s.idSolicitud}" data-action="rechazar"><i class="bi bi-x-lg"></i> Rechazar</button>
-                        </div>` : `<span class="text-muted small">Procesada</span>`}
+                        ` : `<span class="text-muted small align-self-center">Procesada</span>`}
+                    </div>
                 </td>
             </tr>`).join('');
+
+        tbody.querySelectorAll('[data-action="ver-evaluacion"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const s = solicitudesActuales.find(x => String(x.idSolicitud) === btn.dataset.id);
+                const cont = document.getElementById('contenidoEvaluacion');
+                if (!s || !s.evaluacion) {
+                    cont.innerHTML = `<p class="text-muted mb-0">Esta solicitud no tiene una evaluacion registrada.</p>`;
+                } else {
+                    cont.innerHTML = Object.keys(ETIQUETAS_EVAL).map(clave => `
+                        <p class="mb-2">
+                            <strong>${ETIQUETAS_EVAL[clave]}:</strong><br>
+                            ${UI.esc(s.evaluacion[clave] || 'No especificado')}
+                        </p>`).join('');
+                }
+                modalVerEvaluacion.show();
+            });
+        });
 
         tbody.querySelectorAll('[data-action="aprobar"]').forEach(btn => {
             btn.addEventListener('click', async () => {

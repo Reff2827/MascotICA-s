@@ -84,6 +84,14 @@ const Productos = {
         if (error) { console.error(error); return []; }
         return data;
     },
+    async listarStockBajo(umbral = 5) {
+        const { data, error } = await db.from('productos')
+            .select('idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url')
+            .lte('stock', umbral)
+            .order('stock');
+        if (error) { console.error(error); return []; }
+        return data;
+    },
     async buscarPorId(id) {
         const { data, error } = await db.from('productos')
             .select('idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url')
@@ -138,14 +146,15 @@ function mapSolicitud(row) {
         refId: row.refId,
         cantidad: row.cantidad,
         fecha: row.fecha,
-        estado: row.estado
+        estado: row.estado,
+        evaluacion: row.evaluacion || null
     };
 }
 
 const Solicitudes = {
     async listar() {
         const { data, error } = await db.from('solicitudes')
-            .select('idSolicitud:id_solicitud, idUsuario:id_usuario, tipo, refId:ref_id, cantidad, fecha, estado, perfiles(nombre)')
+            .select('idSolicitud:id_solicitud, idUsuario:id_usuario, tipo, refId:ref_id, cantidad, fecha, estado, evaluacion, perfiles(nombre)')
             .order('fecha', { ascending: false });
         if (error) { console.error(error); return []; }
         return data.map(mapSolicitud);
@@ -156,7 +165,7 @@ const Solicitudes = {
     },
     async listarPorUsuario(idUsuario) {
         const { data, error } = await db.from('solicitudes')
-            .select('idSolicitud:id_solicitud, idUsuario:id_usuario, tipo, refId:ref_id, cantidad, fecha, estado, perfiles(nombre)')
+            .select('idSolicitud:id_solicitud, idUsuario:id_usuario, tipo, refId:ref_id, cantidad, fecha, estado, evaluacion, perfiles(nombre)')
             .eq('id_usuario', idUsuario)
             .order('fecha', { ascending: false });
         if (error) { console.error(error); return []; }
@@ -164,7 +173,7 @@ const Solicitudes = {
     },
     async buscarPorId(id) {
         const { data, error } = await db.from('solicitudes')
-            .select('idSolicitud:id_solicitud, idUsuario:id_usuario, tipo, refId:ref_id, cantidad, fecha, estado, perfiles(nombre)')
+            .select('idSolicitud:id_solicitud, idUsuario:id_usuario, tipo, refId:ref_id, cantidad, fecha, estado, evaluacion, perfiles(nombre)')
             .eq('id_solicitud', Number(id))
             .maybeSingle();
         if (error) { console.error(error); return null; }
@@ -180,7 +189,7 @@ const Solicitudes = {
         return p ? p.nombre : 'Producto eliminado';
     },
 
-    async crearSolicitudAdopcion(usuario, idMascota) {
+    async crearSolicitudAdopcion(usuario, idMascota, evaluacion) {
         const mascota = await Mascotas.buscarPorId(idMascota);
         if (!mascota) return 'La mascota no existe.';
         if (mascota.estado !== 'DISPONIBLE') return 'Esa mascota ya no esta disponible.';
@@ -189,7 +198,8 @@ const Solicitudes = {
             id_usuario: usuario.idUsuario,
             tipo: 'ADOPCION',
             ref_id: Number(idMascota),
-            cantidad: 1
+            cantidad: 1,
+            evaluacion: evaluacion || null
         });
         if (error) { console.error(error); return 'No se pudo registrar la solicitud.'; }
 

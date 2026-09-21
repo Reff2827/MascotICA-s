@@ -27,7 +27,12 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Contraseña</label>
-                    <input type="password" id="password" class="form-control" placeholder="********" required>
+                    <div class="input-group">
+                        <input type="password" id="password" class="form-control" placeholder="********" required>
+                        <button type="button" class="btn btn-outline-secondary" data-toggle-password="password">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" id="btnIngresar" class="btn w-100 text-white" style="background-color:#ff8c42;">
                     <i class="bi bi-box-arrow-in-right"></i> Ingresar
@@ -72,7 +77,12 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Contraseña</label>
-                    <input type="password" id="regPassword" class="form-control" placeholder="Minimo 6 caracteres" required>
+                    <div class="input-group">
+                        <input type="password" id="regPassword" class="form-control" placeholder="Minimo 6 caracteres" required>
+                        <button type="button" class="btn btn-outline-secondary" data-toggle-password="regPassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" id="btnRegistrar" class="btn w-100 text-white" style="background-color:#ff8c42;">
                     <i class="bi bi-person-plus"></i> Crear cuenta
@@ -96,6 +106,17 @@
     const panelRegistro = document.getElementById('panelRegistro');
     const mensaje = document.getElementById('mensajeLogin');
     let correoPendiente = '';
+
+    document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const input = document.getElementById(btn.dataset.togglePassword);
+            const icono = btn.querySelector('i');
+            const oculto = input.type === 'password';
+            input.type = oculto ? 'text' : 'password';
+            icono.classList.toggle('bi-eye', !oculto);
+            icono.classList.toggle('bi-eye-slash', oculto);
+        });
+    });
 
     function mostrar(tipo, texto) {
         const clase = tipo === 'error' ? 'alert-danger' : 'alert-success';
