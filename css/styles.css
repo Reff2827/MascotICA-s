@@ -1138,6 +1138,10 @@ body > .container-fluid {
     background: linear-gradient(150deg, oklch(0.672 0.158 300), oklch(0.528 0.178 288));
 }
 
+.bg-rojo {
+    background: linear-gradient(150deg, oklch(0.702 0.178 25), oklch(0.548 0.185 18));
+}
+
 /* Fichas de mascota y producto */
 .card-mascota,
 .card-producto {
@@ -1813,4 +1817,25 @@ body > .container-fluid > *:nth-child(n+5) { animation-delay: 0.2s; }
         backdrop-filter: none;
         background: white;
     }
+}
+
+.modal-content {
+    background: var(--card-solid);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--border);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .btn-close {
+        filter: invert(1) grayscale(100%);
+    }
+}
+
+:root[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%);
 }

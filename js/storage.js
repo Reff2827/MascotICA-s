@@ -189,21 +189,12 @@ const Solicitudes = {
         return p ? p.nombre : 'Producto eliminado';
     },
 
-    async crearSolicitudAdopcion(usuario, idMascota, evaluacion) {
-        const mascota = await Mascotas.buscarPorId(idMascota);
-        if (!mascota) return 'La mascota no existe.';
-        if (mascota.estado !== 'DISPONIBLE') return 'Esa mascota ya no esta disponible.';
-
-        const { error } = await db.from('solicitudes').insert({
-            id_usuario: usuario.idUsuario,
-            tipo: 'ADOPCION',
-            ref_id: Number(idMascota),
-            cantidad: 1,
-            evaluacion: evaluacion || null
+        async crearSolicitudAdopcion(usuario, idMascota, evaluacion) {
+        const { error } = await db.rpc('solicitar_adopcion', {
+            p_id_mascota: Number(idMascota),
+            p_evaluacion: evaluacion || null
         });
-        if (error) { console.error(error); return 'No se pudo registrar la solicitud.'; }
-
-        await Mascotas.cambiarEstado(idMascota, 'EN_PROCESO');
+        if (error) return error.message;
         return null;
     },
 
