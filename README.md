@@ -1,90 +1,180 @@
-# MascotICA's - Panel Admin (version simplificada Web)
+# MascotICA's
 
-Segundo avance del proyecto: sistema de adopcion de mascotas y venta de
-insumos, reescrito como una aplicacion **100% HTML + CSS + JavaScript**,
-sin backend, sin base de datos externa y sin necesidad de instalar Java,
-Maven ni nada. Los datos se guardan en el propio navegador
-(`localStorage`), y la app conserva **todas las funciones** de la version
-anterior (Spring Boot + Thymeleaf + H2).
+Sistema web para la gestión de adopción de mascotas y venta de productos para mascotas.
 
-## Como ejecutarlo (dar "run")
+El proyecto está desarrollado con **HTML, CSS y JavaScript**, utilizando **Supabase** como servicio backend. Supabase proporciona la autenticación de usuarios, la base de datos PostgreSQL y las políticas de seguridad mediante Row Level Security (RLS).
 
-- **Windows:** doble clic en `run.bat`
-- **Mac:** doble clic en `run.command`
-- **Linux:** doble clic en `run.sh` (o `./run.sh` desde la terminal)
+## Tecnologías utilizadas
 
-Cualquiera de los tres abre automaticamente `index.html` en tu navegador
-por defecto. No hace falta levantar ningun servidor.
+- HTML5
+- CSS3
+- JavaScript
+- Bootstrap 5
+- Bootstrap Icons
+- Supabase
+- PostgreSQL, proporcionado mediante Supabase
+- Supabase Auth para autenticación
+- Supabase Storage para almacenamiento de archivos e imágenes
 
-> Alternativa: tambien puedes abrir `index.html` directamente
-> haciendole doble clic desde el explorador de archivos.
+No es necesario instalar Java, Maven, Spring Boot, MySQL ni PostgreSQL localmente.
 
-## Usuarios de prueba
+## Cómo ejecutar el proyecto
 
-| Rol      | Correo               | Contrasena |
-|----------|-----------------------|------------|
-| Admin    | admin@albergue.com    | admin123   |
-| Cliente  | cliente@correo.com    | 123456     |
+El proyecto puede ejecutarse desde el navegador o mediante un servidor local.
+
+### Opción recomendada
+
+Abrir el proyecto en Visual Studio Code y utilizar una extensión como **Live Server** para ejecutar `index.html`.
+
+Para que las funciones conectadas a Supabase trabajen correctamente, se debe contar con la configuración correspondiente en:
+
+`js/supabaseClient.js`
+
+## Autenticación
+
+La autenticación se realiza mediante **Supabase Auth**.
+
+El proceso de inicio de sesión utiliza:
+
+1. Correo electrónico.
+2. Contraseña.
+3. Código PIN enviado al correo electrónico.
+4. Verificación del código mediante Supabase.
+
+Los perfiles de usuario se almacenan en la tabla `perfiles` y pueden tener uno de los siguientes roles:
+
+- `ADMIN`
+- `CLIENTE`
+
+El registro de nuevos usuarios crea automáticamente su perfil mediante un trigger de Supabase.
+
+## Base de datos
+
+La información principal del sistema se almacena en **PostgreSQL mediante Supabase**.
+
+No es necesario instalar PostgreSQL de forma local, ya que la base de datos es administrada desde el proyecto de Supabase.
+
+### Tablas principales
+
+#### `perfiles`
+
+Almacena la información adicional de los usuarios autenticados.
+
+Campos principales:
+
+- `id`
+- `nombre`
+- `rol`
+
+#### `mascotas`
+
+Almacena las mascotas disponibles para adopción.
+
+Campos principales:
+
+- `id_mascota`
+- `nombre`
+- `especie`
+- `raza`
+- `edad`
+- `estado`
+- `imagen_url`
+
+Estados disponibles:
+
+- `DISPONIBLE`
+- `EN_PROCESO`
+- `ADOPTADO`
+
+#### `productos`
+
+Almacena los productos disponibles para la venta.
+
+Campos principales:
+
+- `id_producto`
+- `nombre`
+- `categoria`
+- `precio`
+- `stock`
+- `imagen_url`
+
+Categorías:
+
+- `ALIMENTO`
+- `HIGIENE`
+
+#### `solicitudes`
+
+Registra las solicitudes realizadas por los clientes.
+
+Campos principales:
+
+- `id_solicitud`
+- `id_usuario`
+- `tipo`
+- `ref_id`
+- `cantidad`
+- `fecha`
+- `estado`
+- `evaluacion`
+
+Tipos de solicitud:
+
+- `ADOPCION`
+- `COMPRA`
+
+Estados:
+
+- `PENDIENTE`
+- `APROBADA`
+- `RECHAZADA`
+
+## Seguridad
+
+El proyecto utiliza **Row Level Security (RLS)** de Supabase.
+
+Las principales reglas son:
+
+- Los usuarios pueden consultar su propio perfil.
+- Los administradores pueden gestionar mascotas y productos.
+- Las mascotas y productos pueden ser consultados públicamente.
+- Los clientes pueden crear sus propias solicitudes.
+- Los clientes pueden consultar sus propias solicitudes.
+- Los administradores pueden consultar y gestionar las solicitudes.
+
+Además, se utiliza la función `es_admin()` para validar los permisos administrativos.
 
 ## Estructura del proyecto
 
-```
-petshop-web/
-├── index.html                 # Punto de entrada, redirige segun sesion
-├── login.html                 # Inicio de sesion
-├── run.bat / run.sh / run.command   # Lanzadores (abren el navegador)
+```text
+Mascoticas/
+├── index.html
+├── login.html
+├── README.md
+│
+├── admin/
+│   ├── dashboard.html
+│   ├── mascotas.html
+│   ├── mascota-form.html
+│   ├── productos.html
+│   ├── producto-form.html
+│   └── solicitudes.html
+│
+├── cliente/
+│   ├── index.html
+│   └── mis-solicitudes.html
+│
 ├── css/
-│   └── styles.css             # Estilos generales de toda la app
+│   └── styles.css
+│
 ├── js/
-│   ├── storage.js             # "Base de datos" en localStorage + CRUD
-│   ├── auth.js                # Sesion y proteccion de rutas por rol
-│   └── ui.js                  # Navbar dinamico, alertas, helpers
-├── admin/                     # Panel de administrador (rol ADMIN)
-│   ├── dashboard.html         # Estadisticas generales
-│   ├── mascotas.html          # Listado + filtro por estado
-│   ├── mascota-form.html      # Alta / edicion de mascota
-│   ├── productos.html         # Listado + filtro por categoria
-│   ├── producto-form.html     # Alta / edicion de producto
-│   └── solicitudes.html       # Aprobar / rechazar solicitudes
-└── catalogo/                  # Vista del cliente (rol CLIENTE)
-    ├── index.html              # Catalogo de mascotas y productos
-    └── mis-solicitudes.html    # Historial de solicitudes propias
-```
-
-## Funciones incluidas
-
-- **Login / Logout** con roles `ADMIN` y `CLIENTE`.
-- **Dashboard admin**: total de mascotas, disponibles/adoptadas,
-  productos en catalogo y solicitudes pendientes.
-- **Mascotas (admin)**: crear, editar, eliminar, filtrar por estado
-  y cambiar estado (`DISPONIBLE`, `EN_PROCESO`, `ADOPTADO`).
-- **Productos (admin)**: crear, editar, eliminar, filtrar por
-  categoria (`ALIMENTO`, `HIGIENE`), control de stock.
-- **Solicitudes (admin)**: listar, filtrar por estado, aprobar o
-  rechazar solicitudes de adopcion/compra.
-- **Catalogo (cliente)**: ver mascotas disponibles y productos con
-  stock, enviar solicitud de adopcion o de compra.
-- **Mis solicitudes (cliente)**: ver el estado de las solicitudes
-  propias.
-- **Reglas de negocio** identicas a la version Spring Boot:
-  - Al solicitar una adopcion, la mascota pasa a `EN_PROCESO`.
-  - Al aprobar la adopcion, pasa a `ADOPTADO`; al rechazarla, vuelve
-    a `DISPONIBLE`.
-  - Al solicitar una compra se valida el stock disponible (no se
-    descuenta todavia).
-  - Al aprobar la compra se descuenta el stock; al rechazarla, no se
-    modifica.
-
-## Nota sobre los datos
-
-Los datos (usuarios, mascotas, productos y solicitudes) se guardan en
-el `localStorage` del navegador que uses, por lo que persisten entre
-sesiones en ese mismo navegador/equipo. Si quieres reiniciar todo a
-los datos de prueba originales, abre la consola del navegador (F12) y
-ejecuta:
-
-```js
-localStorage.clear();
-```
-
-y recarga la pagina.
+│   ├── auth.js
+│   ├── storage.js
+│   ├── supabaseClient.js
+│   ├── ui.js
+│   └── theme.js
+│
+└── img/
+    ├── mascotas/
+    └── productos/
