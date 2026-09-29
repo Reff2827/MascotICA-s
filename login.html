@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Iniciar sesión - MascotICA's</title>
 
     <link
@@ -16,423 +17,511 @@
     >
 
     <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Tema: se carga antes del primer pintado -->
+    <script src="js/theme.js"></script>
 </head>
 
 <body class="login-page">
 
-    <main class="container py-4 py-md-5">
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-8 col-lg-5">
-
-                <div class="card border-0 shadow-sm login-card">
-
-                    <div class="card-body p-4 p-md-5">
-
-                        <div class="text-center mb-4">
-                            <div class="login-logo">
-                                <img
-                                    src="img/logo.png"
-                                    alt="MascotICA's"
-                                    class="login-logo__image"
-                                >
-                            </div>
-
-                            <h1 class="h3 fw-bold mt-3 mb-1">
-                                MascotICA's
-                            </h1>
-
-                            <p class="text-muted mb-0">
-                                Adopción y venta de insumos
-                            </p>
-                        </div>
-
-                        <div id="mensajeLogin"></div>
-
-                        <section id="panelLogin">
-
-                            <form id="formLogin">
-
-                                <div class="mb-3">
-                                    <label for="correo" class="form-label">
-                                        Correo electrónico
-                                    </label>
-
-                                    <input
-                                        type="email"
-                                        class="form-control"
-                                        id="correo"
-                                        autocomplete="email"
-                                        required
-                                    >
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">
-                                        Contraseña
-                                    </label>
-
-                                    <div class="input-group">
-                                        <input
-                                            type="password"
-                                            class="form-control"
-                                            id="password"
-                                            autocomplete="current-password"
-                                            required
-                                        >
-
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-secondary"
-                                            id="btnMostrarPassword"
-                                            aria-label="Mostrar contraseña"
-                                        >
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary-ps w-100"
-                                    id="btnIngresar"
-                                >
-                                    <i class="bi bi-box-arrow-in-right"></i>
-                                    Ingresar
-                                </button>
-
-                            </form>
-
-
-                            <div class="text-center mt-4">
-                                <span class="text-muted">
-                                    ¿No tienes una cuenta?
-                                </span>
-
-                                <button
-                                    type="button"
-                                    class="btn btn-link p-0"
-                                    id="btnIrRegistro"
-                                >
-                                    Regístrate
-                                </button>
-                            </div>
-
-                        </section>
-
-                        <section id="panelPin" class="d-none">
-
-                            <div class="text-center mb-4">
-                                <div class="fs-1 mb-2">
-                                    <i class="bi bi-shield-lock"></i>
-                                </div>
-
-                                <h2 class="h5 fw-bold">
-                                    Verificación de seguridad
-                                </h2>
-
-                                <p class="text-muted mb-0">
-                                    Hemos enviado un código a tu correo.
-                                </p>
-                            </div>
-
-
-                            <form id="formPin">
-
-                                <div class="mb-3">
-                                    <label for="codigoPin" class="form-label">
-                                        Código de verificación
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        class="form-control text-center fs-4"
-                                        id="codigoPin"
-                                        inputmode="numeric"
-                                        autocomplete="one-time-code"
-                                        maxlength="8"
-                                        required
-                                    >
-                                </div>
-
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary-ps w-100"
-                                    id="btnVerificar"
-                                >
-                                    <i class="bi bi-check-circle"></i>
-                                    Verificar código
-                                </button>
-
-                            </form>
-
-
-                            <div class="text-center mt-3">
-                                <button
-                                    type="button"
-                                    class="btn btn-link"
-                                    id="btnVolverLogin"
-                                >
-                                    Volver al inicio de sesión
-                                </button>
-                            </div>
-
-                        </section>
-
-                        <section id="panelRegistro" class="d-none">
-
-                            <div class="text-center mb-4">
-                                <h2 class="h4 fw-bold">
-                                    Crear cuenta
-                                </h2>
-
-                                <p class="text-muted mb-0">
-                                    Regístrate para usar MascotICA's.
-                                </p>
-                            </div>
-
-
-                            <form id="formRegistro">
-
-                                <div class="mb-3">
-                                    <label for="regNombre" class="form-label">
-                                        Nombre
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="regNombre"
-                                        autocomplete="name"
-                                        required
-                                    >
-                                </div>
-
-
-                                <div class="mb-3">
-                                    <label for="regCorreo" class="form-label">
-                                        Correo electrónico
-                                    </label>
-
-                                    <input
-                                        type="email"
-                                        class="form-control"
-                                        id="regCorreo"
-                                        autocomplete="email"
-                                        required
-                                    >
-                                </div>
-
-
-                                <div class="mb-2">
-                                    <label for="regPassword" class="form-label">
-                                        Contraseña
-                                    </label>
-
-                                    <div class="input-group">
-                                        <input
-                                            type="password"
-                                            class="form-control"
-                                            id="regPassword"
-                                            autocomplete="new-password"
-                                            required
-                                        >
-
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-secondary"
-                                            id="btnMostrarRegPassword"
-                                            aria-label="Mostrar contraseña"
-                                        >
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-
-                                <!-- REQUISITOS DE CONTRASEÑA -->
-                                <div
-                                    id="passwordRequirements"
-                                    class="small text-muted mb-3"
-                                >
-                                    <div id="reqLongitud">
-                                        <i class="bi bi-circle"></i>
-                                        Mínimo 8 caracteres
-                                    </div>
-
-                                    <div id="reqMayuscula">
-                                        <i class="bi bi-circle"></i>
-                                        Al menos una mayúscula
-                                    </div>
-
-                                    <div id="reqMinuscula">
-                                        <i class="bi bi-circle"></i>
-                                        Al menos una minúscula
-                                    </div>
-
-                                    <div id="reqNumero">
-                                        <i class="bi bi-circle"></i>
-                                        Al menos un número
-                                    </div>
-                                </div>
-
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary-ps w-100"
-                                    id="btnRegistrar"
-                                    disabled
-                                >
-                                    <i class="bi bi-person-plus"></i>
-                                    Crear cuenta
-                                </button>
-
-                            </form>
-
-
-                            <div class="text-center mt-3">
-                                <button
-                                    type="button"
-                                    class="btn btn-link"
-                                    id="btnVolverLoginRegistro"
-                                >
-                                    Ya tengo una cuenta
-                                </button>
-                            </div>
-
-                        </section>
-
-
-                        <!-- ========================= -->
-                        <!-- PANEL CAMBIO DE PASSWORD -->
-                        <!-- ========================= -->
-                        <section id="panelCambioPassword" class="d-none">
-
-                            <div class="text-center mb-4">
-
-                                <div class="fs-1 mb-2">
-                                    <i class="bi bi-shield-check"></i>
-                                </div>
-
-                                <h2 class="h5 fw-bold">
-                                    Mejora la seguridad de tu cuenta
-                                </h2>
-
-                                <p class="text-muted mb-0">
-                                    Tu cuenta utiliza una contraseña creada
-                                    con una política anterior. Te recomendamos
-                                    actualizarla antes de continuar.
-                                </p>
-
-                            </div>
-
-
-                            <form id="formCambioPassword">
-
-                                <div class="mb-3">
-                                    <label
-                                        for="cambioPassword"
-                                        class="form-label"
-                                    >
-                                        Nueva contraseña
-                                    </label>
-
-                                    <div class="input-group">
-                                        <input
-                                            type="password"
-                                            class="form-control"
-                                            id="cambioPassword"
-                                            autocomplete="new-password"
-                                            required
-                                        >
-
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-secondary"
-                                            id="btnMostrarCambioPassword"
-                                            aria-label="Mostrar contraseña"
-                                        >
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-
-                                <div class="mb-2">
-                                    <label
-                                        for="cambioPasswordConfirmar"
-                                        class="form-label"
-                                    >
-                                        Repetir nueva contraseña
-                                    </label>
-
-                                    <input
-                                        type="password"
-                                        class="form-control"
-                                        id="cambioPasswordConfirmar"
-                                        autocomplete="new-password"
-                                        required
-                                    >
-                                </div>
-
-
-                                <div
-                                    id="cambioPasswordRequirements"
-                                    class="small text-muted mb-3"
-                                >
-                                    <div id="cambioReqLongitud">
-                                        <i class="bi bi-circle"></i>
-                                        Mínimo 8 caracteres
-                                    </div>
-
-                                    <div id="cambioReqMayuscula">
-                                        <i class="bi bi-circle"></i>
-                                        Al menos una mayúscula
-                                    </div>
-
-                                    <div id="cambioReqMinuscula">
-                                        <i class="bi bi-circle"></i>
-                                        Al menos una minúscula
-                                    </div>
-
-                                    <div id="cambioReqNumero">
-                                        <i class="bi bi-circle"></i>
-                                        Al menos un número
-                                    </div>
-                                </div>
-
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary-ps w-100"
-                                    id="btnCambiarPassword"
-                                    disabled
-                                >
-                                    <i class="bi bi-key"></i>
-                                    Cambiar contraseña
-                                </button>
-
-                            </form>
-
-
-                            <div class="text-center mt-3">
-                                <button
-                                    type="button"
-                                    class="btn btn-link"
-                                    id="btnContinuarSinCambiar"
-                                >
-                                    Continuar por ahora
-                                </button>
-                            </div>
-
-                        </section>
-
+    <main class="login-wrapper">
+
+        <div class="login-container">
+
+            <div class="login-card">
+
+                <!-- =========================
+                     BOTÓN DE TEMA
+                ========================== -->
+                <button
+                    type="button"
+                    class="login-theme-button"
+                    id="btnTema"
+                    aria-label="Cambiar a modo oscuro"
+                >
+                    <i class="bi bi-moon-stars-fill"></i>
+                </button>
+
+
+                <!-- =========================
+                     ENCABEZADO
+                ========================== -->
+                <div class="text-center mb-4">
+
+                    <div class="login-logo">
+                        <img
+                            src="img/logo.png"
+                            alt="MascotICA's"
+                            class="login-logo__image"
+                        >
                     </div>
+
+                    <h1 class="h3 fw-bold mt-3 mb-1">
+                        MascotICA's
+                    </h1>
+
+                    <p class="text-muted mb-0">
+                        Adopción y venta de insumos
+                    </p>
+
                 </div>
 
+
+                <div id="mensajeLogin"></div>
+
+
+                <!-- =========================
+                     PANEL LOGIN
+                ========================== -->
+                <section id="panelLogin">
+
+                    <form id="formLogin">
+
+                        <div class="mb-3">
+
+                            <label
+                                for="correo"
+                                class="form-label"
+                            >
+                                Correo electrónico
+                            </label>
+
+                            <input
+                                type="email"
+                                class="form-control"
+                                id="correo"
+                                autocomplete="email"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label
+                                for="password"
+                                class="form-label"
+                            >
+                                Contraseña
+                            </label>
+
+                            <div class="input-group">
+
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    id="password"
+                                    autocomplete="current-password"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    id="btnMostrarPassword"
+                                    aria-label="Mostrar contraseña"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary-ps w-100"
+                            id="btnIngresar"
+                        >
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Ingresar
+                        </button>
+
+                    </form>
+
+
+                    <div class="text-center mt-4">
+
+                        <span class="text-muted">
+                            ¿No tienes una cuenta?
+                        </span>
+
+                        <button
+                            type="button"
+                            class="btn btn-link p-0"
+                            id="btnIrRegistro"
+                        >
+                            Regístrate
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =========================
+                     PANEL PIN
+                ========================== -->
+                <section id="panelPin" class="d-none">
+
+                    <div class="text-center mb-4">
+
+                        <div class="fs-1 mb-2 login-panel-icon">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+
+                        <h2 class="h5 fw-bold">
+                            Verificación de seguridad
+                        </h2>
+
+                        <p class="text-muted mb-0">
+                            Hemos enviado un código a tu correo.
+                        </p>
+
+                    </div>
+
+
+                    <form id="formPin">
+
+                        <div class="mb-3">
+
+                            <label
+                                for="codigoPin"
+                                class="form-label"
+                            >
+                                Código de verificación
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control text-center fs-4"
+                                id="codigoPin"
+                                inputmode="numeric"
+                                autocomplete="one-time-code"
+                                maxlength="8"
+                                required
+                            >
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary-ps w-100"
+                            id="btnVerificar"
+                        >
+                            <i class="bi bi-check-circle"></i>
+                            Verificar código
+                        </button>
+
+                    </form>
+
+
+                    <div class="text-center mt-3">
+
+                        <button
+                            type="button"
+                            class="btn btn-link"
+                            id="btnVolverLogin"
+                        >
+                            Volver al inicio de sesión
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =========================
+                     PANEL REGISTRO
+                ========================== -->
+                <section id="panelRegistro" class="d-none">
+
+                    <div class="text-center mb-4">
+
+                        <h2 class="h4 fw-bold">
+                            Crear cuenta
+                        </h2>
+
+                        <p class="text-muted mb-0">
+                            Regístrate para usar MascotICA's.
+                        </p>
+
+                    </div>
+
+
+                    <form id="formRegistro">
+
+                        <div class="mb-3">
+
+                            <label
+                                for="regNombre"
+                                class="form-label"
+                            >
+                                Nombre
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="regNombre"
+                                autocomplete="name"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label
+                                for="regCorreo"
+                                class="form-label"
+                            >
+                                Correo electrónico
+                            </label>
+
+                            <input
+                                type="email"
+                                class="form-control"
+                                id="regCorreo"
+                                autocomplete="email"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="mb-2">
+
+                            <label
+                                for="regPassword"
+                                class="form-label"
+                            >
+                                Contraseña
+                            </label>
+
+                            <div class="input-group">
+
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    id="regPassword"
+                                    autocomplete="new-password"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    id="btnMostrarRegPassword"
+                                    aria-label="Mostrar contraseña"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- REQUISITOS DE CONTRASEÑA -->
+                        <div
+                            id="passwordRequirements"
+                            class="small mb-3"
+                        >
+
+                            <div id="reqLongitud">
+                                <i class="bi bi-circle"></i>
+                                Mínimo 8 caracteres
+                            </div>
+
+                            <div id="reqMayuscula">
+                                <i class="bi bi-circle"></i>
+                                Al menos una mayúscula
+                            </div>
+
+                            <div id="reqMinuscula">
+                                <i class="bi bi-circle"></i>
+                                Al menos una minúscula
+                            </div>
+
+                            <div id="reqNumero">
+                                <i class="bi bi-circle"></i>
+                                Al menos un número
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary-ps w-100"
+                            id="btnRegistrar"
+                            disabled
+                        >
+                            <i class="bi bi-person-plus"></i>
+                            Crear cuenta
+                        </button>
+
+                    </form>
+
+
+                    <div class="text-center mt-3">
+
+                        <button
+                            type="button"
+                            class="btn btn-link"
+                            id="btnVolverLoginRegistro"
+                        >
+                            Ya tengo una cuenta
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =========================
+                     PANEL CAMBIO PASSWORD
+                ========================== -->
+                <section id="panelCambioPassword" class="d-none">
+
+                    <div class="text-center mb-4">
+
+                        <div class="fs-1 mb-2 login-panel-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+
+                        <h2 class="h5 fw-bold">
+                            Mejora la seguridad de tu cuenta
+                        </h2>
+
+                        <p class="text-muted mb-0">
+                            Tu cuenta utiliza una contraseña creada
+                            con una política anterior. Te recomendamos
+                            actualizarla antes de continuar.
+                        </p>
+
+                    </div>
+
+
+                    <form id="formCambioPassword">
+
+                        <div class="mb-3">
+
+                            <label
+                                for="cambioPassword"
+                                class="form-label"
+                            >
+                                Nueva contraseña
+                            </label>
+
+                            <div class="input-group">
+
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    id="cambioPassword"
+                                    autocomplete="new-password"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    id="btnMostrarCambioPassword"
+                                    aria-label="Mostrar contraseña"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mb-2">
+
+                            <label
+                                for="cambioPasswordConfirmar"
+                                class="form-label"
+                            >
+                                Repetir nueva contraseña
+                            </label>
+
+                            <input
+                                type="password"
+                                class="form-control"
+                                id="cambioPasswordConfirmar"
+                                autocomplete="new-password"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div
+                            id="cambioPasswordRequirements"
+                            class="small mb-3"
+                        >
+
+                            <div id="cambioReqLongitud">
+                                <i class="bi bi-circle"></i>
+                                Mínimo 8 caracteres
+                            </div>
+
+                            <div id="cambioReqMayuscula">
+                                <i class="bi bi-circle"></i>
+                                Al menos una mayúscula
+                            </div>
+
+                            <div id="cambioReqMinuscula">
+                                <i class="bi bi-circle"></i>
+                                Al menos una minúscula
+                            </div>
+
+                            <div id="cambioReqNumero">
+                                <i class="bi bi-circle"></i>
+                                Al menos un número
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary-ps w-100"
+                            id="btnCambiarPassword"
+                            disabled
+                        >
+                            <i class="bi bi-key"></i>
+                            Cambiar contraseña
+                        </button>
+
+                    </form>
+
+
+                    <div class="text-center mt-3">
+
+                        <button
+                            type="button"
+                            class="btn btn-link"
+                            id="btnContinuarSinCambiar"
+                        >
+                            Continuar por ahora
+                        </button>
+
+                    </div>
+
+                </section>
+
             </div>
+
         </div>
+
     </main>
 
 
@@ -441,24 +530,91 @@
     <script src="js/supabaseClient.js"></script>
     <script src="js/auth.js"></script>
 
-    <script>
-        const panelLogin = document.getElementById('panelLogin');
-        const panelPin = document.getElementById('panelPin');
-        const panelRegistro = document.getElementById('panelRegistro');
-        const panelCambioPassword = document.getElementById('panelCambioPassword');
 
-        const mensajeLogin = document.getElementById('mensajeLogin');
+    <script>
+        /* =========================
+           TEMA
+        ========================== */
+
+        const btnTema =
+            document.getElementById('btnTema');
+
+
+        function actualizarBotonTema() {
+
+            const oscuro =
+                Tema.efectivo() === 'dark';
+
+            btnTema.innerHTML = oscuro
+                ? '<i class="bi bi-sun-fill"></i>'
+                : '<i class="bi bi-moon-stars-fill"></i>';
+
+            btnTema.setAttribute(
+                'aria-label',
+                oscuro
+                    ? 'Cambiar a modo claro'
+                    : 'Cambiar a modo oscuro'
+            );
+
+            btnTema.setAttribute(
+                'title',
+                oscuro
+                    ? 'Cambiar a modo claro'
+                    : 'Cambiar a modo oscuro'
+            );
+        }
+
+
+        btnTema.addEventListener(
+            'click',
+            () => {
+
+                Tema.alternar();
+
+                actualizarBotonTema();
+            }
+        );
+
+
+        actualizarBotonTema();
+
+
+        /* =========================
+           PANELES
+        ========================== */
+
+        const panelLogin =
+            document.getElementById('panelLogin');
+
+        const panelPin =
+            document.getElementById('panelPin');
+
+        const panelRegistro =
+            document.getElementById('panelRegistro');
+
+        const panelCambioPassword =
+            document.getElementById('panelCambioPassword');
+
+        const mensajeLogin =
+            document.getElementById('mensajeLogin');
 
         let correoPendiente = '';
 
 
         /* =========================
            MENSAJES
-        ========================= */
+        ========================== */
 
-        function mostrarMensaje(texto, tipo = 'danger') {
+        function mostrarMensaje(
+            texto,
+            tipo = 'danger'
+        ) {
+
             mensajeLogin.innerHTML = `
-                <div class="alert alert-${tipo}" role="alert">
+                <div
+                    class="alert alert-${tipo}"
+                    role="alert"
+                >
                     ${texto}
                 </div>
             `;
@@ -466,15 +622,17 @@
 
 
         function limpiarMensaje() {
+
             mensajeLogin.innerHTML = '';
         }
 
 
         /* =========================
            PANELES
-        ========================= */
+        ========================== */
 
         function mostrarPanel(panel) {
+
             panelLogin.classList.add('d-none');
             panelPin.classList.add('d-none');
             panelRegistro.classList.add('d-none');
@@ -488,32 +646,44 @@
 
         /* =========================
            PASSWORD VISIBILIDAD
-        ========================= */
+        ========================== */
 
-        function configurarMostrarPassword(inputId, buttonId) {
+        function configurarMostrarPassword(
+            inputId,
+            buttonId
+        ) {
 
-            const input = document.getElementById(inputId);
-            const button = document.getElementById(buttonId);
+            const input =
+                document.getElementById(inputId);
+
+            const button =
+                document.getElementById(buttonId);
 
             if (!input || !button) return;
 
-            button.addEventListener('click', () => {
+            button.addEventListener(
+                'click',
+                () => {
 
-                const mostrar = input.type === 'password';
+                    const mostrar =
+                        input.type === 'password';
 
-                input.type = mostrar ? 'text' : 'password';
+                    input.type =
+                        mostrar ? 'text' : 'password';
 
-                button.innerHTML = mostrar
-                    ? '<i class="bi bi-eye-slash"></i>'
-                    : '<i class="bi bi-eye"></i>';
+                    button.innerHTML =
+                        mostrar
+                            ? '<i class="bi bi-eye-slash"></i>'
+                            : '<i class="bi bi-eye"></i>';
 
-                button.setAttribute(
-                    'aria-label',
-                    mostrar
-                        ? 'Ocultar contraseña'
-                        : 'Mostrar contraseña'
-                );
-            });
+                    button.setAttribute(
+                        'aria-label',
+                        mostrar
+                            ? 'Ocultar contraseña'
+                            : 'Mostrar contraseña'
+                    );
+                }
+            );
         }
 
 
@@ -535,38 +705,43 @@
 
         /* =========================
            PASSWORD REQUIREMENTS
-        ========================= */
+        ========================== */
 
         function actualizarRequisitosPassword(
             password,
             prefijo = ''
         ) {
 
-            const resultado = Auth.validarFortalezaPassword(password);
+            const resultado =
+                Auth.validarFortalezaPassword(password);
 
             const requisitos = [
                 {
-                    elemento: document.getElementById(
-                        prefijo + 'ReqLongitud'
-                    ),
+                    elemento:
+                        document.getElementById(
+                            prefijo + 'ReqLongitud'
+                        ),
                     cumple: resultado.longitud
                 },
                 {
-                    elemento: document.getElementById(
-                        prefijo + 'ReqMayuscula'
-                    ),
+                    elemento:
+                        document.getElementById(
+                            prefijo + 'ReqMayuscula'
+                        ),
                     cumple: resultado.mayuscula
                 },
                 {
-                    elemento: document.getElementById(
-                        prefijo + 'ReqMinuscula'
-                    ),
+                    elemento:
+                        document.getElementById(
+                            prefijo + 'ReqMinuscula'
+                        ),
                     cumple: resultado.minuscula
                 },
                 {
-                    elemento: document.getElementById(
-                        prefijo + 'ReqNumero'
-                    ),
+                    elemento:
+                        document.getElementById(
+                            prefijo + 'ReqNumero'
+                        ),
                     cumple: resultado.numero
                 }
             ];
@@ -575,22 +750,37 @@
 
                 if (!item.elemento) return;
 
-                const icono = item.elemento.querySelector('i');
+                const icono =
+                    item.elemento.querySelector('i');
 
                 if (item.cumple) {
-                    item.elemento.classList.add('text-success');
-                    item.elemento.classList.remove('text-muted');
+
+                    item.elemento.classList.add(
+                        'text-success'
+                    );
+
+                    item.elemento.classList.remove(
+                        'text-muted'
+                    );
 
                     if (icono) {
-                        icono.className = 'bi bi-check-circle-fill';
+                        icono.className =
+                            'bi bi-check-circle-fill';
                     }
 
                 } else {
-                    item.elemento.classList.remove('text-success');
-                    item.elemento.classList.add('text-muted');
+
+                    item.elemento.classList.remove(
+                        'text-success'
+                    );
+
+                    item.elemento.classList.add(
+                        'text-muted'
+                    );
 
                     if (icono) {
-                        icono.className = 'bi bi-circle';
+                        icono.className =
+                            'bi bi-circle';
                     }
                 }
             });
@@ -599,35 +789,55 @@
         }
 
 
-        const regPassword = document.getElementById('regPassword');
-        const btnRegistrar = document.getElementById('btnRegistrar');
-
-        regPassword.addEventListener('input', () => {
-
-            const valida = actualizarRequisitosPassword(
-                regPassword.value
+        const regPassword =
+            document.getElementById(
+                'regPassword'
             );
 
-            btnRegistrar.disabled = !valida;
-        });
+        const btnRegistrar =
+            document.getElementById(
+                'btnRegistrar'
+            );
+
+
+        regPassword.addEventListener(
+            'input',
+            () => {
+
+                const valida =
+                    actualizarRequisitosPassword(
+                        regPassword.value
+                    );
+
+                btnRegistrar.disabled =
+                    !valida;
+            }
+        );
 
 
         const cambioPassword =
-            document.getElementById('cambioPassword');
+            document.getElementById(
+                'cambioPassword'
+            );
 
         const cambioPasswordConfirmar =
-            document.getElementById('cambioPasswordConfirmar');
+            document.getElementById(
+                'cambioPasswordConfirmar'
+            );
 
         const btnCambiarPassword =
-            document.getElementById('btnCambiarPassword');
+            document.getElementById(
+                'btnCambiarPassword'
+            );
 
 
         function validarCambioPassword() {
 
-            const valida = actualizarRequisitosPassword(
-                cambioPassword.value,
-                'cambio'
-            );
+            const valida =
+                actualizarRequisitosPassword(
+                    cambioPassword.value,
+                    'cambio'
+                );
 
             const coinciden =
                 cambioPassword.value ===
@@ -652,74 +862,132 @@
 
         /* =========================
            IR A REGISTRO
-        ========================= */
+        ========================== */
 
         document
             .getElementById('btnIrRegistro')
-            .addEventListener('click', () => {
+            .addEventListener(
+                'click',
+                () => {
 
-                mostrarPanel(panelRegistro);
-            });
+                    mostrarPanel(panelRegistro);
+                }
+            );
 
 
         document
             .getElementById('btnVolverLogin')
-            .addEventListener('click', () => {
+            .addEventListener(
+                'click',
+                () => {
 
-                mostrarPanel(panelLogin);
-            });
+                    mostrarPanel(panelLogin);
+                }
+            );
 
 
         document
             .getElementById('btnVolverLoginRegistro')
-            .addEventListener('click', () => {
+            .addEventListener(
+                'click',
+                () => {
 
-                mostrarPanel(panelLogin);
-            });
+                    mostrarPanel(panelLogin);
+                }
+            );
 
 
         /* =========================
            LOGIN
-        ========================= */
+        ========================== */
 
         document
             .getElementById('formLogin')
-            .addEventListener('submit', async (e) => {
+            .addEventListener(
+                'submit',
+                async (e) => {
 
-                e.preventDefault();
+                    e.preventDefault();
 
-                limpiarMensaje();
+                    limpiarMensaje();
 
-                const correo =
-                    document.getElementById('correo').value.trim();
+                    const correo =
+                        document
+                            .getElementById('correo')
+                            .value
+                            .trim();
 
-                const password =
-                    document.getElementById('password').value;
+                    const password =
+                        document
+                            .getElementById('password')
+                            .value;
 
+                    const btn =
+                        document
+                            .getElementById('btnIngresar');
 
-                const btn =
-                    document.getElementById('btnIngresar');
+                    btn.disabled = true;
 
-                btn.disabled = true;
-
-                btn.innerHTML = `
-                    <span class="spinner-border spinner-border-sm"></span>
-                    Verificando...
-                `;
-
-
-                const passwordValida =
-                    await Auth.validarPassword(
-                        correo,
-                        password
-                    );
+                    btn.innerHTML = `
+                        <span class="spinner-border spinner-border-sm"></span>
+                        Verificando...
+                    `;
 
 
-                if (!passwordValida) {
+                    const passwordValida =
+                        await Auth.validarPassword(
+                            correo,
+                            password
+                        );
 
-                    mostrarMensaje(
-                        'Correo o contraseña incorrectos.'
-                    );
+
+                    if (!passwordValida) {
+
+                        mostrarMensaje(
+                            'Correo o contraseña incorrectos.'
+                        );
+
+                        btn.disabled = false;
+
+                        btn.innerHTML = `
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Ingresar
+                        `;
+
+                        return;
+                    }
+
+
+                    correoPendiente = correo;
+
+
+                    const errorPin =
+                        await Auth.enviarPin(
+                            correo
+                        );
+
+
+                    if (errorPin) {
+
+                        mostrarMensaje(errorPin);
+
+                        btn.disabled = false;
+
+                        btn.innerHTML = `
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Ingresar
+                        `;
+
+                        return;
+                    }
+
+
+                    mostrarPanel(panelPin);
+
+                    document
+                        .getElementById('codigoPin')
+                        .focus();
+
 
                     btn.disabled = false;
 
@@ -727,289 +995,306 @@
                         <i class="bi bi-box-arrow-in-right"></i>
                         Ingresar
                     `;
-
-                    return;
                 }
-
-
-                correoPendiente = correo;
-
-
-                const errorPin =
-                    await Auth.enviarPin(correo);
-
-
-                if (errorPin) {
-
-                    mostrarMensaje(errorPin);
-
-                    btn.disabled = false;
-
-                    btn.innerHTML = `
-                        <i class="bi bi-box-arrow-in-right"></i>
-                        Ingresar
-                    `;
-
-                    return;
-                }
-
-
-                mostrarPanel(panelPin);
-
-                document
-                    .getElementById('codigoPin')
-                    .focus();
-
-
-                btn.disabled = false;
-
-                btn.innerHTML = `
-                    <i class="bi bi-box-arrow-in-right"></i>
-                    Ingresar
-                `;
-            });
+            );
 
 
         /* =========================
            VERIFICAR PIN
-        ========================= */
+        ========================== */
 
         document
             .getElementById('formPin')
-            .addEventListener('submit', async (e) => {
+            .addEventListener(
+                'submit',
+                async (e) => {
 
-                e.preventDefault();
+                    e.preventDefault();
 
-                limpiarMensaje();
+                    limpiarMensaje();
 
-                const codigo =
-                    document
-                        .getElementById('codigoPin')
-                        .value
-                        .trim();
+                    const codigo =
+                        document
+                            .getElementById('codigoPin')
+                            .value
+                            .trim();
 
+                    const btn =
+                        document
+                            .getElementById('btnVerificar');
 
-                const btn =
-                    document.getElementById('btnVerificar');
-
-                btn.disabled = true;
-
-                btn.innerHTML = `
-                    <span class="spinner-border spinner-border-sm"></span>
-                    Verificando...
-                `;
-
-
-                const resultado =
-                    await Auth.verificarPin(
-                        correoPendiente,
-                        codigo
-                    );
-
-
-                if (resultado.error) {
-
-                    mostrarMensaje(resultado.error);
-
-                    btn.disabled = false;
+                    btn.disabled = true;
 
                     btn.innerHTML = `
-                        <i class="bi bi-check-circle"></i>
-                        Verificar código
+                        <span class="spinner-border spinner-border-sm"></span>
+                        Verificando...
                     `;
 
-                    return;
+
+                    const resultado =
+                        await Auth.verificarPin(
+                            correoPendiente,
+                            codigo
+                        );
+
+
+                    if (resultado.error) {
+
+                        mostrarMensaje(
+                            resultado.error
+                        );
+
+                        btn.disabled = false;
+
+                        btn.innerHTML = `
+                            <i class="bi bi-check-circle"></i>
+                            Verificar código
+                        `;
+
+                        return;
+                    }
+
+
+                    if (
+                        resultado.requiereCambioPassword
+                    ) {
+
+                        mostrarPanel(
+                            panelCambioPassword
+                        );
+
+                        return;
+                    }
+
+
+                    Auth.redirigirSegunRol(
+                        resultado.usuario.rol
+                    );
                 }
-
-
-                if (resultado.requiereCambioPassword) {
-
-                    mostrarPanel(panelCambioPassword);
-
-                    return;
-                }
-
-
-                Auth.redirigirSegunRol(
-                    resultado.usuario.rol
-                );
-            });
+            );
 
 
         /* =========================
            CAMBIO DE PASSWORD
-        ========================= */
+        ========================== */
 
         document
             .getElementById('formCambioPassword')
-            .addEventListener('submit', async (e) => {
+            .addEventListener(
+                'submit',
+                async (e) => {
 
-                e.preventDefault();
+                    e.preventDefault();
 
-                limpiarMensaje();
+                    limpiarMensaje();
 
-                const nuevaPassword =
-                    cambioPassword.value;
+                    const nuevaPassword =
+                        cambioPassword.value;
 
-
-                const confirmar =
-                    cambioPasswordConfirmar.value;
-
-
-                if (nuevaPassword !== confirmar) {
-
-                    mostrarMensaje(
-                        'Las contraseñas no coinciden.'
-                    );
-
-                    return;
-                }
+                    const confirmar =
+                        cambioPasswordConfirmar.value;
 
 
-                const btn =
-                    document.getElementById(
-                        'btnCambiarPassword'
-                    );
+                    if (
+                        nuevaPassword !==
+                        confirmar
+                    ) {
+
+                        mostrarMensaje(
+                            'Las contraseñas no coinciden.'
+                        );
+
+                        return;
+                    }
 
 
-                btn.disabled = true;
-
-                btn.innerHTML = `
-                    <span class="spinner-border spinner-border-sm"></span>
-                    Actualizando...
-                `;
+                    const btn =
+                        document.getElementById(
+                            'btnCambiarPassword'
+                        );
 
 
-                const error =
-                    await Auth.actualizarPassword(
-                        nuevaPassword
-                    );
-
-
-                if (error) {
-
-                    mostrarMensaje(error);
-
-                    btn.disabled = false;
+                    btn.disabled = true;
 
                     btn.innerHTML = `
-                        <i class="bi bi-key"></i>
-                        Cambiar contraseña
+                        <span class="spinner-border spinner-border-sm"></span>
+                        Actualizando...
                     `;
 
-                    return;
+
+                    const error =
+                        await Auth.actualizarPassword(
+                            nuevaPassword
+                        );
+
+
+                    if (error) {
+
+                        mostrarMensaje(error);
+
+                        btn.disabled = false;
+
+                        btn.innerHTML = `
+                            <i class="bi bi-key"></i>
+                            Cambiar contraseña
+                        `;
+
+                        return;
+                    }
+
+
+                    mostrarMensaje(
+                        'Contraseña actualizada correctamente.',
+                        'success'
+                    );
+
+
+                    setTimeout(
+                        () => {
+
+                            const usuario =
+                                Auth.usuarioActual();
+
+                            if (usuario) {
+
+                                Auth.redirigirSegunRol(
+                                    usuario.rol
+                                );
+                            }
+
+                        },
+                        700
+                    );
                 }
+            );
 
 
-                mostrarMensaje(
-                    'Contraseña actualizada correctamente.',
-                    'success'
-                );
+        /* =========================
+           CONTINUAR SIN CAMBIAR
+        ========================== */
 
-
-                setTimeout(() => {
+        document
+            .getElementById(
+                'btnContinuarSinCambiar'
+            )
+            .addEventListener(
+                'click',
+                () => {
 
                     const usuario =
                         Auth.usuarioActual();
 
                     if (usuario) {
+
                         Auth.redirigirSegunRol(
                             usuario.rol
                         );
                     }
-
-                }, 700);
-            });
-
-
-        /* =========================
-           CONTINUAR SIN CAMBIAR
-        ========================= */
-
-        document
-            .getElementById('btnContinuarSinCambiar')
-            .addEventListener('click', () => {
-
-                const usuario =
-                    Auth.usuarioActual();
-
-                if (usuario) {
-
-                    Auth.redirigirSegunRol(
-                        usuario.rol
-                    );
                 }
-            });
+            );
 
 
         /* =========================
            REGISTRO
-        ========================= */
+        ========================== */
 
         document
             .getElementById('formRegistro')
-            .addEventListener('submit', async (e) => {
+            .addEventListener(
+                'submit',
+                async (e) => {
 
-                e.preventDefault();
+                    e.preventDefault();
 
-                limpiarMensaje();
+                    limpiarMensaje();
 
-                const nombre =
-                    document
-                        .getElementById('regNombre')
-                        .value
-                        .trim();
+                    const nombre =
+                        document
+                            .getElementById('regNombre')
+                            .value
+                            .trim();
 
-                const correo =
-                    document
-                        .getElementById('regCorreo')
-                        .value
-                        .trim();
+                    const correo =
+                        document
+                            .getElementById('regCorreo')
+                            .value
+                            .trim();
 
-                const password =
-                    document
-                        .getElementById('regPassword')
-                        .value;
-
-
-                const validacion =
-                    Auth.validarFortalezaPassword(
-                        password
-                    );
+                    const password =
+                        document
+                            .getElementById('regPassword')
+                            .value;
 
 
-                if (!validacion.valida) {
+                    const validacion =
+                        Auth.validarFortalezaPassword(
+                            password
+                        );
+
+
+                    if (!validacion.valida) {
+
+                        mostrarMensaje(
+                            'La contraseña no cumple todos los requisitos.'
+                        );
+
+                        return;
+                    }
+
+
+                    const btn =
+                        document.getElementById(
+                            'btnRegistrar'
+                        );
+
+                    btn.disabled = true;
+
+                    btn.innerHTML = `
+                        <span class="spinner-border spinner-border-sm"></span>
+                        Creando cuenta...
+                    `;
+
+
+                    const error =
+                        await Auth.registrar(
+                            nombre,
+                            correo,
+                            password
+                        );
+
+
+                    if (error) {
+
+                        mostrarMensaje(error);
+
+                        btn.disabled = false;
+
+                        btn.innerHTML = `
+                            <i class="bi bi-person-plus"></i>
+                            Crear cuenta
+                        `;
+
+                        return;
+                    }
+
 
                     mostrarMensaje(
-                        'La contraseña no cumple todos los requisitos.'
-                    );
-
-                    return;
-                }
-
-
-                const btn =
-                    document.getElementById('btnRegistrar');
-
-                btn.disabled = true;
-
-                btn.innerHTML = `
-                    <span class="spinner-border spinner-border-sm"></span>
-                    Creando cuenta...
-                `;
-
-
-                const error =
-                    await Auth.registrar(
-                        nombre,
-                        correo,
-                        password
+                        'Cuenta creada correctamente. Ya puedes iniciar sesión.',
+                        'success'
                     );
 
 
-                if (error) {
+                    document
+                        .getElementById('correo')
+                        .value = correo;
 
-                    mostrarMensaje(error);
+                    document
+                        .getElementById('password')
+                        .value = '';
+
+
+                    mostrarPanel(panelLogin);
+
 
                     btn.disabled = false;
 
@@ -1017,41 +1302,13 @@
                         <i class="bi bi-person-plus"></i>
                         Crear cuenta
                     `;
-
-                    return;
                 }
-
-
-                mostrarMensaje(
-                    'Cuenta creada correctamente. Ya puedes iniciar sesión.',
-                    'success'
-                );
-
-
-                document
-                    .getElementById('correo')
-                    .value = correo;
-
-                document
-                    .getElementById('password')
-                    .value = '';
-
-
-                mostrarPanel(panelLogin);
-
-
-                btn.disabled = false;
-
-                btn.innerHTML = `
-                    <i class="bi bi-person-plus"></i>
-                    Crear cuenta
-                `;
-            });
+            );
 
 
         /* =========================
            SESIÓN YA EXISTENTE
-        ========================= */
+        ========================== */
 
         document.addEventListener(
             'DOMContentLoaded',

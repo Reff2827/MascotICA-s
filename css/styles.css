@@ -1421,7 +1421,7 @@ input[type="number"].form-control-sm::-webkit-inner-spin-button {
 }
 
 input[type="number"].form-control-sm {
-    -moz-appearance: textfield;
+    appearance: textfield;
     text-align: center;
     font-variant-numeric: tabular-nums;
 }
@@ -1597,22 +1597,39 @@ input[type="file"].form-control::-webkit-file-upload-button:hover {
 /* --------------------------------------------------------------------------
    15. Inicio de sesión
    -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   15. Inicio de sesión
+   -------------------------------------------------------------------------- */
+
+.login-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    background:
+        radial-gradient(
+            32rem 28rem at 18% 20%,
+            oklch(0.687 0.178 42 / 0.14),
+            transparent 68%
+        ),
+        radial-gradient(
+            30rem 28rem at 82% 78%,
+            oklch(0.672 0.108 192 / 0.08),
+            transparent 68%
+        ),
+        var(--background);
+    color: var(--foreground);
+}
 
 .login-wrapper {
     position: relative;
     min-height: 100vh;
     min-height: 100dvh;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
     overflow: hidden;
-    background: linear-gradient(
-        165deg,
-        oklch(0.232 0.032 268) 0%,
-        oklch(0.178 0.028 282) 58%,
-        oklch(0.152 0.022 258) 100%
-    );
 }
 
 .login-wrapper::before {
@@ -1620,33 +1637,45 @@ input[type="file"].form-control::-webkit-file-upload-button:hover {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(34rem 30rem at 34% 28%,
-            oklch(0.687 0.178 42 / 0.62), transparent 68%),
-        radial-gradient(32rem 30rem at 68% 74%,
-            oklch(0.672 0.108 192 / 0.52), transparent 68%),
-        radial-gradient(30rem 26rem at 72% 16%,
-            oklch(0.585 0.173 295 / 0.48), transparent 66%),
-        radial-gradient(26rem 24rem at 22% 88%,
-            oklch(0.645 0.135 236 / 0.38), transparent 68%);
+        radial-gradient(
+            34rem 30rem at 34% 28%,
+            oklch(0.687 0.178 42 / 0.14),
+            transparent 68%
+        ),
+        radial-gradient(
+            32rem 30rem at 68% 74%,
+            oklch(0.672 0.108 192 / 0.08),
+            transparent 68%
+        ),
+        radial-gradient(
+            30rem 26rem at 72% 16%,
+            oklch(0.585 0.173 295 / 0.08),
+            transparent 66%
+        );
     filter: blur(10px);
     pointer-events: none;
 }
 
+.login-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 28rem;
+    margin-inline: auto;
+}
+
 .login-card {
     position: relative;
-    max-width: 24.5rem;
     width: 100%;
+    max-width: 28rem;
     padding: 2rem !important;
-    border: 1px solid oklch(1 0 0 / 0.18);
+    border: 1px solid var(--border);
     border-radius: var(--radius-2xl);
-    background: oklch(1 0 0 / 0.13);
-    -webkit-backdrop-filter: saturate(180%) blur(40px);
-    backdrop-filter: saturate(180%) blur(40px);
+    background: var(--material-regular);
+    color: var(--foreground);
     box-shadow:
-        inset 0 1px 0 oklch(1 0 0 / 0.28),
-        0 2px 6px oklch(0 0 0 / 0.2),
-        0 32px 70px -20px oklch(0 0 0 / 0.55);
-    color: oklch(0.985 0.002 270);
+        0 20px 50px -24px oklch(0 0 0 / 0.32),
+        0 4px 14px -6px oklch(0 0 0 / 0.16);
     animation: card-in var(--slow) var(--spring) both;
 }
 
@@ -1662,101 +1691,456 @@ input[type="file"].form-control::-webkit-file-upload-button:hover {
     }
 }
 
+
+/* =========================
+   BOTÓN DE TEMA
+========================= */
+
+.login-theme-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 5;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+
+    color: var(--foreground);
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+
+    box-shadow:
+        0 3px 10px -5px oklch(0 0 0 / 0.35);
+
+    cursor: pointer;
+
+    transition:
+        color var(--base) var(--ease),
+        background var(--base) var(--ease),
+        border-color var(--base) var(--ease),
+        transform var(--base) var(--spring),
+        box-shadow var(--base) var(--ease);
+}
+
+.login-theme-button:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow:
+        0 6px 14px -7px oklch(0 0 0 / 0.4);
+}
+
+.login-theme-button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.login-theme-button i {
+    font-size: 1rem;
+}
+
+
+/* =========================
+   LOGO
+========================= */
+
+.login-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 5rem;
+    height: 5rem;
+
+    margin-inline: auto;
+}
+
+.login-logo__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+/* =========================
+   TEXTOS
+========================= */
+
+.login-card h1,
+.login-card h2,
+.login-card h3,
+.login-card h4 {
+    color: var(--foreground);
+}
+
 .login-card h3 {
-    color: oklch(1 0 0);
     font-size: 1.5rem;
     letter-spacing: -0.024em;
     margin-bottom: 0.15rem;
 }
 
 .login-card .text-muted {
-    color: oklch(1 0 0 / 0.62) !important;
+    color: var(--muted-foreground) !important;
 }
 
 .login-card .form-label {
-    color: oklch(1 0 0 / 0.82);
-    font-weight: 550;
+    color: var(--foreground);
+    font-weight: 600;
 }
 
+
+/* =========================
+   CAMPOS
+========================= */
+
 .login-card .form-control {
-    color: oklch(1 0 0);
-    background: oklch(1 0 0 / 0.08);
-    border-color: oklch(1 0 0 / 0.16);
-    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.06);
+    min-height: 2.75rem;
+
+    color: var(--foreground);
+    background: var(--background);
+
+    border: 1px solid var(--border);
+
+    box-shadow: none;
+
+    transition:
+        border-color var(--base) var(--ease),
+        box-shadow var(--base) var(--ease),
+        background var(--base) var(--ease);
 }
 
 .login-card .form-control::placeholder {
-    color: oklch(1 0 0 / 0.38);
+    color: var(--muted-foreground);
+    opacity: 0.75;
+}
+
+.login-card .form-control:hover {
+    border-color: oklch(0.687 0.178 42 / 0.5);
 }
 
 .login-card .form-control:focus {
-    background: oklch(1 0 0 / 0.14);
-    border-color: oklch(1 0 0 / 0.4);
-    box-shadow: 0 0 0 4px oklch(1 0 0 / 0.12);
+    color: var(--foreground);
+    background: var(--background);
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px oklch(0.687 0.178 42 / 0.18);
 }
 
+
+/* =========================
+   AUTOCOMPLETADO
+========================= */
+
+.login-card .form-control:-webkit-autofill,
+.login-card .form-control:-webkit-autofill:hover,
+.login-card .form-control:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--foreground);
+
+    -webkit-box-shadow:
+        0 0 0 1000px var(--background) inset;
+
+    box-shadow:
+        0 0 0 1000px var(--background) inset;
+
+    caret-color: var(--foreground);
+}
+
+
+/* =========================
+   BOTONES DE MOSTRAR PASSWORD
+========================= */
+
+.login-card .input-group .btn-outline-secondary {
+    min-width: 2.9rem;
+
+    color: var(--foreground);
+    background: var(--background);
+
+    border-color: var(--border);
+}
+
+.login-card .input-group .btn-outline-secondary:hover {
+    color: var(--primary);
+    background: var(--background);
+    border-color: var(--primary);
+}
+
+.login-card .input-group .btn-outline-secondary:focus-visible {
+    color: var(--primary);
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px oklch(0.687 0.178 42 / 0.18);
+}
+
+
+/* =========================
+   BOTONES DE ENLACE
+========================= */
+
+.login-card .btn-link {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.login-card .btn-link:hover {
+    color: var(--primary-active);
+    text-decoration: underline;
+}
+
+.login-card .btn-link:focus-visible {
+    color: var(--primary-active);
+}
+
+
+/* =========================
+   SEPARADOR
+========================= */
+
 .login-card hr {
-    border-color: oklch(1 0 0 / 0.14);
+    border-color: var(--border);
     opacity: 1;
     margin: 1.25rem 0 1rem;
 }
 
-.login-card a {
-    color: oklch(0.86 0.09 56);
-    font-weight: 550;
-}
 
-.login-card a:hover {
-    color: oklch(0.92 0.07 60);
-}
+/* =========================
+   ALERTAS
+========================= */
 
 .login-card .alert {
     max-width: none;
     margin: 0 0 1rem;
-    background: oklch(1 0 0 / 0.1);
-    border-color: oklch(1 0 0 / 0.16);
-    color: oklch(1 0 0 / 0.92);
+
+    color: var(--foreground);
+
+    background: var(--background);
+    border: 1px solid var(--border);
+
     box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
+
     padding: 0.7rem 0.9rem;
 }
 
+.login-card .alert-danger {
+    color: var(--foreground);
+    border-color: oklch(0.62 0.2 25 / 0.35);
+    background: oklch(0.62 0.2 25 / 0.08);
+}
+
+.login-card .alert-success {
+    color: var(--foreground);
+    border-color: oklch(0.72 0.16 155 / 0.35);
+    background: oklch(0.72 0.16 155 / 0.08);
+}
+
 .login-card .alert-danger i.bi {
-    color: oklch(0.78 0.16 25);
+    color: oklch(0.68 0.19 25);
 }
 
 .login-card .alert-success i.bi {
-    color: oklch(0.8 0.15 158);
+    color: oklch(0.72 0.16 155);
 }
+
+
+/* =========================
+   ICONOS DE LOS PANELES
+========================= */
+
+.login-panel-icon {
+    color: var(--primary);
+}
+
+
+/* =========================
+   REQUISITOS DE PASSWORD
+========================= */
+
+#passwordRequirements,
+#cambioPasswordRequirements {
+    line-height: 1.8;
+}
+
+#passwordRequirements > div,
+#cambioPasswordRequirements > div {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+
+    color: var(--muted-foreground);
+
+    transition:
+        color var(--base) var(--ease);
+}
+
+#passwordRequirements i,
+#cambioPasswordRequirements i {
+    font-size: 0.85rem;
+}
+
+#passwordRequirements .text-success,
+#cambioPasswordRequirements .text-success {
+    color: oklch(0.62 0.17 155) !important;
+}
+
+
+/* =========================
+   MARCA ANTIGUA
+========================= */
 
 .login-mark {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     width: 3.5rem;
     height: 3.5rem;
+
     font-size: 1.6rem;
+
     color: oklch(0.995 0.004 80);
+
     background: linear-gradient(
         160deg,
         oklch(0.762 0.166 52),
         oklch(0.618 0.182 36)
     );
+
     border-radius: var(--radius-xl);
+
     box-shadow:
         inset 0 1px 0 oklch(1 0 0 / 0.4),
         0 10px 26px -8px oklch(0.687 0.178 42 / 0.75);
 }
 
+
+/* =========================
+   CÓDIGO PIN
+========================= */
+
 #codigoPin {
     font-family: var(--font-numeric);
     font-size: 1.35rem;
     font-weight: 600;
+
     letter-spacing: 0.42em;
     text-indent: 0.42em;
+
     font-variant-numeric: tabular-nums;
+
     padding-block: 0.7rem;
+}
+
+
+/* =========================
+   INPUTS NUMÉRICOS
+========================= */
+
+input[type="number"].form-control-sm {
+    -webkit-appearance: textfield;
+    appearance: textfield;
+
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+[data-theme="dark"] .login-page {
+    background:
+        radial-gradient(
+            32rem 28rem at 18% 20%,
+            oklch(0.687 0.178 42 / 0.18),
+            transparent 68%
+        ),
+        radial-gradient(
+            30rem 28rem at 82% 78%,
+            oklch(0.672 0.108 192 / 0.1),
+            transparent 68%
+        ),
+        var(--background);
+}
+
+[data-theme="dark"] .login-card {
+    background: var(--material-regular);
+
+    border-color: oklch(1 0 0 / 0.12);
+
+    box-shadow:
+        0 24px 60px -24px oklch(0 0 0 / 0.65),
+        0 4px 14px -6px oklch(0 0 0 / 0.45);
+}
+
+[data-theme="dark"] .login-card .form-control {
+    background: oklch(0.18 0.025 270 / 0.72);
+    border-color: oklch(1 0 0 / 0.14);
+}
+
+[data-theme="dark"] .login-card .form-control:focus {
+    background: oklch(0.18 0.025 270 / 0.9);
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px oklch(0.687 0.178 42 / 0.22);
+}
+
+[data-theme="dark"] .login-card .input-group .btn-outline-secondary {
+    background: oklch(0.18 0.025 270 / 0.72);
+    border-color: oklch(1 0 0 / 0.14);
+}
+
+[data-theme="dark"] .login-theme-button {
+    background: oklch(0.18 0.025 270 / 0.9);
+    border-color: oklch(1 0 0 / 0.14);
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 575.98px) {
+
+    .login-wrapper {
+        padding: 1rem;
+        align-items: flex-start;
+    }
+
+    .login-container {
+        max-width: 100%;
+        margin-top: 1rem;
+    }
+
+    .login-card {
+        padding: 1.5rem !important;
+        border-radius: var(--radius-xl);
+    }
+
+    .login-logo {
+        width: 4.5rem;
+        height: 4.5rem;
+    }
+
+    .login-theme-button {
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 2.35rem;
+        height: 2.35rem;
+    }
 }
 
 /* --------------------------------------------------------------------------
