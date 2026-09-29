@@ -542,17 +542,21 @@ body > .container-fluid > .d-flex > h3 > i.bi:first-child {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: 2.25rem;
+    height: 2.25rem;
     flex: 0 0 auto;
-    font-size: 0.95rem;
-    color: var(--primary-foreground);
-    background: linear-gradient(160deg, var(--primary) 0%, var(--primary-active) 100%);
     border-radius: var(--radius-md);
-    box-shadow:
-        inset 0 1px 0 oklch(1 0 0 / 0.38),
-        0 2px 8px -2px oklch(0.687 0.178 42 / 0.55);
+    overflow: hidden;
+    background: transparent;
+    box-shadow: none;
     transition: transform var(--base) var(--spring);
+}
+
+.app-brand__logo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .app-brand:hover .app-brand__mark {
@@ -997,7 +1001,7 @@ fieldset:disabled .btn {
 }
 
 /* --------------------------------------------------------------------------
-   9. Control segmentado
+   9. Filtros
    -------------------------------------------------------------------------- */
 
 #filtroCategoria,
@@ -1437,6 +1441,26 @@ input[type="file"].form-control::-webkit-file-upload-button {
 input[type="file"].form-control::file-selector-button:hover,
 input[type="file"].form-control::-webkit-file-upload-button:hover {
     background-color: var(--primary-hover);
+}
+
+/* MEJORA: iconos de campos de entrada visibles también en modo oscuro */
+.input-group-text {
+    color: var(--muted-foreground);
+    background: var(--input);
+    border-color: var(--border-strong);
+}
+
+.input-group-text i.bi {
+    color: var(--muted-foreground);
+}
+
+.input-group:focus-within .input-group-text {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.input-group:focus-within .input-group-text i.bi {
+    color: var(--primary);
 }
 
 /* --------------------------------------------------------------------------
@@ -1995,7 +2019,7 @@ body > .container-fluid > *:nth-child(n+5) {
     filter: invert(1) grayscale(100%);
 }
 
-/* ==========================================================================
+/* ========================================================================== 
    MASCOTAS PERDIDAS
    ========================================================================== */
 

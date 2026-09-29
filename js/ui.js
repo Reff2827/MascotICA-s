@@ -234,56 +234,53 @@ const UI = {
                   `
 
                 : '';
-
-
+                
+        const logoSrc =
+        (typeof Auth !== 'undefined' &&
+            typeof Auth.raiz === 'function')
+            ? Auth.raiz() + 'img/logo.png'
+            : './img/logo.png';
+            
         document.getElementById(
             'navbar'
         ).innerHTML = `
+        <header
+        class="app-header"
+        id="appHeader">
 
-            <header
-                class="app-header"
-                id="appHeader">
+        <nav
+            class="app-navbar"
+            aria-label="Navegación principal">
 
-                <nav
-                    class="app-navbar"
-                    aria-label="Navegación principal">
+            <a
+                class="app-brand"
+                href="${inicio}">
 
+                <span class="app-brand__mark">
+                    <img
+                        src="${logoSrc}"
+                        alt="MascotICA's"
+                        class="app-brand__logo">
+                </span>
 
-                    <a
-                        class="app-brand"
-                        href="${inicio}">
+                <span>
+                    MascotICA's
+                    ${insignia}
+                </span>
 
-                        <span
-                            class="app-brand__mark"
-                            aria-hidden="true">
+            </a>
 
-                            <i class="bi bi-heart-fill"></i>
+            <button
+                class="icon-button app-burger"
+                id="btnMenu"
+                type="button"
+                aria-expanded="false"
+                aria-controls="appNav"
+                aria-label="Abrir menú">
 
-                        </span>
+                <i class="bi bi-list"></i>
 
-                        <span>
-
-                            MascotICA's
-
-                            ${insignia}
-
-                        </span>
-
-                    </a>
-
-
-                    <button
-                        class="icon-button app-burger"
-                        id="btnMenu"
-                        type="button"
-                        aria-expanded="false"
-                        aria-controls="appNav"
-                        aria-label="Abrir menú">
-
-                        <i class="bi bi-list"></i>
-
-                    </button>
-
+            </button>
 
                     <ul
                         class="app-nav"
