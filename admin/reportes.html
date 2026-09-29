@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Reportes · MascotICA's Admin</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet">
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
+        rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="../css/styles.css">
+
+    <script src="../js/theme.js"></script>
+
+</head>
+
+
+<body>
+
+<div id="navbar"></div>
+
+<div id="alertas"></div>
+
+
+<main class="container-fluid px-4 pb-5">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+
+            <h3 class="fw-bold mb-1">
+
+                <i class="bi bi-geo-alt-fill"></i>
+
+                Reportes de mascotas
+
+            </h3>
+
+            <p class="text-muted mb-0">
+                Revisa los reportes enviados por los usuarios y actualiza su estado.
+            </p>
+
+        </div>
+
+
+        <div class="d-flex gap-2">
+
+            <button
+                type="button"
+                class="btn btn-outline-secondary"
+                id="btnActualizar">
+
+                <i class="bi bi-arrow-clockwise"></i>
+
+                Actualizar
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ESTADÍSTICAS -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card card-stat bg-naranja p-3">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <div class="small">
+                            Total de reportes
+                        </div>
+
+                        <div
+                            class="fs-2 fw-bold"
+                            id="statTotal">
+                            0
+                        </div>
+
+                    </div>
+
+                    <i class="bi bi-geo-alt icon"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card card-stat bg-rojo p-3">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <div class="small">
+                            Abandonadas
+                        </div>
+
+                        <div
+                            class="fs-2 fw-bold"
+                            id="statAbandonadas">
+                            0
+                        </div>
+
+                    </div>
+
+                    <i class="bi bi-exclamation-triangle icon"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card card-stat bg-verde p-3">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <div class="small">
+                            Atendidas
+                        </div>
+
+                        <div
+                            class="fs-2 fw-bold"
+                            id="statAtendidas">
+                            0
+                        </div>
+
+                    </div>
+
+                    <i class="bi bi-check-circle icon"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FILTROS -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <div class="row g-3 align-items-end">
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Buscar
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+
+                        <input
+                            type="search"
+                            class="form-control"
+                            id="buscar"
+                            placeholder="Nombre, zona o contacto...">
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label class="form-label">
+                        Estado
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="filtroEstado">
+
+                        <option value="todos">
+                            Todos
+                        </option>
+
+                        <option value="abandonada">
+                            Abandonadas
+                        </option>
+
+                        <option value="atendida">
+                            Atendidas
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label class="form-label">
+                        Especie
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="filtroEspecie">
+
+                        <option value="todos">
+                            Todas
+                        </option>
+
+                        <option value="perro">
+                            Perros
+                        </option>
+
+                        <option value="gato">
+                            Gatos
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-2">
+
+                    <div class="text-muted small">
+                        Mostrando
+                    </div>
+
+                    <strong id="cantidadMostrada">
+                        0 reportes
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- REPORTES -->
+
+    <div id="contenedorReportes">
+
+        <div class="text-center py-5">
+
+            <div
+                class="spinner-border"
+                role="status">
+            </div>
+
+            <p class="mt-3 text-muted">
+                Cargando reportes...
+            </p>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- MODAL DETALLE -->
+
+<div
+    class="modal fade"
+    id="modalDetalle"
+    tabindex="-1"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="detalleTitulo">
+                    Reporte
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar">
+                </button>
+
+            </div>
+
+
+            <div
+                class="modal-body"
+                id="detalleContenido">
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+
+<script src="../js/supabaseClient.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/ui.js"></script>
+
+
+<script>
+
+const usuario = Auth.requireAdmin();
+
+if (usuario) {
+
+    UI.navbarAdmin(usuario);
+
+    UI.mostrarFlash();
+
+    iniciarReportes();
+
+}
+
+
+function iniciarReportes() {
+
+    let reportes = [];
+
+    const modal =
+        new bootstrap.Modal(
+            document.getElementById('modalDetalle')
+        );
+
+
+    /* ============================================================
+       CARGAR
+       ============================================================ */
+
+    async function cargar() {
+
+        const contenedor =
+            document.getElementById(
+                'contenedorReportes'
+            );
+
+
+        contenedor.innerHTML = `
+
+            <div class="text-center py-5">
+
+                <div
+                    class="spinner-border"
+                    role="status">
+                </div>
+
+                <p class="mt-3 text-muted">
+                    Cargando reportes...
+                </p>
+
+            </div>
+
+        `;
+
+
+        const {
+            data,
+            error
+        } = await db
+            .from('pet_reports')
+            .select('*')
+            .order(
+                'created_at',
+                {
+                    ascending: false
+                }
+            );
+
+
+        if (error) {
+
+            console.error(error);
+
+            contenedor.innerHTML = `
+
+                <div class="alert alert-danger">
+
+                    <i class="bi bi-exclamation-triangle"></i>
+
+                    No se pudieron cargar los reportes.
+
+                    <br>
+
+                    <small>
+                        ${UI.esc(error.message || '')}
+                    </small>
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        reportes = data || [];
+
+        actualizarEstadisticas();
+
+        pintar();
+
+    }
+
+
+    /* ============================================================
+       ESTADÍSTICAS
+       ============================================================ */
+
+    function actualizarEstadisticas() {
+
+        const abandonadas =
+            reportes.filter(
+                r => r.status === 'abandonada'
+            ).length;
+
+
+        const atendidas =
+            reportes.filter(
+                r => r.status === 'atendida'
+            ).length;
+
+
+        document.getElementById(
+            'statTotal'
+        ).textContent = reportes.length;
+
+
+        document.getElementById(
+            'statAbandonadas'
+        ).textContent = abandonadas;
+
+
+        document.getElementById(
+            'statAtendidas'
+        ).textContent = atendidas;
+
+    }
+
+
+    /* ============================================================
+       FILTROS
+       ============================================================ */
+
+    function filtrados() {
+
+        const buscar =
+            document
+                .getElementById('buscar')
+                .value
+                .trim()
+                .toLowerCase();
+
+
+        const estado =
+            document
+                .getElementById('filtroEstado')
+                .value;
+
+
+        const especie =
+            document
+                .getElementById('filtroEspecie')
+                .value;
+
+
+        return reportes.filter(r => {
+
+            const texto = [
+
+                r.pet_name,
+
+                r.zone,
+
+                r.contact_name,
+
+                r.contact_phone,
+
+                r.description
+
+            ]
+            .join(' ')
+            .toLowerCase();
+
+
+            const coincideBusqueda =
+                !buscar ||
+                texto.includes(buscar);
+
+
+            const coincideEstado =
+                estado === 'todos' ||
+                r.status === estado;
+
+
+            const coincideEspecie =
+                especie === 'todos' ||
+                r.species === especie;
+
+
+            return (
+                coincideBusqueda &&
+                coincideEstado &&
+                coincideEspecie
+            );
+
+        });
+
+    }
+
+
+    /* ============================================================
+       PINTAR
+       ============================================================ */
+
+    function pintar() {
+
+        const lista = filtrados();
+
+
+        document.getElementById(
+            'cantidadMostrada'
+        ).textContent =
+            `${lista.length} reporte${lista.length === 1 ? '' : 's'}`;
+
+
+        const contenedor =
+            document.getElementById(
+                'contenedorReportes'
+            );
+
+
+        if (!lista.length) {
+
+            contenedor.innerHTML = `
+
+                <div class="card border-0 shadow-sm">
+
+                    <div class="card-body text-center py-5">
+
+                        <i
+                            class="bi bi-inbox"
+                            style="font-size:3rem">
+                        </i>
+
+                        <h5 class="mt-3">
+                            No hay reportes para mostrar
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            Prueba cambiando los filtros.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        contenedor.innerHTML = `
+
+            <div class="row g-4">
+
+                ${lista.map(crearTarjeta).join('')}
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* ============================================================
+       TARJETA
+       ============================================================ */
+
+    function crearTarjeta(r) {
+
+        const fotos = [
+
+            r.photo_url_1,
+
+            r.photo_url_2,
+
+            r.photo_url_3
+
+        ].filter(Boolean);
+
+
+        const estadoTexto =
+            r.status === 'abandonada'
+                ? 'Abandonada'
+                : 'Atendida';
+
+
+        const estadoClase =
+            r.status === 'abandonada'
+                ? 'bg-danger'
+                : 'bg-success';
+
+
+        const especieTexto =
+            r.species === 'perro'
+                ? '🐶 Perro'
+                : '🐱 Gato';
+
+
+        const fotoPrincipal =
+            fotos[0] || null;
+
+
+        return `
+
+            <div class="col-xl-4 col-lg-6">
+
+                <div class="card h-100 border-0 shadow-sm">
+
+                    ${
+                        fotoPrincipal
+
+                            ? `
+
+                                <img
+                                    src="${UI.esc(fotoPrincipal)}"
+                                    alt="${UI.esc(r.pet_name)}"
+                                    style="
+                                        width:100%;
+                                        height:230px;
+                                        object-fit:cover;
+                                        border-radius:20px 20px 0 0;
+                                    ">
+
+                              `
+
+                            : `
+
+                                <div
+                                    style="
+                                        height:230px;
+                                        display:grid;
+                                        place-items:center;
+                                        background:var(--muted);
+                                        border-radius:20px 20px 0 0;
+                                        font-size:5rem;
+                                    ">
+
+                                    ${r.species === 'perro' ? '🐶' : '🐱'}
+
+                                </div>
+
+                              `
+                    }
+
+
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+
+                            <div>
+
+                                <h5 class="fw-bold mb-1">
+                                    ${UI.esc(r.pet_name)}
+                                </h5>
+
+                                <div class="small text-muted">
+                                    ${especieTexto}
+                                </div>
+
+                            </div>
+
+
+                            <span class="badge ${estadoClase}">
+                                ${estadoTexto}
+                            </span>
+
+                        </div>
+
+
+                        <div class="small mb-2">
+
+                            <i class="bi bi-geo-alt"></i>
+
+                            ${UI.esc(r.zone)}
+
+                        </div>
+
+
+                        <p class="small text-muted mb-3">
+
+                            ${UI.esc(r.description)}
+
+                        </p>
+
+
+                        <div class="small border-top pt-3 mb-3">
+
+                            <strong>
+                                Contacto:
+                            </strong>
+
+                            ${UI.esc(r.contact_name)}
+
+                            <br>
+
+                            <strong>
+                                Teléfono:
+                            </strong>
+
+                            ${UI.esc(r.contact_phone)}
+
+                            <br>
+
+                            <strong>
+                                Fecha:
+                            </strong>
+
+                            ${UI.formatoFecha(r.created_at)}
+
+                        </div>
+
+
+                        ${
+                            fotos.length > 1
+
+                                ? `
+
+                                    <div class="d-flex gap-2 mb-3">
+
+                                        ${fotos.map(f => `
+
+                                            <img
+                                                src="${UI.esc(f)}"
+                                                alt=""
+                                                style="
+                                                    width:60px;
+                                                    height:60px;
+                                                    object-fit:cover;
+                                                    border-radius:10px;
+                                                ">
+
+                                        `).join('')}
+
+                                    </div>
+
+                                  `
+
+                                : ''
+                        }
+
+
+                        <div class="d-grid gap-2">
+
+                            <button
+                                type="button"
+                                class="btn btn-primary-ps"
+                                data-detalle="${r.id}">
+
+                                <i class="bi bi-eye"></i>
+
+                                Ver reporte
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary"
+                                data-mapa="${r.id}">
+
+                                <i class="bi bi-map"></i>
+
+                                Ver ubicación
+
+                            </button>
+
+
+                            ${
+                                r.status === 'abandonada'
+
+                                    ? `
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-success"
+                                            data-atender="${r.id}">
+
+                                            <i class="bi bi-check-circle"></i>
+
+                                            Marcar como atendida
+
+                                        </button>
+
+                                      `
+
+                                    : `
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-danger"
+                                            data-reabrir="${r.id}">
+
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+
+                                            Marcar como abandonada
+
+                                        </button>
+
+                                      `
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* ============================================================
+       VER DETALLE
+       ============================================================ */
+
+    async function verDetalle(id) {
+
+        const r =
+            reportes.find(
+                x => x.id === id
+            );
+
+
+        if (!r) {
+            return;
+        }
+
+
+        const fotos = [
+
+            r.photo_url_1,
+
+            r.photo_url_2,
+
+            r.photo_url_3
+
+        ].filter(Boolean);
+
+
+        const estado =
+            r.status === 'abandonada'
+                ? 'Abandonada'
+                : 'Atendida';
+
+
+        document.getElementById(
+            'detalleTitulo'
+        ).textContent =
+            `Reporte: ${r.pet_name}`;
+
+
+        document.getElementById(
+            'detalleContenido'
+        ).innerHTML = `
+
+            <div class="row g-4">
+
+                <div class="col-lg-7">
+
+                    <div class="row g-2">
+
+                        ${
+                            fotos.length
+
+                                ? fotos.map(f => `
+
+                                    <div class="col-md-${fotos.length === 1 ? '12' : '6'}">
+
+                                        <img
+                                            src="${UI.esc(f)}"
+                                            alt="${UI.esc(r.pet_name)}"
+                                            class="w-100"
+                                            style="
+                                                height:260px;
+                                                object-fit:cover;
+                                                border-radius:16px;
+                                            ">
+
+                                    </div>
+
+                                `).join('')
+
+                                : `
+
+                                    <div class="col-12">
+
+                                        <div
+                                            class="d-flex align-items-center justify-content-center"
+                                            style="
+                                                height:300px;
+                                                background:var(--muted);
+                                                border-radius:16px;
+                                                font-size:5rem;
+                                            ">
+
+                                            ${r.species === 'perro' ? '🐶' : '🐱'}
+
+                                        </div>
+
+                                    </div>
+
+                                  `
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-lg-5">
+
+                    <div class="mb-3">
+
+                        <span class="badge ${
+                            r.status === 'abandonada'
+                                ? 'bg-danger'
+                                : 'bg-success'
+                        }">
+
+                            ${estado}
+
+                        </span>
+
+                    </div>
+
+
+                    <h4 class="fw-bold">
+                        ${UI.esc(r.pet_name)}
+                    </h4>
+
+
+                    <p>
+                        <strong>Especie:</strong>
+                        ${
+                            r.species === 'perro'
+                                ? 'Perro'
+                                : 'Gato'
+                        }
+                    </p>
+
+
+                    <p>
+                        <strong>Zona:</strong>
+                        ${UI.esc(r.zone)}
+                    </p>
+
+
+                    <p>
+                        <strong>Descripción:</strong><br>
+                        ${UI.esc(r.description)}
+                    </p>
+
+
+                    <hr>
+
+
+                    <p>
+                        <strong>Contacto:</strong><br>
+                        ${UI.esc(r.contact_name)}
+                    </p>
+
+
+                    <p>
+                        <strong>Teléfono:</strong><br>
+                        ${UI.esc(r.contact_phone)}
+                    </p>
+
+
+                    <p>
+                        <strong>Fecha del reporte:</strong><br>
+                        ${UI.formatoFecha(r.created_at)}
+                    </p>
+
+
+                    <p class="small text-muted">
+
+                        Coordenadas:
+                        ${Number(r.lat).toFixed(6)},
+                        ${Number(r.lng).toFixed(6)}
+
+                    </p>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-primary-ps w-100"
+                        data-modal-mapa="${r.id}">
+
+                        <i class="bi bi-map"></i>
+
+                        Abrir ubicación
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        modal.show();
+
+    }
+
+
+    /* ============================================================
+       CAMBIAR ESTADO
+       ============================================================ */
+
+    async function cambiarEstado(id, nuevoEstado) {
+
+        const reporte =
+            reportes.find(
+                r => r.id === id
+            );
+
+
+        if (!reporte) {
+            return;
+        }
+
+
+        const texto =
+            nuevoEstado === 'atendida'
+                ? 'atendida'
+                : 'abandonada';
+
+
+        const confirmar =
+            confirm(
+                `¿Quieres marcar este reporte como ${texto}?`
+            );
+
+
+        if (!confirmar) {
+            return;
+        }
+
+
+        const {
+            data,
+            error
+        } = await db
+            .from('pet_reports')
+            .update({
+                status: nuevoEstado
+            })
+            .eq('id', id)
+            .select()
+            .single();
+
+
+        if (error) {
+
+            console.error(error);
+
+            alert(
+                'No se pudo actualizar el reporte: ' +
+                error.message
+            );
+
+            return;
+        }
+
+
+        reportes =
+            reportes.map(r =>
+                r.id === id
+                    ? data
+                    : r
+            );
+
+
+        actualizarEstadisticas();
+
+        pintar();
+
+    }
+
+
+    /* ============================================================
+       MAPA
+       ============================================================ */
+
+    function abrirMapa(id) {
+
+        const r =
+            reportes.find(
+                x => x.id === id
+            );
+
+
+        if (!r) {
+            return;
+        }
+
+
+        const url =
+            `https://www.openstreetmap.org/?mlat=${r.lat}&mlon=${r.lng}#map=17/${r.lat}/${r.lng}`;
+
+
+        window.open(
+            url,
+            '_blank',
+            'noopener'
+        );
+
+    }
+
+
+    /* ============================================================
+       EVENTOS
+       ============================================================ */
+
+    document
+        .getElementById('buscar')
+        .addEventListener(
+            'input',
+            pintar
+        );
+
+
+    document
+        .getElementById('filtroEstado')
+        .addEventListener(
+            'change',
+            pintar
+        );
+
+
+    document
+        .getElementById('filtroEspecie')
+        .addEventListener(
+            'change',
+            pintar
+        );
+
+
+    document
+        .getElementById('btnActualizar')
+        .addEventListener(
+            'click',
+            cargar
+        );
+
+
+    document
+        .getElementById('contenedorReportes')
+        .addEventListener(
+            'click',
+            e => {
+
+                const detalle =
+                    e.target.closest(
+                        '[data-detalle]'
+                    );
+
+                if (detalle) {
+
+                    verDetalle(
+                        detalle.dataset.detalle
+                    );
+
+                    return;
+                }
+
+
+                const mapa =
+                    e.target.closest(
+                        '[data-mapa]'
+                    );
+
+                if (mapa) {
+
+                    abrirMapa(
+                        mapa.dataset.mapa
+                    );
+
+                    return;
+                }
+
+
+                const atender =
+                    e.target.closest(
+                        '[data-atender]'
+                    );
+
+                if (atender) {
+
+                    cambiarEstado(
+                        atender.dataset.atender,
+                        'atendida'
+                    );
+
+                    return;
+                }
+
+
+                const reabrir =
+                    e.target.closest(
+                        '[data-reabrir]'
+                    );
+
+                if (reabrir) {
+
+                    cambiarEstado(
+                        reabrir.dataset.reabrir,
+                        'abandonada'
+                    );
+
+                }
+
+            }
+        );
+
+
+    document
+        .getElementById('detalleContenido')
+        .addEventListener(
+            'click',
+            e => {
+
+                const boton =
+                    e.target.closest(
+                        '[data-modal-mapa]'
+                    );
+
+                if (!boton) {
+                    return;
+                }
+
+                abrirMapa(
+                    boton.dataset.modalMapa
+                );
+
+            }
+        );
+
+
+    /* ============================================================
+       TIEMPO REAL
+       ============================================================ */
+
+    db.channel('admin_pet_reports_live')
+
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'pet_reports'
+            },
+            payload => {
+
+                if (payload.eventType === 'INSERT') {
+
+                    reportes.unshift(
+                        payload.new
+                    );
+
+                }
+
+                if (payload.eventType === 'UPDATE') {
+
+                    reportes =
+                        reportes.map(r =>
+                            r.id === payload.new.id
+                                ? payload.new
+                                : r
+                        );
+
+                }
+
+                if (payload.eventType === 'DELETE') {
+
+                    reportes =
+                        reportes.filter(
+                            r => r.id !== payload.old.id
+                        );
+
+                }
+
+
+                actualizarEstadisticas();
+
+                pintar();
+
+            }
+        )
+
+        .subscribe();
+
+
+    /* CARGA INICIAL */
+
+    cargar();
+
+}
+
+</script>
+
+</body>
+</html>

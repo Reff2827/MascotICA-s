@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Nunito:wght@600;700;800&display=swap");
+
 :root {
     color-scheme: light;
 
@@ -54,7 +56,7 @@
     --specular: inset 0 1px 0 oklch(1 0 0 / 0.72);
     --specular-strong: inset 0 1px 0 oklch(1 0 0 / 0.9);
 
-    /* Elevación: contacto nítido + ambiente amplio (nunca una sola sombra) */
+    /* Elevación */
     --shadow-xs: 0 1px 2px oklch(0.235 0.018 266 / 0.06);
     --shadow-sm:
         0 1px 2px oklch(0.235 0.018 266 / 0.05),
@@ -69,7 +71,7 @@
         0 2px 4px oklch(0.235 0.018 266 / 0.06),
         0 26px 60px -14px oklch(0.235 0.018 266 / 0.20);
 
-    /* Movimiento: una sola curva, la estándar de Apple */
+    /* Movimiento */
     --spring: cubic-bezier(0.32, 0.72, 0, 1);
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --fast: 0.16s;
@@ -85,7 +87,7 @@
         sans-serif;
 }
 
-/* Modo oscuro: por preferencia del sistema o forzado con data-theme */
+/* Modo oscuro */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
         color-scheme: dark;
@@ -125,10 +127,18 @@
         --specular-strong: inset 0 1px 0 oklch(1 0 0 / 0.16);
 
         --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.30);
-        --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.32), 0 2px 8px -2px oklch(0 0 0 / 0.40);
-        --shadow-md: 0 1px 2px oklch(0 0 0 / 0.34), 0 6px 18px -4px oklch(0 0 0 / 0.46);
-        --shadow-lg: 0 1px 3px oklch(0 0 0 / 0.36), 0 14px 34px -8px oklch(0 0 0 / 0.52);
-        --shadow-xl: 0 2px 4px oklch(0 0 0 / 0.38), 0 26px 60px -14px oklch(0 0 0 / 0.62);
+        --shadow-sm:
+            0 1px 2px oklch(0 0 0 / 0.32),
+            0 2px 8px -2px oklch(0 0 0 / 0.40);
+        --shadow-md:
+            0 1px 2px oklch(0 0 0 / 0.34),
+            0 6px 18px -4px oklch(0 0 0 / 0.46);
+        --shadow-lg:
+            0 1px 3px oklch(0 0 0 / 0.36),
+            0 14px 34px -8px oklch(0 0 0 / 0.52);
+        --shadow-xl:
+            0 2px 4px oklch(0 0 0 / 0.38),
+            0 26px 60px -14px oklch(0 0 0 / 0.62);
     }
 }
 
@@ -170,16 +180,22 @@
     --specular-strong: inset 0 1px 0 oklch(1 0 0 / 0.16);
 
     --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.30);
-    --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.32), 0 2px 8px -2px oklch(0 0 0 / 0.40);
-    --shadow-md: 0 1px 2px oklch(0 0 0 / 0.34), 0 6px 18px -4px oklch(0 0 0 / 0.46);
-    --shadow-lg: 0 1px 3px oklch(0 0 0 / 0.36), 0 14px 34px -8px oklch(0 0 0 / 0.52);
-    --shadow-xl: 0 2px 4px oklch(0 0 0 / 0.38), 0 26px 60px -14px oklch(0 0 0 / 0.62);
+    --shadow-sm:
+        0 1px 2px oklch(0 0 0 / 0.32),
+        0 2px 8px -2px oklch(0 0 0 / 0.40);
+    --shadow-md:
+        0 1px 2px oklch(0 0 0 / 0.34),
+        0 6px 18px -4px oklch(0 0 0 / 0.46);
+    --shadow-lg:
+        0 1px 3px oklch(0 0 0 / 0.36),
+        0 14px 34px -8px oklch(0 0 0 / 0.52);
+    --shadow-xl:
+        0 2px 4px oklch(0 0 0 / 0.38),
+        0 26px 60px -14px oklch(0 0 0 / 0.62);
 }
 
 /* --------------------------------------------------------------------------
    2. Puente hacia Bootstrap 5.3
-   Reasigna las variables nativas de Bootstrap para que los componentes que
-   no tocamos hereden el sistema en vez de pelearse con él.
    -------------------------------------------------------------------------- */
 
 :root {
@@ -240,8 +256,6 @@ body {
     text-rendering: optimizeLegibility;
 }
 
-/* El lienzo. Tres focos de luz muy tenues: el cristal necesita algo detrás que
-   refractar, pero el fondo nunca debe competir con el contenido. */
 body::before {
     content: "";
     position: fixed;
@@ -297,13 +311,26 @@ a:hover {
     background: oklch(0.687 0.178 42 / 0.22);
 }
 
-/* Foco visible y consistente en toda la app */
+/* Foco visible y consistente */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
     outline: none;
     box-shadow: 0 0 0 4px var(--ring);
 }
 
-/* Barra de desplazamiento discreta */
+/* MEJORA: foco específico para controles interactivos personalizados */
+:where(
+    .btn,
+    .icon-button,
+    .app-nav__link,
+    .pp-chip,
+    .pp-item
+):focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--ring);
+}
+
+/* Barra de desplazamiento */
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--border-strong) transparent;
@@ -332,8 +359,6 @@ a:hover {
 
 /* --------------------------------------------------------------------------
    4. Tipografía
-   Tracking negativo creciente en los tamaños grandes, como el sistema de
-   tipos de iOS. Cifras tabulares en todo dato cuantitativo.
    -------------------------------------------------------------------------- */
 
 h1, h2, h3, h4, h5, h6,
@@ -345,12 +370,35 @@ h1, h2, h3, h4, h5, h6,
     margin-bottom: 0.5em;
 }
 
-h1, .h1 { font-size: clamp(1.75rem, 1.35rem + 1.7vw, 2.4rem); letter-spacing: -0.024em; }
-h2, .h2 { font-size: clamp(1.45rem, 1.2rem + 1.1vw, 1.9rem);  letter-spacing: -0.021em; }
-h3, .h3 { font-size: clamp(1.2rem, 1.06rem + 0.6vw, 1.45rem); letter-spacing: -0.018em; }
-h4, .h4 { font-size: 1.1rem;    letter-spacing: -0.014em; }
-h5, .h5 { font-size: 1rem;      letter-spacing: -0.011em; }
-h6, .h6 { font-size: 0.9375rem; letter-spacing: -0.008em; }
+h1, .h1 {
+    font-size: clamp(1.75rem, 1.35rem + 1.7vw, 2.4rem);
+    letter-spacing: -0.024em;
+}
+
+h2, .h2 {
+    font-size: clamp(1.45rem, 1.2rem + 1.1vw, 1.9rem);
+    letter-spacing: -0.021em;
+}
+
+h3, .h3 {
+    font-size: clamp(1.2rem, 1.06rem + 0.6vw, 1.45rem);
+    letter-spacing: -0.018em;
+}
+
+h4, .h4 {
+    font-size: 1.1rem;
+    letter-spacing: -0.014em;
+}
+
+h5, .h5 {
+    font-size: 1rem;
+    letter-spacing: -0.011em;
+}
+
+h6, .h6 {
+    font-size: 0.9375rem;
+    letter-spacing: -0.008em;
+}
 
 .fw-bold {
     font-weight: 650 !important;
@@ -365,7 +413,6 @@ h6, .h6 { font-size: 0.9375rem; letter-spacing: -0.008em; }
     line-height: 1.45;
 }
 
-/* Encabezado de página: el icono se convierte en una ficha con la marca */
 body > .container-fluid > h3,
 body > .container-fluid > .d-flex > h3 {
     display: flex;
@@ -418,7 +465,6 @@ body > .container-fluid > .d-flex > h3 > i.bi:first-child {
     backdrop-filter: var(--blur-thick);
 }
 
-/* Si el navegador no soporta desenfoque, se opacan las superficies */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     :root {
         --material-thin: oklch(1 0 0 / 0.94);
@@ -431,8 +477,6 @@ body > .container-fluid > .d-flex > h3 > i.bi:first-child {
 
 /* --------------------------------------------------------------------------
    6. Dock de navegación
-   Es el elemento donde gastamos la audacia: flota, se encoge al hacer scroll,
-   profundiza el desenfoque y lleva una píldora deslizante tras el enlace activo.
    -------------------------------------------------------------------------- */
 
 .app-header {
@@ -477,7 +521,6 @@ body > .container-fluid > .d-flex > h3 > i.bi:first-child {
     box-shadow: var(--specular-strong), var(--shadow-lg);
 }
 
-/* Marca */
 .app-brand {
     display: inline-flex;
     align-items: center;
@@ -529,7 +572,6 @@ body > .container-fluid > .d-flex > h3 > i.bi:first-child {
     border-radius: var(--radius-xs);
 }
 
-/* Enlaces + píldora deslizante */
 .app-nav {
     position: relative;
     display: flex;
@@ -595,7 +637,6 @@ body > .container-fluid > .d-flex > h3 > i.bi:first-child {
     opacity: 1;
 }
 
-/* Zona derecha */
 .app-navbar__tail {
     display: flex;
     align-items: center;
@@ -638,7 +679,6 @@ body > .container-fluid > .d-flex > h3 > i.bi:first-child {
     text-overflow: ellipsis;
 }
 
-/* Botón circular fantasma: tema, salir, menú */
 .icon-button {
     display: inline-flex;
     align-items: center;
@@ -680,14 +720,10 @@ body > .container-fluid > .d-flex > h3 > i.bi:first-child {
     display: none;
 }
 
-/* Navegación desplegable en móvil */
 @media (max-width: 991.98px) {
     .app-navbar {
         flex-wrap: wrap;
         row-gap: 0;
-    }
-
-    .app-navbar {
         gap: 0.25rem;
         padding-left: 0.55rem;
         padding-right: 0.4rem;
@@ -698,8 +734,9 @@ body > .container-fluid > .d-flex > h3 > i.bi:first-child {
         margin-right: auto;
         min-width: 0;
         padding-inline: 0;
+        font-size: 0.95rem;
+        gap: 0.5rem;
     }
-
 
     .app-navbar__tail {
         order: 2;
@@ -723,11 +760,6 @@ body > .container-fluid > .d-flex > h3 > i.bi:first-child {
 
     .app-user {
         padding: 0.28rem;
-    }
-
-    .app-brand {
-        font-size: 0.95rem;
-        gap: 0.5rem;
     }
 
     .app-nav {
@@ -767,9 +799,7 @@ body > .container-fluid > .d-flex > h3 > i.bi:first-child {
     }
 }
 
-/* Pantallas muy estrechas: se recorta lo prescindible antes que envolver */
 @media (max-width: 575.98px) {
-    /* El rol ya queda claro por los propios enlaces del menú */
     .app-brand__role {
         display: none;
     }
@@ -813,11 +843,23 @@ body > .container-fluid {
         box-shadow var(--base) var(--ease-out),
         background-color var(--fast) var(--ease-out),
         border-color var(--fast) var(--ease-out),
-        color var(--fast) var(--ease-out);
+        color var(--fast) var(--ease-out),
+        opacity var(--fast) var(--ease-out);
 }
 
 .btn:active {
     transform: scale(0.97);
+}
+
+/* MEJORA: estado deshabilitado */
+.btn:disabled,
+.btn.disabled,
+fieldset:disabled .btn {
+    pointer-events: none;
+    opacity: 0.55;
+    transform: none !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
 }
 
 .btn-sm {
@@ -838,7 +880,6 @@ body > .container-fluid {
     line-height: 1;
 }
 
-/* Acción principal */
 .btn-primary-ps,
 .btn-primary {
     color: var(--primary-foreground);
@@ -869,7 +910,6 @@ body > .container-fluid {
         0 1px 2px oklch(0.592 0.176 36 / 0.25);
 }
 
-/* Secundario: cristal */
 .btn-outline-primary,
 .btn-outline-secondary,
 .btn-outline-dark,
@@ -957,7 +997,7 @@ body > .container-fluid {
 }
 
 /* --------------------------------------------------------------------------
-   9. Control segmentado (filtros de estado y categoría)
+   9. Control segmentado
    -------------------------------------------------------------------------- */
 
 #filtroCategoria,
@@ -1038,7 +1078,6 @@ body > .container-fluid {
     margin-right: 0.35rem;
 }
 
-/* La acción de la cabecera nunca se parte en dos líneas */
 .card-header .btn {
     flex: 0 0 auto;
     white-space: nowrap;
@@ -1053,7 +1092,6 @@ body > .container-fluid {
     border-top: 1px solid var(--border);
 }
 
-/* Bootstrap fuerza bg-white en varias cabeceras */
 .card-header.bg-white,
 .bg-white {
     background: transparent !important;
@@ -1067,7 +1105,6 @@ body > .container-fluid {
     box-shadow: var(--specular), var(--shadow-sm) !important;
 }
 
-/* Tarjetas de estadística del panel */
 .card-stat {
     position: relative;
     border: 1px solid transparent;
@@ -1083,7 +1120,6 @@ body > .container-fluid {
         box-shadow var(--base) var(--ease-out);
 }
 
-/* Reflejo especular diagonal fijo: es material, no decoración animada */
 .card-stat::after {
     content: "";
     position: absolute;
@@ -1093,7 +1129,8 @@ body > .container-fluid {
         145deg,
         oklch(1 0 0 / 0.22) 0%,
         oklch(1 0 0 / 0.04) 42%,
-        oklch(0 0 0 / 0.08) 100%);
+        oklch(0 0 0 / 0.08) 100%
+    );
     pointer-events: none;
 }
 
@@ -1148,6 +1185,9 @@ body > .container-fluid {
 .card-mascota,
 .card-producto {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     background: var(--card);
@@ -1173,6 +1213,7 @@ body > .container-fluid {
     display: block;
     height: 200px;
     width: 100%;
+    flex: 0 0 200px;
     object-fit: cover;
     background: var(--muted);
     border-bottom: 1px solid var(--border);
@@ -1182,6 +1223,21 @@ body > .container-fluid {
 .card-mascota:hover .img-top,
 .card-producto:hover .img-top {
     transform: scale(1.04);
+}
+
+/* MEJORA: mantiene el contenido y acciones alineados */
+.card-mascota .card-body,
+.card-producto .card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
+.card-mascota .card-body > .btn:last-child,
+.card-producto .card-body > .btn:last-child,
+.card-mascota .card-body > .d-flex:last-child,
+.card-producto .card-body > .d-flex:last-child {
+    margin-top: auto;
 }
 
 .card-mascota .card-title,
@@ -1205,7 +1261,6 @@ body > .container-fluid {
     color: var(--foreground);
 }
 
-/* Precio */
 .card-producto .card-body > .fw-bold {
     font-family: var(--font-numeric);
     font-size: 1.15rem;
@@ -1216,7 +1271,6 @@ body > .container-fluid {
 
 /* --------------------------------------------------------------------------
    11. Insignias de estado
-   Pastillas suaves con punto de color: legibles, no gritan.
    -------------------------------------------------------------------------- */
 
 .badge {
@@ -1356,7 +1410,6 @@ textarea.form-control {
     resize: vertical;
 }
 
-/* Los steppers nativos rompen la alineación dentro de las fichas */
 input[type="number"].form-control-sm::-webkit-outer-spin-button,
 input[type="number"].form-control-sm::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -1369,7 +1422,6 @@ input[type="number"].form-control-sm {
     font-variant-numeric: tabular-nums;
 }
 
-/* Boton nativo del input de archivo, alineado al resto de controles */
 input[type="file"].form-control::file-selector-button,
 input[type="file"].form-control::-webkit-file-upload-button {
     margin-right: 0.8rem;
@@ -1436,7 +1488,6 @@ input[type="file"].form-control::-webkit-file-upload-button:hover {
     background: oklch(0.687 0.178 42 / 0.055);
 }
 
-/* Identificadores: cifras tabulares, peso secundario */
 .table tbody td:first-child {
     font-variant-numeric: tabular-nums;
 }
@@ -1447,7 +1498,6 @@ input[type="file"].form-control::-webkit-file-upload-button:hover {
 
 /* --------------------------------------------------------------------------
    14. Avisos
-   Se comportan como un toast flotante bajo el dock.
    -------------------------------------------------------------------------- */
 
 #alertas {
@@ -1513,6 +1563,7 @@ input[type="file"].form-control::-webkit-file-upload-button:hover {
         opacity: 0;
         transform: translateY(-0.75rem) scale(0.97);
     }
+
     to {
         opacity: 1;
         transform: none;
@@ -1532,14 +1583,14 @@ input[type="file"].form-control::-webkit-file-upload-button:hover {
     justify-content: center;
     padding: 1.5rem;
     overflow: hidden;
-    background: linear-gradient(165deg,
+    background: linear-gradient(
+        165deg,
         oklch(0.232 0.032 268) 0%,
         oklch(0.178 0.028 282) 58%,
-        oklch(0.152 0.022 258) 100%);
+        oklch(0.152 0.022 258) 100%
+    );
 }
 
-/* Luces de fondo: el cristal de la tarjeta necesita algo que refractar, así
-   que los focos se cruzan justo detrás de ella, no en las esquinas. */
 .login-wrapper::before {
     content: "";
     position: absolute;
@@ -1580,6 +1631,7 @@ input[type="file"].form-control::-webkit-file-upload-button:hover {
         opacity: 0;
         transform: translateY(1.25rem) scale(0.97);
     }
+
     to {
         opacity: 1;
         transform: none;
@@ -1654,7 +1706,6 @@ input[type="file"].form-control::-webkit-file-upload-button:hover {
     color: oklch(0.8 0.15 158);
 }
 
-/* Marca del inicio de sesión */
 .login-mark {
     display: inline-flex;
     align-items: center;
@@ -1663,14 +1714,17 @@ input[type="file"].form-control::-webkit-file-upload-button:hover {
     height: 3.5rem;
     font-size: 1.6rem;
     color: oklch(0.995 0.004 80);
-    background: linear-gradient(160deg, oklch(0.762 0.166 52), oklch(0.618 0.182 36));
+    background: linear-gradient(
+        160deg,
+        oklch(0.762 0.166 52),
+        oklch(0.618 0.182 36)
+    );
     border-radius: var(--radius-xl);
     box-shadow:
         inset 0 1px 0 oklch(1 0 0 / 0.4),
         0 10px 26px -8px oklch(0.687 0.178 42 / 0.75);
 }
 
-/* Campo del código de verificación: dígitos separados */
 #codigoPin {
     font-family: var(--font-numeric);
     font-size: 1.35rem;
@@ -1683,24 +1737,38 @@ input[type="file"].form-control::-webkit-file-upload-button:hover {
 
 /* --------------------------------------------------------------------------
    16. Entrada orquestada
-   Un solo momento al cargar: el contenido sube una vez y se queda quieto.
    -------------------------------------------------------------------------- */
 
 body > .container-fluid > * {
     animation: rise var(--slow) var(--spring) both;
 }
 
-body > .container-fluid > *:nth-child(1) { animation-delay: 0.02s; }
-body > .container-fluid > *:nth-child(2) { animation-delay: 0.07s; }
-body > .container-fluid > *:nth-child(3) { animation-delay: 0.12s; }
-body > .container-fluid > *:nth-child(4) { animation-delay: 0.17s; }
-body > .container-fluid > *:nth-child(n+5) { animation-delay: 0.2s; }
+body > .container-fluid > *:nth-child(1) {
+    animation-delay: 0.02s;
+}
+
+body > .container-fluid > *:nth-child(2) {
+    animation-delay: 0.07s;
+}
+
+body > .container-fluid > *:nth-child(3) {
+    animation-delay: 0.12s;
+}
+
+body > .container-fluid > *:nth-child(4) {
+    animation-delay: 0.17s;
+}
+
+body > .container-fluid > *:nth-child(n+5) {
+    animation-delay: 0.2s;
+}
 
 @keyframes rise {
     from {
         opacity: 0;
         transform: translateY(0.75rem);
     }
+
     to {
         opacity: 1;
         transform: none;
@@ -1755,6 +1823,7 @@ body > .container-fluid > *:nth-child(n+5) { animation-delay: 0.2s; }
     .card-mascota .img-top,
     .card-producto .img-top {
         height: 170px;
+        flex-basis: 170px;
     }
 
     body > .container-fluid > h3 > i.bi:first-child,
@@ -1778,8 +1847,6 @@ body > .container-fluid > *:nth-child(n+5) { animation-delay: 0.2s; }
         margin-inline: 1rem;
     }
 
-    /* Cabeceras "titulo + boton" (mascotas.html, productos.html...): que el
-       boton baje debajo del titulo en vez de apretarse en la misma linea */
     body > .container-fluid > .d-flex.justify-content-between.align-items-center {
         flex-wrap: wrap;
         row-gap: 0.6rem;
@@ -1790,8 +1857,6 @@ body > .container-fluid > *:nth-child(n+5) { animation-delay: 0.2s; }
         justify-content: center;
     }
 
-    /* Grupos de filtros (Todas / Disponible / etc.): deslizan en vez de
-       desbordar la pagina cuando no caben todos los botones */
     .btn-group {
         max-width: 100%;
         overflow-x: auto;
@@ -1808,7 +1873,6 @@ body > .container-fluid > *:nth-child(n+5) { animation-delay: 0.2s; }
         flex: 0 0 auto;
     }
 
-    /* Alternador URL / archivo en los formularios de mascota y producto */
     #contenedorUrl ~ #contenedorArchivo,
     .d-flex.gap-2.mb-3 {
         flex-wrap: wrap;
@@ -1818,7 +1882,6 @@ body > .container-fluid > *:nth-child(n+5) { animation-delay: 0.2s; }
         flex: 1 1 auto;
     }
 
-    /* Tarjeta de login: un poco menos de aire en pantallas muy angostas */
     .login-card {
         padding: 1.5rem !important;
     }
@@ -1826,10 +1889,19 @@ body > .container-fluid > *:nth-child(n+5) { animation-delay: 0.2s; }
     .login-wrapper {
         padding: 1rem;
     }
+
+    /* MEJORA: tablas generales desplazables en móvil */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-responsive .table {
+        min-width: 600px;
+    }
 }
 
-/* Las tablas del dashboard no llevan .table-responsive en el HTML: si el
-   contenido no cabe, que se desplace solo la tabla, no toda la pagina */
+/* Las tablas del dashboard no llevan .table-responsive en el HTML */
 #tablaUltimasSolicitudes,
 #tablaStockBajo {
     overflow-x: auto;
@@ -1859,6 +1931,12 @@ body > .container-fluid > *:nth-child(n+5) { animation-delay: 0.2s; }
     .card-mascota:hover .img-top,
     .card-producto:hover .img-top {
         transform: none;
+    }
+
+    /* MEJORA: desactiva también las animaciones específicas de mascotas perdidas */
+    .pp-item.is-new,
+    .pp-live i {
+        animation: none !important;
     }
 }
 
@@ -1915,4 +1993,217 @@ body > .container-fluid > *:nth-child(n+5) { animation-delay: 0.2s; }
 
 :root[data-theme="dark"] .btn-close {
     filter: invert(1) grayscale(100%);
+}
+
+/* ==========================================================================
+   MASCOTAS PERDIDAS
+   ========================================================================== */
+
+.pp-page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1rem 1rem 5rem;
+}
+
+.pp-hero {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 28px;
+    padding: 1.5rem;
+    box-shadow: 0 9px 0 0 var(--primary-active);
+    margin-bottom: 1.5rem;
+}
+
+.pp-hero h1 {
+    font-size: clamp(1.9rem, 5vw, 2.8rem);
+    line-height: .95;
+    margin: .4rem 0;
+}
+
+.pp-hero small {
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-weight: 800;
+    opacity: .75;
+}
+
+.pp-layout {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 992px) {
+    .pp-layout {
+        grid-template-columns: minmax(0, 1.6fr) minmax(340px, 1fr);
+    }
+
+    .pp-mapwrap {
+        position: sticky;
+        top: 90px;
+        align-self: start;
+    }
+
+    .pp-map {
+        height: calc(100vh - 140px) !important;
+    }
+
+    .pp-list {
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+        padding: 0 .4rem 1rem 0;
+    }
+}
+
+.pp-map {
+    height: 55vh;
+    min-height: 300px;
+    border: 2px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--muted);
+    z-index: 0;
+}
+
+.pp-chips {
+    display: flex;
+    gap: .5rem;
+    overflow-x: auto;
+    padding-bottom: .5rem;
+    margin-bottom: .75rem;
+}
+
+.pp-chip {
+    flex: none;
+    border: 2px solid var(--border);
+    background: var(--card-solid);
+    color: var(--foreground);
+    border-radius: 999px;
+    padding: .4rem 1rem;
+    font-weight: 800;
+    font-size: .85rem;
+    cursor: pointer;
+    transition:
+        background-color var(--fast) var(--ease-out),
+        color var(--fast) var(--ease-out),
+        transform var(--fast) var(--spring);
+}
+
+.pp-chip:hover {
+    transform: translateY(-1px);
+}
+
+.pp-chip.on {
+    background: var(--primary);
+    color: #fff;
+}
+
+.pp-item {
+    display: flex;
+    gap: .75rem;
+    padding: .75rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    border-radius: 22px;
+    background: var(--card-solid);
+    box-shadow: var(--shadow-sm);
+    transition:
+        transform var(--fast) var(--spring),
+        box-shadow var(--fast) var(--ease-out),
+        border-color var(--fast) var(--ease-out);
+}
+
+.pp-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.pp-item img,
+.pp-item .ph {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    object-fit: cover;
+    flex: none;
+    background: var(--muted);
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+}
+
+.pp-item.is-new {
+    animation: ppnew 1.6s ease;
+}
+
+@keyframes ppnew {
+    0% {
+        background: var(--warning);
+        transform: scale(1.03);
+    }
+
+    100% {
+        background: var(--card-solid);
+        transform: scale(1);
+    }
+}
+
+.pp-tag {
+    font-size: .7rem;
+    font-weight: 800;
+    border-radius: 999px;
+    padding: .1rem .55rem;
+    background: rgba(47,191,143,.22);
+}
+
+.pp-tag.hallado {
+    background: rgba(251,201,74,.4);
+}
+
+.pata-pin {
+    background: none;
+    border: none;
+}
+
+.pata-pin-inner {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 3px solid var(--border);
+    display: grid;
+    place-items: center;
+    font-size: 16px;
+    box-shadow: 0 2px 0 0 var(--hard, var(--foreground));
+}
+
+.leaflet-popup-content-wrapper {
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+}
+
+.pp-pick {
+    height: 260px;
+}
+
+.pp-live {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .75rem;
+    font-weight: 800;
+}
+
+.pp-live i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--success);
+    animation: pplive 1.4s infinite;
+}
+
+@keyframes pplive {
+    50% {
+        opacity: .25;
+    }
 }

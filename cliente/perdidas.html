@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportar mascota abandonada · MascotICA's</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <script src="../js/theme.js"></script>
+</head>
+
+<body>
+
+<div id="navbar"></div>
+
+<main class="pp-page">
+
+    <section class="pp-hero">
+        <small>
+            Hoy · <span id="total">0</span> reportes activos ·
+            <span class="pp-live"><i></i> en vivo</span>
+        </small>
+
+        <h1>Reportar mascota abandonada</h1>
+
+        <p class="mb-3">
+            ¿Encontraste una mascota abandonada? Repórtala para que el albergue
+            pueda conocer su ubicación y atender el caso.
+        </p>
+
+        <button class="btn btn-sun px-4 py-2" id="btnNuevo" type="button">
+            <i class="bi bi-plus-lg"></i>
+            Crear reporte
+        </button>
+    </section>
+
+    <div class="pp-layout">
+
+        <div class="pp-mapwrap">
+            <div id="mapa" class="pp-map"></div>
+        </div>
+
+        <div>
+            <div class="pp-chips" id="chips"></div>
+            <div class="pp-list" id="lista"></div>
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- MODAL PARA CREAR REPORTE -->
+
+<div class="modal fade" id="modalReporte" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    Reportar mascota abandonada
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar">
+                </button>
+            </div>
+
+
+            <div class="modal-body">
+
+                <form id="form" class="row g-3">
+
+                    <!-- FOTOS -->
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            Fotos de la mascota
+                            <span class="text-muted">(1 a 3)</span>
+                        </label>
+
+                        <input
+                            type="file"
+                            id="fotos"
+                            accept="image/*"
+                            class="form-control"
+                            multiple>
+
+                        <div class="form-text">
+                            Puedes subir hasta 3 fotos para ayudar a identificarla.
+                        </div>
+
+                        <div id="previewFotos" class="pp-photo-preview mt-3"></div>
+
+                    </div>
+
+
+                    <!-- NOMBRE -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Nombre o referencia
+                        </label>
+
+                        <input
+                            id="nombre"
+                            class="form-control"
+                            placeholder="Ej. Sin nombre / Firulais"
+                            maxlength="100"
+                            required>
+
+                    </div>
+
+
+                    <!-- ESPECIE -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Especie
+                        </label>
+
+                        <select id="especie" class="form-select" required>
+
+                            <option value="perro">
+                                🐶 Perro
+                            </option>
+
+                            <option value="gato">
+                                🐱 Gato
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- ZONA -->
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            Zona o barrio
+                        </label>
+
+                        <input
+                            id="zona"
+                            class="form-control"
+                            placeholder="Ej. Subtanjalla"
+                            maxlength="150"
+                            required>
+
+                    </div>
+
+
+                    <!-- DESCRIPCIÓN -->
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            Descripción
+                        </label>
+
+                        <textarea
+                            id="desc"
+                            class="form-control"
+                            rows="3"
+                            maxlength="1000"
+                            placeholder="Color, tamaño, collar, señas particulares, condición, etc."
+                            required></textarea>
+
+                    </div>
+
+
+                    <!-- CONTACTO -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Tu nombre
+                        </label>
+
+                        <input
+                            id="cNombre"
+                            class="form-control"
+                            maxlength="100"
+                            placeholder="Nombre de contacto"
+                            required>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Teléfono / WhatsApp
+                        </label>
+
+                        <input
+                            id="cTel"
+                            class="form-control"
+                            inputmode="tel"
+                            maxlength="30"
+                            placeholder="Ej. 987654321"
+                            required>
+
+                    </div>
+
+
+                    <!-- UBICACIÓN -->
+
+                    <div class="col-12">
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+
+                            <label class="form-label mb-0">
+                                Ubicación donde encontraste a la mascota
+                            </label>
+
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-dark"
+                                id="btnGps">
+
+                                <i class="bi bi-crosshair"></i>
+                                Mi ubicación
+
+                            </button>
+
+                        </div>
+
+                        <div id="mapaPick" class="pp-map pp-pick"></div>
+
+                        <div class="form-text">
+                            Toca el mapa para marcar el lugar exacto.
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-12">
+
+                        <div id="err" class="text-danger fw-bold"></div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-primary-ps w-100"
+                    id="btnPublicar">
+
+                    <i class="bi bi-send-fill"></i>
+                    Publicar reporte
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/supabaseClient.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/ui.js"></script>
+
+
+<script>
+
+const usuario = Auth.usuarioActual();
+
+if (!usuario) {
+    location.replace('../login.html');
+} else {
+    iniciar();
+}
+
+
+function iniciar() {
+
+    UI.navbarPerdidas(usuario);
+
+
+    const CENTRO = [-14.0678, -75.7286];
+
+    const EMO = {
+        perro: '🐶',
+        gato: '🐱'
+    };
+
+    const COL = {
+        perro: 'var(--mint)',
+        gato: 'var(--sun)'
+    };
+
+
+    let reportes = [];
+    let filtro = 'todos';
+
+    let nuevoId = null;
+
+    let pick = null;
+    let pickMarker = null;
+    let mapaPick = null;
+
+
+    const marcadores = new Map();
+
+
+    /* ============================================================
+       MAPA PRINCIPAL
+       ============================================================ */
+
+    const mapa = L.map('mapa').setView(CENTRO, 13);
+
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }
+    ).addTo(mapa);
+
+
+    /* ============================================================
+       UTILIDADES
+       ============================================================ */
+
+    const hace = iso => {
+
+        const minutos = Math.max(
+            1,
+            Math.round(
+                (Date.now() - new Date(iso)) / 60000
+            )
+        );
+
+        if (minutos < 60) {
+            return `hace ${minutos} min`;
+        }
+
+        const horas = Math.round(minutos / 60);
+
+        if (horas < 24) {
+            return `hace ${horas} h`;
+        }
+
+        const dias = Math.round(horas / 24);
+
+        return dias === 1
+            ? 'ayer'
+            : `hace ${dias} días`;
+    };
+
+
+    const fotosReporte = r => {
+
+        return [
+            r.photo_url_1,
+            r.photo_url_2,
+            r.photo_url_3
+        ].filter(Boolean);
+    };
+
+
+    const primeraFoto = r => {
+
+        const fotos = fotosReporte(r);
+
+        return fotos.length
+            ? fotos[0]
+            : null;
+    };
+
+
+    const icono = r => {
+
+        return L.divIcon({
+
+            className: 'pata-pin',
+
+            iconSize: [34, 34],
+
+            iconAnchor: [17, 34],
+
+            html: `
+                <div
+                    class="pata-pin-inner"
+                    style="background:${COL[r.species] || 'var(--brand)'}">
+
+                    ${EMO[r.species] || '🐾'}
+
+                </div>
+            `
+        });
+    };
+
+
+    const visibles = () => {
+
+        if (filtro === 'todos') {
+            return reportes;
+        }
+
+        return reportes.filter(
+            r => r.status === filtro
+        );
+    };
+
+
+    /* ============================================================
+       POPUP
+       ============================================================ */
+
+    const popup = r => {
+
+        const tel = String(
+            r.contact_phone || ''
+        ).replace(/\D/g, '');
+
+        const foto = primeraFoto(r);
+
+        const estado =
+            r.status === 'abandonada'
+                ? 'Abandonada'
+                : 'Atendida';
+
+
+        return `
+            <div style="min-width:190px">
+
+                ${
+                    foto
+                        ? `
+                            <img
+                                src="${UI.esc(foto)}"
+                                alt=""
+                                style="
+                                    width:100%;
+                                    height:120px;
+                                    object-fit:cover;
+                                    border-radius:10px;
+                                    margin-bottom:8px;
+                                ">
+                          `
+                        : ''
+                }
+
+                <strong>
+                    ${UI.esc(r.pet_name)}
+                </strong>
+
+                · ${estado}
+
+                <br>
+
+                <span>
+                    ${r.species === 'perro' ? '🐶 Perro' : '🐱 Gato'}
+                </span>
+
+                <br>
+
+                <span>
+                    ${UI.esc(r.zone)}
+                </span>
+
+                <br>
+
+                <small>
+                    ${UI.esc(r.description)}
+                </small>
+
+                <br>
+
+                ${
+                    tel
+                        ? `
+                            <a
+                                class="btn btn-sm btn-primary-ps mt-2 w-100"
+                                target="_blank"
+                                rel="noopener"
+                                href="https://wa.me/${tel}">
+
+                                <i class="bi bi-whatsapp"></i>
+                                ${UI.esc(
+                                    r.contact_name || 'Contactar'
+                                )}
+
+                            </a>
+                          `
+                        : ''
+                }
+
+            </div>
+        `;
+    };
+
+
+    /* ============================================================
+       PINTAR
+       ============================================================ */
+
+    function pintar() {
+
+        const visiblesReportes = visibles();
+
+        document.getElementById('total').textContent =
+            reportes.filter(
+                r => r.status === 'abandonada'
+            ).length;
+
+
+        document.getElementById('chips').innerHTML = [
+
+            ['todos', 'Todos'],
+
+            ['abandonada', 'Abandonadas'],
+
+            ['atendida', 'Atendidas']
+
+        ]
+        .map(([key, texto]) => `
+
+            <button
+                class="pp-chip ${filtro === key ? 'on' : ''}"
+                data-f="${key}"
+                type="button">
+
+                ${texto}
+
+            </button>
+
+        `)
+        .join('');
+
+
+        marcadores.forEach(
+            marcador => marcador.remove()
+        );
+
+        marcadores.clear();
+
+
+        visiblesReportes.forEach(r => {
+
+            const marcador = L.marker(
+                [r.lat, r.lng],
+                {
+                    icon: icono(r)
+                }
+            )
+            .addTo(mapa)
+            .bindPopup(popup(r));
+
+
+            marcadores.set(
+                r.id,
+                marcador
+            );
+
+        });
+
+
+        document.getElementById('lista').innerHTML =
+            visiblesReportes.length
+
+                ? visiblesReportes.map(r => {
+
+                    const foto = primeraFoto(r);
+
+                    const estadoClase =
+                        r.status === 'abandonada'
+                            ? 'abandonada'
+                            : 'atendida';
+
+                    const estadoTexto =
+                        r.status === 'abandonada'
+                            ? 'Abandonada'
+                            : 'Atendida';
+
+
+                    return `
+
+                        <div
+                            class="pp-item ${r.id === nuevoId ? 'is-new' : ''}"
+                            data-id="${r.id}">
+
+                            ${
+                                foto
+                                    ? `
+                                        <img
+                                            src="${UI.esc(foto)}"
+                                            loading="lazy"
+                                            alt="">
+                                      `
+                                    : `
+                                        <div class="ph">
+                                            ${EMO[r.species] || '🐾'}
+                                        </div>
+                                      `
+                            }
+
+
+                            <div class="min-w-0">
+
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <strong class="fs-5">
+                                        ${UI.esc(r.pet_name)}
+                                    </strong>
+
+                                    <span class="pp-tag ${estadoClase}">
+                                        ${estadoTexto}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="small">
+
+                                    ${
+                                        r.species === 'perro'
+                                            ? '🐶 Perro'
+                                            : '🐱 Gato'
+                                    }
+
+                                    ·
+
+                                    ${hace(r.created_at)}
+
+                                    ·
+
+                                    ${UI.esc(r.zone)}
+
+                                </div>
+
+
+                                <div class="small text-truncate text-muted">
+
+                                    ${UI.esc(r.description)}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }).join('')
+
+                : `
+
+                    <div class="text-center py-4">
+
+                        <i
+                            class="bi bi-geo-alt"
+                            style="font-size:2rem">
+                        </i>
+
+                        <p class="mb-0 mt-2">
+                            Todavía no hay reportes.
+                        </p>
+
+                    </div>
+
+                `;
+    }
+
+
+    /* ============================================================
+       AGREGAR REPORTE
+       ============================================================ */
+
+    function agregar(r) {
+
+        const existe = reportes.some(
+            x => x.id === r.id
+        );
+
+        if (existe) {
+            return;
+        }
+
+        reportes.unshift(r);
+
+        nuevoId = r.id;
+
+        pintar();
+
+
+        setTimeout(() => {
+
+            nuevoId = null;
+
+        }, 1800);
+    }
+
+
+    /* ============================================================
+       FILTROS
+       ============================================================ */
+
+    document
+        .getElementById('chips')
+        .addEventListener('click', e => {
+
+            const boton =
+                e.target.closest('[data-f]');
+
+            if (!boton) {
+                return;
+            }
+
+            filtro = boton.dataset.f;
+
+            pintar();
+
+        });
+
+
+    /* ============================================================
+       CLICK EN LISTA
+       ============================================================ */
+
+    document
+        .getElementById('lista')
+        .addEventListener('click', e => {
+
+            const item =
+                e.target.closest('[data-id]');
+
+            if (!item) {
+                return;
+            }
+
+            const reporte =
+                reportes.find(
+                    x => x.id === item.dataset.id
+                );
+
+            if (!reporte) {
+                return;
+            }
+
+
+            mapa.flyTo(
+                [reporte.lat, reporte.lng],
+                16
+            );
+
+
+            marcadores
+                .get(reporte.id)
+                ?.openPopup();
+
+
+            document
+                .getElementById('mapa')
+                .scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+        });
+
+
+    /* ============================================================
+       CARGAR REPORTES
+       ============================================================ */
+
+    (async () => {
+
+        const {
+            data,
+            error
+        } = await db
+            .from('pet_reports')
+            .select('*')
+            .order(
+                'created_at',
+                {
+                    ascending: false
+                }
+            );
+
+
+        if (error) {
+
+            console.error(error);
+
+            document.getElementById('lista').innerHTML = `
+                <div class="alert alert-danger">
+                    No pudimos cargar los reportes.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        reportes = data || [];
+
+        pintar();
+
+    })();
+
+
+    /* ============================================================
+       TIEMPO REAL
+       ============================================================ */
+
+    db.channel('pet_reports_live')
+
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'pet_reports'
+            },
+            payload => {
+
+                agregar(payload.new);
+
+            }
+        )
+
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'pet_reports'
+            },
+            payload => {
+
+                reportes =
+                    reportes.map(r =>
+                        r.id === payload.new.id
+                            ? payload.new
+                            : r
+                    );
+
+                pintar();
+
+            }
+        )
+
+        .on(
+            'postgres_changes',
+            {
+                event: 'DELETE',
+                schema: 'public',
+                table: 'pet_reports'
+            },
+            payload => {
+
+                reportes =
+                    reportes.filter(
+                        r => r.id !== payload.old.id
+                    );
+
+                pintar();
+
+            }
+        )
+
+        .subscribe();
+
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
+
+    const modal =
+        new bootstrap.Modal(
+            document.getElementById('modalReporte')
+        );
+
+
+    const err = mensaje => {
+
+        document.getElementById('err').textContent =
+            mensaje || '';
+
+    };
+
+
+    /* ============================================================
+       FOTOS
+       ============================================================ */
+
+    const inputFotos =
+        document.getElementById('fotos');
+
+    const previewFotos =
+        document.getElementById('previewFotos');
+
+
+    inputFotos.addEventListener(
+        'change',
+        () => {
+
+            previewFotos.innerHTML = '';
+
+            const archivos =
+                Array.from(inputFotos.files);
+
+
+            if (archivos.length > 3) {
+
+                err(
+                    'Puedes seleccionar máximo 3 fotos.'
+                );
+
+                inputFotos.value = '';
+
+                return;
+            }
+
+
+            archivos.forEach(archivo => {
+
+                const reader =
+                    new FileReader();
+
+
+                reader.onload = e => {
+
+                    const imagen =
+                        document.createElement('img');
+
+                    imagen.src =
+                        e.target.result;
+
+                    imagen.alt =
+                        'Vista previa';
+
+
+                    previewFotos.appendChild(
+                        imagen
+                    );
+
+                };
+
+
+                reader.readAsDataURL(archivo);
+
+            });
+
+        }
+    );
+
+
+    /* ============================================================
+       MAPA DE SELECCIÓN
+       ============================================================ */
+
+    const marcar = (lat, lng) => {
+
+        pick = {
+            lat,
+            lng
+        };
+
+
+        if (pickMarker) {
+
+            pickMarker.setLatLng(
+                [lat, lng]
+            );
+
+        } else {
+
+            pickMarker =
+                L.marker(
+                    [lat, lng]
+                ).addTo(mapaPick);
+
+        }
+
+
+        mapaPick.setView(
+            [lat, lng],
+            Math.max(
+                mapaPick.getZoom(),
+                16
+            )
+        );
+
+    };
+
+
+    document
+        .getElementById('btnNuevo')
+        .addEventListener(
+            'click',
+            () => {
+
+                document
+                    .getElementById('form')
+                    .reset();
+
+                previewFotos.innerHTML = '';
+
+                pick = null;
+
+                if (pickMarker && mapaPick) {
+
+                    mapaPick.removeLayer(
+                        pickMarker
+                    );
+
+                }
+
+                pickMarker = null;
+
+                err('');
+
+                modal.show();
+
+            }
+        );
+
+
+    document
+        .getElementById('modalReporte')
+        .addEventListener(
+            'shown.bs.modal',
+            () => {
+
+                if (!mapaPick) {
+
+                    mapaPick =
+                        L.map(
+                            'mapaPick'
+                        ).setView(
+                            CENTRO,
+                            13
+                        );
+
+
+                    L.tileLayer(
+                        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        {
+                            maxZoom: 19,
+                            attribution:
+                                '© OpenStreetMap'
+                        }
+                    ).addTo(
+                        mapaPick
+                    );
+
+
+                    mapaPick.on(
+                        'click',
+                        e => {
+
+                            marcar(
+                                e.latlng.lat,
+                                e.latlng.lng
+                            );
+
+                        }
+                    );
+
+                }
+
+
+                mapaPick.invalidateSize();
+
+            }
+        );
+
+
+    /* ============================================================
+       GPS
+       ============================================================ */
+
+    document
+        .getElementById('btnGps')
+        .addEventListener(
+            'click',
+            () => {
+
+                if (!navigator.geolocation) {
+
+                    err(
+                        'Tu navegador no permite obtener la ubicación.'
+                    );
+
+                    return;
+                }
+
+
+                err(
+                    'Obteniendo tu ubicación...'
+                );
+
+
+                navigator.geolocation.getCurrentPosition(
+
+                    position => {
+
+                        marcar(
+                            position.coords.latitude,
+                            position.coords.longitude
+                        );
+
+                        err('');
+
+                    },
+
+                    () => {
+
+                        err(
+                            'No pudimos obtener tu ubicación. Toca el mapa.'
+                        );
+
+                    },
+
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+
+                );
+
+            }
+        );
+
+
+    /* ============================================================
+       PUBLICAR
+       ============================================================ */
+
+    document
+        .getElementById('btnPublicar')
+        .addEventListener(
+            'click',
+            async () => {
+
+                err('');
+
+
+                const nombre =
+                    document
+                        .getElementById('nombre')
+                        .value
+                        .trim();
+
+
+                const zona =
+                    document
+                        .getElementById('zona')
+                        .value
+                        .trim();
+
+
+                const descripcion =
+                    document
+                        .getElementById('desc')
+                        .value
+                        .trim();
+
+
+                const contacto =
+                    document
+                        .getElementById('cNombre')
+                        .value
+                        .trim();
+
+
+                const telefono =
+                    document
+                        .getElementById('cTel')
+                        .value
+                        .trim();
+
+
+                const especie =
+                    document
+                        .getElementById('especie')
+                        .value;
+
+
+                const archivos =
+                    Array.from(
+                        inputFotos.files
+                    );
+
+
+                /* VALIDACIONES */
+
+                if (!nombre) {
+
+                    err(
+                        'Escribe el nombre o una referencia para la mascota.'
+                    );
+
+                    return;
+                }
+
+
+                if (!zona) {
+
+                    err(
+                        'Escribe la zona o barrio.'
+                    );
+
+                    return;
+                }
+
+
+                if (!descripcion) {
+
+                    err(
+                        'Agrega una descripción de la mascota.'
+                    );
+
+                    return;
+                }
+
+
+                if (!contacto) {
+
+                    err(
+                        'Escribe tu nombre.'
+                    );
+
+                    return;
+                }
+
+
+                if (!telefono) {
+
+                    err(
+                        'Deja un teléfono para que puedan contactarte.'
+                    );
+
+                    return;
+                }
+
+
+                if (!pick) {
+
+                    err(
+                        'Toca el mapa para marcar la ubicación.'
+                    );
+
+                    return;
+                }
+
+
+                if (
+                    archivos.length < 1 ||
+                    archivos.length > 3
+                ) {
+
+                    err(
+                        'Debes subir entre 1 y 3 fotos.'
+                    );
+
+                    return;
+                }
+
+
+                const boton =
+                    document.getElementById(
+                        'btnPublicar'
+                    );
+
+
+                boton.disabled = true;
+
+                boton.innerHTML =
+                    '<span class="spinner-border spinner-border-sm"></span> Publicando...';
+
+
+                try {
+
+                    const urls = [
+                        null,
+                        null,
+                        null
+                    ];
+
+
+                    /* SUBIR FOTOS */
+
+                    for (
+                        let i = 0;
+                        i < archivos.length;
+                        i++
+                    ) {
+
+                        const archivo =
+                            archivos[i];
+
+
+                        if (!archivo.type.startsWith('image/')) {
+
+                            throw new Error(
+                                'Todos los archivos deben ser imágenes.'
+                            );
+
+                        }
+
+
+                        const extension =
+                            (
+                                archivo.name
+                                    .split('.')
+                                    .pop() || 'jpg'
+                            )
+                            .toLowerCase();
+
+
+                        const path =
+                            `reportes/${crypto.randomUUID()}-${i + 1}.${extension}`;
+
+
+                        const upload =
+                            await db
+                                .storage
+                                .from('pet-photos')
+                                .upload(
+                                    path,
+                                    archivo,
+                                    {
+                                        contentType:
+                                            archivo.type ||
+                                            'image/jpeg'
+                                    }
+                                );
+
+
+                        if (upload.error) {
+                            throw upload.error;
+                        }
+
+
+                        urls[i] =
+                            db
+                                .storage
+                                .from('pet-photos')
+                                .getPublicUrl(path)
+                                .data
+                                .publicUrl;
+
+                    }
+
+
+                    /* INSERTAR REPORTE */
+
+                    const {
+                        data,
+                        error
+                    } = await db
+                        .from('pet_reports')
+                        .insert({
+
+                            pet_name:
+                                nombre,
+
+                            species:
+                                especie,
+
+                            status:
+                                'abandonada',
+
+                            description:
+                                descripcion,
+
+                            zone:
+                                zona,
+
+                            lat:
+                                pick.lat,
+
+                            lng:
+                                pick.lng,
+
+                            photo_url_1:
+                                urls[0],
+
+                            photo_url_2:
+                                urls[1],
+
+                            photo_url_3:
+                                urls[2],
+
+                            contact_name:
+                                contacto,
+
+                            contact_phone:
+                                telefono
+
+                        })
+                        .select()
+                        .single();
+
+
+                    if (error) {
+                        throw error;
+                    }
+
+
+                    agregar(data);
+
+                    modal.hide();
+
+
+                    mapa.flyTo(
+                        [
+                            data.lat,
+                            data.lng
+                        ],
+                        16
+                    );
+
+
+                    setTimeout(
+                        () => {
+
+                            marcadores
+                                .get(data.id)
+                                ?.openPopup();
+
+                        },
+                        900
+                    );
+
+
+                } catch (e) {
+
+                    console.error(e);
+
+                    err(
+                        'No pudimos guardar el reporte. ' +
+                        (
+                            e.message ||
+                            'Inténtalo nuevamente.'
+                        )
+                    );
+
+                }
+
+
+                boton.disabled = false;
+
+                boton.innerHTML =
+                    '<i class="bi bi-send-fill"></i> Publicar reporte';
+
+            }
+        );
+
+}
+
+</script>
+
+</body>
+</html>
