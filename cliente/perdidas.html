@@ -211,10 +211,17 @@
                         <input
                             id="cTel"
                             class="form-control"
-                            inputmode="tel"
-                            maxlength="30"
+                            inputmode="numeric"
+                            autocomplete="tel"
+                            maxlength="9"
+                            minlength="9"
+                            pattern="9[0-9]{8}"
                             placeholder="Ej. 987654321"
                             required>
+
+                        <div class="form-text">
+                            Ingresa un celular peruano de 9 dígitos que empiece con 9.
+                        </div>
 
                     </div>
 
@@ -444,6 +451,11 @@ function iniciar() {
             r.contact_phone || ''
         ).replace(/\D/g, '');
 
+        const telWhatsApp =
+            /^9\d{8}$/.test(tel)
+                ? `51${tel}`
+                : '';
+
         const foto = primeraFoto(r);
 
         const estado =
@@ -499,13 +511,13 @@ function iniciar() {
                 <br>
 
                 ${
-                    tel
+                    telWhatsApp
                         ? `
                             <a
                                 class="btn btn-sm btn-primary-ps mt-2 w-100"
                                 target="_blank"
                                 rel="noopener"
-                                href="https://wa.me/${tel}">
+                                href="https://wa.me/${telWhatsApp}">
 
                                 <i class="bi bi-whatsapp"></i>
                                 ${UI.esc(
@@ -1260,10 +1272,24 @@ function iniciar() {
                 }
 
 
-                if (!telefono) {
+                const telefonoLimpio =
+                    telefono.replace(/\D/g, '');
+
+
+                if (!telefonoLimpio) {
 
                     err(
                         'Deja un teléfono para que puedan contactarte.'
+                    );
+
+                    return;
+                }
+
+
+                if (!/^9\d{8}$/.test(telefonoLimpio)) {
+
+                    err(
+                        'Ingresa un celular peruano válido de 9 dígitos que empiece con 9.'
                     );
 
                     return;
@@ -1422,7 +1448,7 @@ function iniciar() {
                                 contacto,
 
                             contact_phone:
-                                telefono
+                                telefonoLimpio
 
                         })
                         .select()

@@ -627,6 +627,7 @@ function iniciarReportes() {
             `;
 
             return;
+
         }
 
 
@@ -680,6 +681,18 @@ function iniciarReportes() {
 
         const fotoPrincipal =
             fotos[0] || null;
+
+
+        const telefono =
+            String(
+                r.contact_phone || ''
+            ).replace(/\D/g, '');
+
+
+        const telefonoWhatsApp =
+            /^9\d{8}$/.test(telefono)
+                ? `51${telefono}`
+                : '';
 
 
         return `
@@ -823,6 +836,25 @@ function iniciarReportes() {
 
                         <div class="d-grid gap-2">
 
+                            ${
+                                telefonoWhatsApp
+                                    ? `
+                                        <a
+                                            href="https://wa.me/${telefonoWhatsApp}"
+                                            target="_blank"
+                                            rel="noopener"
+                                            class="btn btn-success">
+
+                                            <i class="bi bi-whatsapp"></i>
+
+                                            Contactar por WhatsApp
+
+                                        </a>
+                                      `
+                                    : ''
+                            }
+
+
                             <button
                                 type="button"
                                 class="btn btn-primary-ps"
@@ -926,6 +958,18 @@ function iniciarReportes() {
             r.status === 'abandonada'
                 ? 'Abandonada'
                 : 'Atendida';
+
+
+        const telefono =
+            String(
+                r.contact_phone || ''
+            ).replace(/\D/g, '');
+
+
+        const telefonoWhatsApp =
+            /^9\d{8}$/.test(telefono)
+                ? `51${telefono}`
+                : '';
 
 
         document.getElementById(
@@ -1049,6 +1093,25 @@ function iniciarReportes() {
                         <strong>Teléfono:</strong><br>
                         ${UI.esc(r.contact_phone)}
                     </p>
+
+
+                    ${
+                        telefonoWhatsApp
+                            ? `
+                                <a
+                                    href="https://wa.me/${telefonoWhatsApp}"
+                                    target="_blank"
+                                    rel="noopener"
+                                    class="btn btn-success w-100 mb-3">
+
+                                    <i class="bi bi-whatsapp"></i>
+
+                                    Contactar por WhatsApp
+
+                                </a>
+                              `
+                            : ''
+                    }
 
 
                     <p>
