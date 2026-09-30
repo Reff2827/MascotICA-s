@@ -985,6 +985,28 @@ const FichasAdopcion = {
 
     async buscarPorSolicitud(idSolicitud) {
 
+        const id =
+            Number(idSolicitud);
+
+
+        if (!Number.isInteger(id) || id <= 0) {
+
+            console.error(
+                'ID de solicitud invalido:',
+                idSolicitud
+            );
+
+            return null;
+
+        }
+
+
+        console.log(
+            'Buscando ficha para solicitud:',
+            id
+        );
+
+
         const { data, error } =
             await db.from('fichas_adopcion')
                 .select(`
@@ -1004,14 +1026,77 @@ const FichasAdopcion = {
                 `)
                 .eq(
                     'id_solicitud',
-                    Number(idSolicitud)
+                    id
                 )
                 .maybeSingle();
 
 
         if (error) {
 
-            console.error(error);
+            console.error(
+                'Error al buscar ficha:',
+                error
+            );
+
+            return null;
+
+        }
+
+
+        console.log(
+            'Ficha encontrada:',
+            data
+        );
+
+
+        return data;
+
+    },
+
+
+    async buscarPorCodigo(codigo) {
+
+        if (!codigo) {
+
+            console.error(
+                'Codigo de ficha vacio.'
+            );
+
+            return null;
+
+        }
+
+
+        const { data, error } =
+            await db.from('fichas_adopcion')
+                .select(`
+                    id_ficha,
+                    codigo,
+                    id_solicitud,
+                    id_mascota,
+                    id_usuario,
+                    dni,
+                    fecha_adopcion,
+                    nombre_mascota,
+                    especie,
+                    raza,
+                    edad,
+                    sexo,
+                    imagen_url
+                `)
+                .eq(
+                    'codigo',
+                    codigo
+                )
+                .maybeSingle();
+
+
+        if (error) {
+
+            console.error(
+                'Error al buscar ficha por codigo:',
+                error
+            );
 
             return null;
 
