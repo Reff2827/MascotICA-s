@@ -17,6 +17,11 @@
 <div id="navbar"></div>
 <div id="alertas"></div>
 
+<button type="button" class="btn-carrito-flotante" id="btnAbrirCarrito" aria-label="Ver carrito">
+    <i class="bi bi-cart3"></i>
+    <span class="badge d-none" id="badgeCarrito">0</span>
+</button>
+
 <div class="container-fluid px-4 pb-5">
 
     <h3 class="fw-bold mb-3">
@@ -68,25 +73,63 @@
                 </p>
 
 
-                <form id="formEvaluacion">
+                <form id="formEvaluacion" novalidate>
+
+                    <div class="row g-2 mb-3">
+
+                        <div class="col-5">
+
+                            <label class="form-label">
+                                Tipo de documento
+                            </label>
+
+                            <select
+                                class="form-select"
+                                id="evalTipoDocumento">
+
+                                <option value="DNI">DNI</option>
+                                <option value="CE">Carnet de Extranjería</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-7">
+
+                            <label class="form-label">
+                                Número de documento
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="evalNumeroDocumento"
+                                inputmode="numeric"
+                                maxlength="8"
+                                placeholder="Ej: 12345678">
+
+                            <div class="form-text" id="evalDocAyuda">
+                                Ingresa los 8 dígitos de tu DNI.
+                            </div>
+
+                        </div>
+
+                    </div>
+
 
                     <div class="mb-3">
 
                         <label class="form-label">
-                            DNI del adoptante
+                            Fecha de nacimiento
                         </label>
 
                         <input
-                            type="text"
+                            type="date"
                             class="form-control"
-                            id="evalDni"
-                            inputmode="numeric"
-                            maxlength="8"
-                            placeholder="Ej: 12345678"
-                            required>
+                            id="evalFechaNacimiento">
 
                         <div class="form-text">
-                            Ingresa los 8 dígitos de tu DNI.
+                            Debes ser mayor de 18 años para adoptar.
                         </div>
 
                     </div>
@@ -290,6 +333,43 @@
 </div>
 
 
+<div class="modal fade" id="modalCarrito" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-cart3"></i>
+                    Tu carrito
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div id="listaCarrito"></div>
+                <div id="errCarrito" class="text-danger fw-bold mt-2"></div>
+            </div>
+
+            <div class="modal-footer flex-column align-items-stretch gap-2">
+                <div class="d-flex justify-content-between fw-bold fs-5 px-1">
+                    <span>Total</span>
+                    <span id="totalCarrito">S/ 0.00</span>
+                </div>
+                <button type="button" class="btn btn-primary-ps w-100" id="btnConfirmarCompra" disabled>
+                    <i class="bi bi-bag-check-fill"></i>
+                    Confirmar compra
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabaseClient.js"></script>
@@ -314,11 +394,32 @@
 
         UI.navbarCliente(usuario);
         UI.mostrarFlash();
+        UI.limpiarAlEscribir('#formEvaluacion');
 
         pintarMascotas();
         pintarProductos();
+        iniciarCarrito();
 
     }
+
+
+    /* Ajusta el largo esperado del documento segun el tipo elegido */
+    document
+        .getElementById('evalTipoDocumento')
+        .addEventListener('change', function () {
+
+            const esDni = this.value === 'DNI';
+            const campo = document.getElementById('evalNumeroDocumento');
+
+            campo.maxLength = esDni ? 8 : 11;
+            campo.value = '';
+            campo.classList.remove('is-invalid');
+
+            document.getElementById('evalDocAyuda').textContent = esDni
+                ? 'Ingresa los 8 dígitos de tu DNI.'
+                : 'Ingresa los 11 dígitos de tu Carnet de Extranjería.';
+
+        });
 
 
     async function pintarMascotas() {
@@ -415,6 +516,14 @@
                         .getElementById('formEvaluacion')
                         .reset();
 
+                    document
+                        .querySelectorAll('#formEvaluacion .is-invalid')
+                        .forEach(el => el.classList.remove('is-invalid'));
+
+                    document.getElementById('evalNumeroDocumento').maxLength = 8;
+                    document.getElementById('evalDocAyuda').textContent =
+                        'Ingresa los 8 dígitos de tu DNI.';
+
                     modalEvaluacion.show();
 
                 });
@@ -428,33 +537,69 @@
         .getElementById('btnEnviarEvaluacion')
         .addEventListener('click', async () => {
 
-            const form =
-                document.getElementById('formEvaluacion');
+            const mensaje = UI.validarCampos([
+                { id: 'evalTipoDocumento', etiqueta: 'Tipo de documento' },
+                { id: 'evalNumeroDocumento', etiqueta: 'Número de documento' },
+                { id: 'evalFechaNacimiento', etiqueta: 'Fecha de nacimiento' },
+                { id: 'evalVivienda', etiqueta: 'Tipo de vivienda' },
+                { id: 'evalEspacio', etiqueta: 'Espacio adecuado' },
+                { id: 'evalTiempo', etiqueta: 'Horas disponibles' },
+                { id: 'evalExperiencia', etiqueta: 'Experiencia previa' },
+                { id: 'evalAcuerdo', etiqueta: 'Acuerdo del hogar' },
+                { id: 'evalMotivo', etiqueta: 'Motivo de la adopción' }
+            ]);
+
+            if (mensaje) {
+                UI.setFlash('error', mensaje);
+                return;
+            }
 
 
-            if (!form.checkValidity()) {
+            const tipoDocumento =
+                document.getElementById('evalTipoDocumento').value;
 
-                form.reportValidity();
+            const numeroDocumento =
+                document.getElementById('evalNumeroDocumento').value.trim();
+
+            const patronDocumento =
+                tipoDocumento === 'DNI' ? /^\d{8}$/ : /^\d{11}$/;
+
+            if (!patronDocumento.test(numeroDocumento)) {
+
+                UI.marcarInvalido('evalNumeroDocumento', true);
+
+                UI.setFlash(
+                    'error',
+                    tipoDocumento === 'DNI'
+                        ? 'El DNI debe tener exactamente 8 números.'
+                        : 'El Carnet de Extranjería debe tener exactamente 11 números.'
+                );
 
                 return;
 
             }
 
 
-            const dni =
-                document
-                    .getElementById('evalDni')
-                    .value
-                    .trim();
+            const fechaNacimientoValor =
+                document.getElementById('evalFechaNacimiento').value;
 
+            const fechaNacimiento =
+                new Date(fechaNacimientoValor + 'T00:00:00');
 
-            if (!/^\d{8}$/.test(dni)) {
+            const hoy = new Date();
 
-                UI.setFlash(
-                    'error',
-                    'El DNI debe tener exactamente 8 dígitos.'
-                );
+            if (isNaN(fechaNacimiento.getTime()) || fechaNacimiento > hoy) {
 
+                UI.marcarInvalido('evalFechaNacimiento', true);
+                UI.setFlash('error', 'La fecha de nacimiento no es válida.');
+                return;
+
+            }
+
+            if (UI.edadCumplida(fechaNacimiento, hoy) < 18) {
+
+                UI.marcarInvalido('evalFechaNacimiento', true);
+                UI.setFlash('error', 'Debes ser mayor de 18 años para adoptar.');
                 return;
 
             }
@@ -501,7 +646,9 @@
                     usuario,
                     mascotaSeleccionada,
                     evaluacion,
-                    dni
+                    tipoDocumento,
+                    numeroDocumento,
+                    fechaNacimientoValor
                 );
 
 
@@ -582,29 +729,15 @@
                             Stock: ${p.stock}
                         </p>
 
-                        <div class="d-flex gap-1">
+                        <button
+                            class="btn btn-sm btn-primary w-100"
+                            data-id="${p.idProducto}"
+                            data-action="agregar-carrito">
 
-                            <input
-                                type="number"
-                                value="1"
-                                min="1"
-                                max="${p.stock}"
-                                class="form-control form-control-sm"
-                                style="width:70px;"
-                                id="cant-${p.idProducto}"
-                            >
+                            <i class="bi bi-cart-plus"></i>
+                            Agregar al carrito
 
-                            <button
-                                class="btn btn-sm btn-primary flex-fill"
-                                data-id="${p.idProducto}"
-                                data-action="comprar">
-
-                                <i class="bi bi-cart-plus"></i>
-                                Solicitar compra
-
-                            </button>
-
-                        </div>
+                        </button>
 
                     </div>
 
@@ -615,39 +748,190 @@
         `).join('');
 
 
+        productosCache = productos;
+
+
         cont
-            .querySelectorAll('[data-action="comprar"]')
+            .querySelectorAll('[data-action="agregar-carrito"]')
             .forEach(btn => {
 
-                btn.addEventListener('click', async () => {
-
-                    const cantidad =
-                        document.getElementById(
-                            `cant-${btn.dataset.id}`
-                        ).value;
-
-
-                    const error =
-                        await Solicitudes.crearSolicitudCompra(
-                            usuario,
-                            btn.dataset.id,
-                            cantidad
-                        );
-
-
-                    UI.setFlash(
-                        error ? 'error' : 'exito',
-                        error ||
-                        'Tu solicitud de compra fue enviada. Un administrador la revisara pronto.'
-                    );
-
-
-                    window.location.reload();
-
+                btn.addEventListener('click', () => {
+                    agregarAlCarrito(btn.dataset.id);
                 });
 
             });
 
+    }
+
+
+    /* ================================================================
+       CARRITO DE COMPRAS
+       ================================================================ */
+
+    const CARRITO_KEY = 'ps_carrito';
+    let productosCache = [];
+    let carrito = JSON.parse(localStorage.getItem(CARRITO_KEY) || '{}');
+    let modalCarrito = null;
+
+    function guardarCarrito() {
+        localStorage.setItem(CARRITO_KEY, JSON.stringify(carrito));
+        actualizarBadgeCarrito();
+    }
+
+    function totalItemsCarrito() {
+        return Object.values(carrito).reduce((a, b) => a + b, 0);
+    }
+
+    function actualizarBadgeCarrito() {
+        const total = totalItemsCarrito();
+        const badge = document.getElementById('badgeCarrito');
+        badge.textContent = total;
+        badge.classList.toggle('d-none', total === 0);
+    }
+
+    function productoPorId(id) {
+        return productosCache.find(p => String(p.idProducto) === String(id));
+    }
+
+    function agregarAlCarrito(idProducto) {
+        const producto = productoPorId(idProducto);
+        if (!producto) return;
+
+        const actual = carrito[idProducto] || 0;
+
+        if (actual >= producto.stock) {
+            UI.setFlash('error', `Solo queda stock para ${producto.stock} unidad(es) de ${producto.nombre}.`);
+            UI.mostrarFlash();
+            return;
+        }
+
+        carrito[idProducto] = actual + 1;
+        guardarCarrito();
+    }
+
+    function cambiarCantidadCarrito(idProducto, delta) {
+        const producto = productoPorId(idProducto);
+        const actual = carrito[idProducto] || 0;
+        let nueva = actual + delta;
+
+        if (producto) nueva = Math.min(nueva, producto.stock);
+
+        if (nueva <= 0) {
+            delete carrito[idProducto];
+        } else {
+            carrito[idProducto] = nueva;
+        }
+
+        guardarCarrito();
+        pintarCarrito();
+    }
+
+    function quitarDelCarrito(idProducto) {
+        delete carrito[idProducto];
+        guardarCarrito();
+        pintarCarrito();
+    }
+
+    function totalCarrito() {
+        return Object.entries(carrito).reduce((total, [id, cantidad]) => {
+            const producto = productoPorId(id);
+            return total + (producto ? producto.precio * cantidad : 0);
+        }, 0);
+    }
+
+    function pintarCarrito() {
+        const cont = document.getElementById('listaCarrito');
+        const entradas = Object.entries(carrito).filter(([id]) => productoPorId(id));
+
+        if (entradas.length === 0) {
+            cont.innerHTML = '<p class="text-muted text-center py-4 mb-0">Tu carrito está vacío.</p>';
+        } else {
+            cont.innerHTML = entradas.map(([id, cantidad]) => {
+                const p = productoPorId(id);
+                return `
+                    <div class="fila-carrito">
+                        <div class="fila-carrito__info">
+                            <strong>${UI.esc(p.nombre)}</strong>
+                            <span class="text-muted small">S/ ${Number(p.precio).toFixed(2)} c/u</span>
+                        </div>
+                        <div class="fila-carrito__cant">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-restar="${id}">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <span>${cantidad}</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-sumar="${id}">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                        <strong class="text-nowrap">S/ ${(p.precio * cantidad).toFixed(2)}</strong>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-quitar="${id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>`;
+            }).join('');
+        }
+
+        document.getElementById('totalCarrito').textContent =
+            'S/ ' + totalCarrito().toFixed(2);
+
+        document.getElementById('btnConfirmarCompra').disabled = entradas.length === 0;
+
+        cont.querySelectorAll('[data-sumar]').forEach(b =>
+            b.addEventListener('click', () => cambiarCantidadCarrito(b.dataset.sumar, 1)));
+        cont.querySelectorAll('[data-restar]').forEach(b =>
+            b.addEventListener('click', () => cambiarCantidadCarrito(b.dataset.restar, -1)));
+        cont.querySelectorAll('[data-quitar]').forEach(b =>
+            b.addEventListener('click', () => quitarDelCarrito(b.dataset.quitar)));
+    }
+
+    function iniciarCarrito() {
+        modalCarrito = new bootstrap.Modal(document.getElementById('modalCarrito'));
+        actualizarBadgeCarrito();
+
+        document.getElementById('btnAbrirCarrito').addEventListener('click', () => {
+            document.getElementById('errCarrito').textContent = '';
+            pintarCarrito();
+            modalCarrito.show();
+        });
+
+        document.getElementById('btnConfirmarCompra').addEventListener('click', confirmarCompra);
+    }
+
+    async function confirmarCompra() {
+        const errCont = document.getElementById('errCarrito');
+        errCont.textContent = '';
+
+        const items = Object.entries(carrito).map(([id, cantidad]) => ({
+            id_producto: Number(id),
+            cantidad
+        }));
+
+        if (items.length === 0) return;
+
+        const boton = document.getElementById('btnConfirmarCompra');
+        boton.disabled = true;
+        boton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+
+        const resultado = await Pedidos.crear(items);
+
+        boton.disabled = false;
+        boton.innerHTML = '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
+
+        if (resultado.error) {
+            errCont.textContent = resultado.error;
+            return;
+        }
+
+        carrito = {};
+        guardarCarrito();
+        modalCarrito.hide();
+
+        UI.setFlash(
+            'exito',
+            `Pedido #${resultado.idPedido} registrado. Queda pendiente de pago (lo conectaremos con Izipay en la siguiente etapa).`
+        );
+
+        window.location.reload();
     }
 
 </script>

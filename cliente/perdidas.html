@@ -208,19 +208,31 @@
                             Teléfono / WhatsApp
                         </label>
 
-                        <input
-                            id="cTel"
-                            class="form-control"
-                            inputmode="numeric"
-                            autocomplete="tel"
-                            maxlength="9"
-                            minlength="9"
-                            pattern="9[0-9]{8}"
-                            placeholder="Ej. 987654321"
-                            required>
+                        <div class="input-group">
+
+                            <select id="cPaisCodigo" class="form-select" style="max-width:7.5rem;">
+                                <option value="PE" selected>PE +51</option>
+                                <option value="BO">BO +591</option>
+                                <option value="CL">CL +56</option>
+                                <option value="CO">CO +57</option>
+                                <option value="EC">EC +593</option>
+                                <option value="MX">MX +52</option>
+                                <option value="ES">ES +34</option>
+                                <option value="US">US +1</option>
+                            </select>
+
+                            <input
+                                id="cTel"
+                                type="tel"
+                                class="form-control"
+                                inputmode="tel"
+                                autocomplete="tel"
+                                placeholder="Ej. 987 654 321">
+
+                        </div>
 
                         <div class="form-text">
-                            Ingresa un celular peruano de 9 dígitos que empiece con 9.
+                            Perú (+51) seleccionado por defecto. Debe ser un número válido de WhatsApp.
                         </div>
 
                     </div>
@@ -291,6 +303,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1/bundle/libphonenumber-min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="../js/supabaseClient.js"></script>
@@ -312,6 +325,7 @@ if (!usuario) {
 function iniciar() {
 
     UI.navbarPerdidas(usuario);
+    UI.limpiarAlEscribir('#form');
 
 
     const CENTRO = [-14.0678, -75.7286];
@@ -935,6 +949,16 @@ function iniciar() {
     const previewFotos =
         document.getElementById('previewFotos');
 
+    const TIPOS_FOTO_PERMITIDOS =
+        ['image/jpeg', 'image/jpg', 'image/png'];
+
+    const TAMANO_MAX_FOTO =
+        5 * 1024 * 1024;
+
+    const fotoEsValida = archivo =>
+        TIPOS_FOTO_PERMITIDOS.includes(archivo.type) &&
+        archivo.size <= TAMANO_MAX_FOTO;
+
 
     inputFotos.addEventListener(
         'change',
@@ -956,6 +980,24 @@ function iniciar() {
 
                 return;
             }
+
+
+            const fotoInvalidaPreview =
+                archivos.find(a => !fotoEsValida(a));
+
+            if (fotoInvalidaPreview) {
+
+                err(
+                    'Cada foto debe ser JPG, JPEG o PNG y pesar como máximo 5 MB.'
+                );
+
+                inputFotos.value = '';
+
+                return;
+            }
+
+
+            err('');
 
 
             archivos.forEach(archivo => {
@@ -1039,6 +1081,10 @@ function iniciar() {
                 document
                     .getElementById('form')
                     .reset();
+
+                document
+                    .querySelectorAll('#form .is-invalid')
+                    .forEach(el => el.classList.remove('is-invalid'));
 
                 previewFotos.innerHTML = '';
 
@@ -1183,40 +1229,36 @@ function iniciar() {
                 err('');
 
 
-                const nombre =
-                    document
-                        .getElementById('nombre')
-                        .value
-                        .trim();
+                const mensajeCampos = UI.validarCampos([
+                    { id: 'nombre', etiqueta: 'Nombre o referencia' },
+                    { id: 'zona', etiqueta: 'Zona o barrio' },
+                    { id: 'desc', etiqueta: 'Descripción' },
+                    { id: 'cNombre', etiqueta: 'Tu nombre' }
+                ]);
 
+                if (mensajeCampos) {
+                    err(mensajeCampos);
+                    return;
+                }
+
+
+                const nombre =
+                    document.getElementById('nombre').value.trim();
 
                 const zona =
-                    document
-                        .getElementById('zona')
-                        .value
-                        .trim();
-
+                    document.getElementById('zona').value.trim();
 
                 const descripcion =
-                    document
-                        .getElementById('desc')
-                        .value
-                        .trim();
-
+                    document.getElementById('desc').value.trim();
 
                 const contacto =
-                    document
-                        .getElementById('cNombre')
-                        .value
-                        .trim();
-
+                    document.getElementById('cNombre').value.trim();
 
                 const telefono =
-                    document
-                        .getElementById('cTel')
-                        .value
-                        .trim();
+                    document.getElementById('cTel').value.trim();
 
+                const isoPais =
+                    document.getElementById('cPaisCodigo').value;
 
                 const especie =
                     document
@@ -1230,70 +1272,36 @@ function iniciar() {
                     );
 
 
-                /* VALIDACIONES */
+                /* VALIDACIONES DE FORMATO */
 
-                if (!nombre) {
+                if (!telefono) {
 
-                    err(
-                        'Escribe el nombre o una referencia para la mascota.'
-                    );
-
+                    UI.marcarInvalido('cTel', true);
+                    err('Deja un teléfono para que puedan contactarte.');
                     return;
                 }
 
 
-                if (!zona) {
+                let numeroTelefono = null;
 
-                    err(
-                        'Escribe la zona o barrio.'
-                    );
+                try {
+                    numeroTelefono =
+                        libphonenumber.parsePhoneNumberFromString(telefono, isoPais);
+                } catch (e) {
+                    numeroTelefono = null;
+                }
 
+                if (!numeroTelefono || !numeroTelefono.isValid()) {
+
+                    UI.marcarInvalido('cTel', true);
+                    err('Ingresa un número de teléfono válido para el país seleccionado.');
                     return;
                 }
 
+                UI.marcarInvalido('cTel', false);
 
-                if (!descripcion) {
-
-                    err(
-                        'Agrega una descripción de la mascota.'
-                    );
-
-                    return;
-                }
-
-
-                if (!contacto) {
-
-                    err(
-                        'Escribe tu nombre.'
-                    );
-
-                    return;
-                }
-
-
-                const telefonoLimpio =
-                    telefono.replace(/\D/g, '');
-
-
-                if (!telefonoLimpio) {
-
-                    err(
-                        'Deja un teléfono para que puedan contactarte.'
-                    );
-
-                    return;
-                }
-
-
-                if (!/^9\d{8}$/.test(telefonoLimpio)) {
-
-                    err(
-                        'Ingresa un celular peruano válido de 9 dígitos que empiece con 9.'
-                    );
-
-                    return;
-                }
+                const telefonoNacional = numeroTelefono.nationalNumber;
+                const codigoPaisTelefono = numeroTelefono.countryCallingCode;
 
 
                 if (!pick) {
@@ -1313,6 +1321,19 @@ function iniciar() {
 
                     err(
                         'Debes subir entre 1 y 3 fotos.'
+                    );
+
+                    return;
+                }
+
+
+                const fotoInvalidaEnvio =
+                    archivos.find(a => !fotoEsValida(a));
+
+                if (fotoInvalidaEnvio) {
+
+                    err(
+                        'Cada foto debe ser JPG, JPEG o PNG y pesar como máximo 5 MB.'
                     );
 
                     return;
@@ -1352,10 +1373,10 @@ function iniciar() {
                             archivos[i];
 
 
-                        if (!archivo.type.startsWith('image/')) {
+                        if (!fotoEsValida(archivo)) {
 
                             throw new Error(
-                                'Todos los archivos deben ser imágenes.'
+                                'Cada foto debe ser JPG, JPEG o PNG y pesar como máximo 5 MB.'
                             );
 
                         }
@@ -1448,7 +1469,10 @@ function iniciar() {
                                 contacto,
 
                             contact_phone:
-                                telefonoLimpio
+                                telefonoNacional,
+
+                            contact_phone_country:
+                                codigoPaisTelefono
 
                         })
                         .select()

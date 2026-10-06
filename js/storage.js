@@ -687,7 +687,9 @@ const Solicitudes = {
         usuario,
         idMascota,
         evaluacion,
-        dni
+        tipoDocumento,
+        numeroDocumento,
+        fechaNacimiento
     ) {
 
         const { error } =
@@ -700,8 +702,14 @@ const Solicitudes = {
                     p_evaluacion:
                         evaluacion || null,
 
-                    p_dni:
-                        dni
+                    p_tipo_documento:
+                        tipoDocumento,
+
+                    p_numero_documento:
+                        numeroDocumento,
+
+                    p_fecha_nacimiento:
+                        fechaNacimiento
                 }
             );
 
@@ -1131,6 +1139,55 @@ const FichasAdopcion = {
 
         return data;
 
+    }
+
+};
+
+const Pedidos = {
+
+    async crear(items) {
+
+        const { data, error } =
+            await db.rpc('crear_pedido', {
+                p_items: items
+            });
+
+        if (error) {
+            return { error: error.message };
+        }
+
+        return { idPedido: data };
+    },
+
+    async listarPropios() {
+
+        const { data, error } =
+            await db.from('pedidos')
+                .select('idPedido:id_pedido, fecha, total, estado, venceEn:vence_en, numeroBoleta:numero_boleta')
+                .order('fecha', { ascending: false });
+
+        if (error) {
+            console.error(error);
+            return [];
+        }
+
+        return data;
+    },
+
+    async buscarPorId(idPedido) {
+
+        const { data, error } =
+            await db.from('pedidos')
+                .select('idPedido:id_pedido, fecha, total, estado, venceEn:vence_en, numeroBoleta:numero_boleta')
+                .eq('id_pedido', Number(idPedido))
+                .maybeSingle();
+
+        if (error) {
+            console.error(error);
+            return null;
+        }
+
+        return data;
     }
 
 };

@@ -856,6 +856,83 @@ const UI = {
 
             : `https://placehold.co/300x200?text=${encodeURIComponent(texto)}`;
 
+    },
+
+    /* ----------------------------------------------------------------------
+       Validacion de formularios
+       Sistema visual unico: campo obligatorio vacio -> borde rojo +
+       foco en el primero + mensaje unico (singular o "completa todos").
+       Las validaciones de formato (DNI, edad, telefono, fotos...) se
+       siguen mostrando aparte, con su propio mensaje especifico.
+       ---------------------------------------------------------------------- */
+
+    validarCampos(definiciones) {
+        let primerInvalido = null;
+        const faltantes = [];
+
+        definiciones.forEach(({ id, etiqueta }) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            const valor = (el.value || '').trim();
+            const ok = valor !== '';
+
+            el.classList.toggle('is-invalid', !ok);
+
+            if (!ok) {
+                faltantes.push(etiqueta);
+                if (!primerInvalido) primerInvalido = el;
+            }
+        });
+
+        if (primerInvalido) primerInvalido.focus();
+
+        if (faltantes.length === 1) {
+            return `Completa el campo ${faltantes[0]}.`;
+        }
+        if (faltantes.length > 1) {
+            return 'Completa todos los campos obligatorios.';
+        }
+        return null;
+    },
+
+    marcarInvalido(id, esInvalido) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('is-invalid', !!esInvalido);
+        if (esInvalido) el.focus();
+    },
+
+    limpiarInvalido(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('is-invalid');
+    },
+
+    /* Quita el borde rojo de cualquier campo en cuanto el usuario lo toca */
+    limpiarAlEscribir(formulario) {
+        const form = typeof formulario === 'string'
+            ? document.querySelector(formulario)
+            : formulario;
+        if (!form) return;
+
+        const limpiar = e => {
+            if (e.target && e.target.classList) {
+                e.target.classList.remove('is-invalid');
+            }
+        };
+
+        form.addEventListener('input', limpiar);
+        form.addEventListener('change', limpiar);
+    },
+
+    /* Edad en anos cumplidos a partir de una fecha de nacimiento */
+    edadCumplida(fechaNacimiento, referencia = new Date()) {
+        let edad = referencia.getFullYear() - fechaNacimiento.getFullYear();
+        const mes = referencia.getMonth() - fechaNacimiento.getMonth();
+        if (mes < 0 || (mes === 0 && referencia.getDate() < fechaNacimiento.getDate())) {
+            edad--;
+        }
+        return edad;
     }
 
 };
