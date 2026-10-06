@@ -5,10 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportar mascota abandonada · MascotICA's</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <link
+        rel="stylesheet"
+        href="../css/styles.css">
 
     <script src="../js/theme.js"></script>
 </head>
@@ -17,279 +28,375 @@
 
 <div id="navbar"></div>
 
-<main class="pp-page">
+<div id="alertas"></div>
 
-    <section class="pp-hero">
-        <small>
-            Hoy · <span id="total">0</span> reportes activos ·
-            <span class="pp-live"><i></i> en vivo</span>
-        </small>
+<div class="container-fluid px-4 pb-5">
 
-        <h1>Reportar mascota abandonada</h1>
-
-        <p class="mb-3">
-            ¿Encontraste una mascota abandonada? Repórtala para que el albergue
-            pueda conocer su ubicación y atender el caso.
-        </p>
-
-        <button class="btn btn-sun px-4 py-2" id="btnNuevo" type="button">
-            <i class="bi bi-plus-lg"></i>
-            Crear reporte
-        </button>
-    </section>
-
-    <div class="pp-layout">
-
-        <div class="pp-mapwrap">
-            <div id="mapa" class="pp-map"></div>
-        </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
 
         <div>
-            <div class="pp-chips" id="chips"></div>
-            <div class="pp-list" id="lista"></div>
+            <h3 class="fw-bold mb-1">
+                <i class="bi bi-geo-alt"></i>
+                Mascotas abandonadas
+            </h3>
+
+            <p class="text-muted mb-0">
+                Reporta una mascota encontrada para ayudar a localizar a su familia.
+            </p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+
+            <span class="badge rounded-pill bg-success">
+                <span id="total">0</span> en vivo
+            </span>
+
+            <button
+                type="button"
+                class="btn btn-primary-ps"
+                id="btnNuevo">
+                <i class="bi bi-plus-circle"></i>
+                Nuevo reporte
+            </button>
+
         </div>
 
     </div>
 
-</main>
+    <div class="row g-4">
 
+        <div class="col-lg-7">
 
-<!-- MODAL PARA CREAR REPORTE -->
+            <div class="card h-100">
 
-<div class="modal fade" id="modalReporte" tabindex="-1" aria-hidden="true">
+                <div class="card-body p-2">
 
-    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                    <div
+                        id="mapa"
+                        style="height: 620px; border-radius: 12px;">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-5">
+
+            <div class="d-flex flex-wrap gap-2 mb-3" id="chips">
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    data-filtro="todos">
+                    Todos
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    data-filtro="abandonada">
+                    Abandonadas
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    data-filtro="atendida">
+                    Atendidas
+                </button>
+
+            </div>
+
+            <div id="lista"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div
+    class="modal fade"
+    id="modalReporte"
+    tabindex="-1"
+    data-bs-backdrop="static">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
 
         <div class="modal-content">
 
             <div class="modal-header">
+
                 <h5 class="modal-title">
-                    <i class="bi bi-geo-alt-fill"></i>
-                    Reportar mascota abandonada
+                    <i class="bi bi-plus-circle"></i>
+                    Reportar mascota
                 </h5>
 
                 <button
                     type="button"
                     class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Cerrar">
+                    data-bs-dismiss="modal">
                 </button>
-            </div>
 
+            </div>
 
             <div class="modal-body">
 
-                <form id="form" class="row g-3">
+                <form
+                    id="formReporte"
+                    novalidate>
 
-                    <!-- FOTOS -->
-
-                    <div class="col-12">
+                    <div class="mb-3">
 
                         <label class="form-label">
-                            Fotos de la mascota
-                            <span class="text-muted">(1 a 3)</span>
+                            Fotos
                         </label>
 
                         <input
                             type="file"
-                            id="fotos"
-                            accept="image/*"
                             class="form-control"
+                            id="fotos"
+                            accept="image/jpeg,image/png"
                             multiple>
 
                         <div class="form-text">
-                            Puedes subir hasta 3 fotos para ayudar a identificarla.
+                            Selecciona de 1 a 3 fotos. Máximo 5 MB por foto.
                         </div>
 
-                        <div id="previewFotos" class="pp-photo-preview mt-3"></div>
+                        <div
+                            id="previewFotos"
+                            class="row g-2 mt-2">
+                        </div>
 
                     </div>
 
+                    <div class="row g-3">
 
-                    <!-- NOMBRE -->
+                        <div class="col-md-6">
 
-                    <div class="col-md-6">
+                            <label
+                                class="form-label"
+                                for="nombre">
+                                Nombre o referencia
+                            </label>
 
-                        <label class="form-label">
-                            Nombre o referencia
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="nombre"
+                                maxlength="100"
+                                required>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label
+                                class="form-label"
+                                for="especie">
+                                Especie
+                            </label>
+
+                            <select
+                                class="form-select"
+                                id="especie"
+                                required>
+
+                                <option value="">
+                                    Selecciona...
+                                </option>
+
+                                <option value="Perro">
+                                    Perro
+                                </option>
+
+                                <option value="Gato">
+                                    Gato
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3 mt-3">
+
+                        <label
+                            class="form-label"
+                            for="zona">
+                            Zona
                         </label>
 
                         <input
-                            id="nombre"
+                            type="text"
                             class="form-control"
-                            placeholder="Ej. Sin nombre / Firulais"
-                            maxlength="100"
-                            required>
-
-                    </div>
-
-
-                    <!-- ESPECIE -->
-
-                    <div class="col-md-6">
-
-                        <label class="form-label">
-                            Especie
-                        </label>
-
-                        <select id="especie" class="form-select" required>
-
-                            <option value="perro">
-                                🐶 Perro
-                            </option>
-
-                            <option value="gato">
-                                🐱 Gato
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- ZONA -->
-
-                    <div class="col-12">
-
-                        <label class="form-label">
-                            Zona o barrio
-                        </label>
-
-                        <input
                             id="zona"
-                            class="form-control"
-                            placeholder="Ej. Subtanjalla"
                             maxlength="150"
                             required>
 
                     </div>
 
+                    <div class="mb-3">
 
-                    <!-- DESCRIPCIÓN -->
-
-                    <div class="col-12">
-
-                        <label class="form-label">
+                        <label
+                            class="form-label"
+                            for="desc">
                             Descripción
                         </label>
 
                         <textarea
-                            id="desc"
                             class="form-control"
-                            rows="3"
+                            id="desc"
+                            rows="4"
                             maxlength="1000"
-                            placeholder="Color, tamaño, collar, señas particulares, condición, etc."
                             required></textarea>
 
                     </div>
 
+                    <div class="mb-3">
 
-                    <!-- CONTACTO -->
-
-                    <div class="col-md-6">
-
-                        <label class="form-label">
-                            Tu nombre
+                        <label
+                            class="form-label"
+                            for="cNombre">
+                            Nombre de contacto
                         </label>
 
                         <input
-                            id="cNombre"
+                            type="text"
                             class="form-control"
+                            id="cNombre"
                             maxlength="100"
-                            placeholder="Nombre de contacto"
                             required>
 
                     </div>
 
-
-                    <div class="col-md-6">
+                    <div class="mb-3">
 
                         <label class="form-label">
-                            Teléfono / WhatsApp
+                            Teléfono de contacto
                         </label>
 
-                        <div class="input-group">
+                        <div class="row g-2">
 
-                            <select id="cPaisCodigo" class="form-select" style="max-width:7.5rem;">
-                                <option value="PE" selected>PE +51</option>
-                                <option value="BO">BO +591</option>
-                                <option value="CL">CL +56</option>
-                                <option value="CO">CO +57</option>
-                                <option value="EC">EC +593</option>
-                                <option value="MX">MX +52</option>
-                                <option value="ES">ES +34</option>
-                                <option value="US">US +1</option>
-                            </select>
+                            <div class="col-sm-4">
 
-                            <input
-                                id="cTel"
-                                type="tel"
-                                class="form-control"
-                                inputmode="tel"
-                                autocomplete="tel"
-                                placeholder="Ej. 987 654 321">
+                                <select
+                                    class="form-select"
+                                    id="cPaisCodigo"
+                                    required>
+
+                                    <option value="51" data-iso="PE">
+                                        +51 Perú
+                                    </option>
+
+                                    <option value="591" data-iso="BO">
+                                        +591 Bolivia
+                                    </option>
+
+                                    <option value="56" data-iso="CL">
+                                        +56 Chile
+                                    </option>
+
+                                    <option value="57" data-iso="CO">
+                                        +57 Colombia
+                                    </option>
+
+                                    <option value="593" data-iso="EC">
+                                        +593 Ecuador
+                                    </option>
+
+                                    <option value="52" data-iso="MX">
+                                        +52 México
+                                    </option>
+
+                                    <option value="34" data-iso="ES">
+                                        +34 España
+                                    </option>
+
+                                    <option value="1" data-iso="US">
+                                        +1 Estados Unidos
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-sm-8">
+
+                                <input
+                                    type="tel"
+                                    class="form-control"
+                                    id="cTel"
+                                    inputmode="numeric"
+                                    autocomplete="tel"
+                                    maxlength="15"
+                                    required
+                                    placeholder="Número de teléfono">
+
+                            </div>
 
                         </div>
 
                         <div class="form-text">
-                            Perú (+51) seleccionado por defecto. Debe ser un número válido de WhatsApp.
+                            Ingresa solamente el número nacional, sin el código de país.
                         </div>
 
                     </div>
 
+                    <div class="mb-3">
 
-                    <!-- UBICACIÓN -->
+                        <label class="form-label">
+                            Ubicación
+                        </label>
 
-                    <div class="col-12">
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary w-100 mb-2"
+                            id="btnGps">
 
-                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <i class="bi bi-crosshair"></i>
+                            Usar mi ubicación
 
-                            <label class="form-label mb-0">
-                                Ubicación donde encontraste a la mascota
-                            </label>
+                        </button>
 
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-outline-dark"
-                                id="btnGps">
-
-                                <i class="bi bi-crosshair"></i>
-                                Mi ubicación
-
-                            </button>
-
+                        <div
+                            id="mapaPick"
+                            style="height: 300px; border-radius: 12px;">
                         </div>
-
-                        <div id="mapaPick" class="pp-map pp-pick"></div>
 
                         <div class="form-text">
-                            Toca el mapa para marcar el lugar exacto.
+                            También puedes seleccionar directamente un punto en el mapa.
                         </div>
 
                     </div>
 
-
-                    <div class="col-12">
-
-                        <div id="err" class="text-danger fw-bold"></div>
-
+                    <div
+                        id="err"
+                        class="text-danger fw-bold">
                     </div>
 
                 </form>
 
             </div>
 
-
             <div class="modal-footer">
 
                 <button
                     type="button"
-                    class="btn btn-primary-ps w-100"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary-ps"
                     id="btnPublicar">
-
-                    <i class="bi bi-send-fill"></i>
+                    <i class="bi bi-send"></i>
                     Publicar reporte
-
                 </button>
 
             </div>
@@ -300,16 +407,18 @@
 
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1/bundle/libphonenumber-min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="../js/supabaseClient.js"></script>
+<script src="../js/storage.js"></script>
 <script src="../js/auth.js"></script>
 <script src="../js/ui.js"></script>
-
 
 <script>
 
@@ -321,549 +430,204 @@ if (!usuario) {
     iniciar();
 }
 
+let mapa = null;
+let mapaPick = null;
+let marcadorPick = null;
+
+let reportes = [];
+let filtroActual = 'todos';
+
+let latSeleccionada = null;
+let lngSeleccionada = null;
+
+const modalReporte =
+    new bootstrap.Modal(
+        document.getElementById('modalReporte')
+    );
+
+const iconosEspecie = {
+    perro: '🐶',
+    gato: '🐱'
+};
 
 function iniciar() {
 
     UI.navbarPerdidas(usuario);
-    UI.limpiarAlEscribir('#form');
 
+    UI.limpiarAlEscribir(
+        '#formReporte'
+    );
 
-    const CENTRO = [-14.0678, -75.7286];
+    crearMapa();
 
-    const EMO = {
-        perro: '🐶',
-        gato: '🐱'
-    };
+    cargarReportes();
 
-    const COL = {
-        perro: 'var(--mint)',
-        gato: 'var(--sun)'
-    };
+    iniciarRealtime();
 
+    document
+        .getElementById('btnNuevo')
+        .addEventListener(
+            'click',
+            abrirNuevoReporte
+        );
 
-    let reportes = [];
-    let filtro = 'todos';
+    document
+        .getElementById('btnPublicar')
+        .addEventListener(
+            'click',
+            publicarReporte
+        );
 
-    let nuevoId = null;
+    document
+        .getElementById('btnGps')
+        .addEventListener(
+            'click',
+            usarUbicacion
+        );
 
-    let pick = null;
-    let pickMarker = null;
-    let mapaPick = null;
+    document
+        .getElementById('fotos')
+        .addEventListener(
+            'change',
+            revisarFotos
+        );
 
+    document
+        .getElementById('cTel')
+        .addEventListener(
+            'input',
+            event => {
 
-    const marcadores = new Map();
+                event.target.value =
+                    event.target.value.replace(
+                        /\D/g,
+                        ''
+                    );
 
+                if (
+                    event.target.value.length > 15
+                ) {
+                    event.target.value =
+                        event.target.value.slice(
+                            0,
+                            15
+                        );
+                }
+            }
+        );
 
-    /* ============================================================
-       MAPA PRINCIPAL
-       ============================================================ */
+    document
+        .getElementById('cPaisCodigo')
+        .addEventListener(
+            'change',
+            () => {
 
-    const mapa = L.map('mapa').setView(CENTRO, 13);
+                const telefono =
+                    document.getElementById(
+                        'cTel'
+                    );
+
+                telefono.value = '';
+
+                telefono.classList.remove(
+                    'is-invalid',
+                    'is-valid'
+                );
+            }
+        );
+
+    document
+        .querySelectorAll(
+            '#chips [data-filtro]'
+        )
+        .forEach(chip => {
+
+            chip.addEventListener(
+                'click',
+                () => {
+
+                    filtroActual =
+                        chip.dataset.filtro;
+
+                    document
+                        .querySelectorAll(
+                            '#chips [data-filtro]'
+                        )
+                        .forEach(item => {
+
+                            const activo =
+                                item.dataset.filtro ===
+                                filtroActual;
+
+                            item.classList.toggle(
+                                'btn-primary',
+                                activo
+                            );
+
+                            item.classList.toggle(
+                                'btn-outline-secondary',
+                                !activo
+                            );
+                        });
+
+                    pintarReportes();
+                }
+            );
+        });
+}
+
+function crearMapa() {
+
+    mapa = L.map('mapa').setView(
+        [-14.0678, -75.7286],
+        13
+    );
 
     L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
             maxZoom: 19,
-            attribution: '© OpenStreetMap'
+            attribution: '&copy; OpenStreetMap'
         }
     ).addTo(mapa);
+}
 
+async function cargarReportes() {
 
-    /* ============================================================
-       UTILIDADES
-       ============================================================ */
-
-    const hace = iso => {
-
-        const minutos = Math.max(
-            1,
-            Math.round(
-                (Date.now() - new Date(iso)) / 60000
-            )
+    const {
+        data,
+        error
+    } = await db
+        .from('pet_reports')
+        .select('*')
+        .order(
+            'created_at',
+            {
+                ascending: false
+            }
         );
 
-        if (minutos < 60) {
-            return `hace ${minutos} min`;
-        }
-
-        const horas = Math.round(minutos / 60);
-
-        if (horas < 24) {
-            return `hace ${horas} h`;
-        }
-
-        const dias = Math.round(horas / 24);
-
-        return dias === 1
-            ? 'ayer'
-            : `hace ${dias} días`;
-    };
-
-
-    const fotosReporte = r => {
-
-        return [
-            r.photo_url_1,
-            r.photo_url_2,
-            r.photo_url_3
-        ].filter(Boolean);
-    };
-
-
-    const primeraFoto = r => {
-
-        const fotos = fotosReporte(r);
-
-        return fotos.length
-            ? fotos[0]
-            : null;
-    };
-
-
-    const icono = r => {
-
-        return L.divIcon({
-
-            className: 'pata-pin',
-
-            iconSize: [34, 34],
-
-            iconAnchor: [17, 34],
-
-            html: `
-                <div
-                    class="pata-pin-inner"
-                    style="background:${COL[r.species] || 'var(--brand)'}">
-
-                    ${EMO[r.species] || '🐾'}
-
-                </div>
-            `
-        });
-    };
-
-
-    const visibles = () => {
-
-        if (filtro === 'todos') {
-            return reportes;
-        }
-
-        return reportes.filter(
-            r => r.status === filtro
-        );
-    };
-
-
-    /* ============================================================
-       POPUP
-       ============================================================ */
-
-    const popup = r => {
-
-        const tel = String(
-            r.contact_phone || ''
-        ).replace(/\D/g, '');
-
-        const telWhatsApp =
-            /^9\d{8}$/.test(tel)
-                ? `51${tel}`
-                : '';
-
-        const foto = primeraFoto(r);
-
-        const estado =
-            r.status === 'abandonada'
-                ? 'Abandonada'
-                : 'Atendida';
-
-
-        return `
-            <div style="min-width:190px">
-
-                ${
-                    foto
-                        ? `
-                            <img
-                                src="${UI.esc(foto)}"
-                                alt=""
-                                style="
-                                    width:100%;
-                                    height:120px;
-                                    object-fit:cover;
-                                    border-radius:10px;
-                                    margin-bottom:8px;
-                                ">
-                          `
-                        : ''
-                }
-
-                <strong>
-                    ${UI.esc(r.pet_name)}
-                </strong>
-
-                · ${estado}
-
-                <br>
-
-                <span>
-                    ${r.species === 'perro' ? '🐶 Perro' : '🐱 Gato'}
-                </span>
-
-                <br>
-
-                <span>
-                    ${UI.esc(r.zone)}
-                </span>
-
-                <br>
-
-                <small>
-                    ${UI.esc(r.description)}
-                </small>
-
-                <br>
-
-                ${
-                    telWhatsApp
-                        ? `
-                            <a
-                                class="btn btn-sm btn-primary-ps mt-2 w-100"
-                                target="_blank"
-                                rel="noopener"
-                                href="https://wa.me/${telWhatsApp}">
-
-                                <i class="bi bi-whatsapp"></i>
-                                ${UI.esc(
-                                    r.contact_name || 'Contactar'
-                                )}
-
-                            </a>
-                          `
-                        : ''
-                }
-
-            </div>
-        `;
-    };
-
-
-    /* ============================================================
-       PINTAR
-       ============================================================ */
-
-    function pintar() {
-
-        const visiblesReportes = visibles();
-
-        document.getElementById('total').textContent =
-            reportes.filter(
-                r => r.status === 'abandonada'
-            ).length;
-
-
-        document.getElementById('chips').innerHTML = [
-
-            ['todos', 'Todos'],
-
-            ['abandonada', 'Abandonadas'],
-
-            ['atendida', 'Atendidas']
-
-        ]
-        .map(([key, texto]) => `
-
-            <button
-                class="pp-chip ${filtro === key ? 'on' : ''}"
-                data-f="${key}"
-                type="button">
-
-                ${texto}
-
-            </button>
-
-        `)
-        .join('');
-
-
-        marcadores.forEach(
-            marcador => marcador.remove()
+    if (error) {
+        console.error(error);
+
+        UI.setFlash(
+            'error',
+            'No se pudieron cargar los reportes.'
         );
 
-        marcadores.clear();
+        UI.mostrarFlash();
 
-
-        visiblesReportes.forEach(r => {
-
-            const marcador = L.marker(
-                [r.lat, r.lng],
-                {
-                    icon: icono(r)
-                }
-            )
-            .addTo(mapa)
-            .bindPopup(popup(r));
-
-
-            marcadores.set(
-                r.id,
-                marcador
-            );
-
-        });
-
-
-        document.getElementById('lista').innerHTML =
-            visiblesReportes.length
-
-                ? visiblesReportes.map(r => {
-
-                    const foto = primeraFoto(r);
-
-                    const estadoClase =
-                        r.status === 'abandonada'
-                            ? 'abandonada'
-                            : 'atendida';
-
-                    const estadoTexto =
-                        r.status === 'abandonada'
-                            ? 'Abandonada'
-                            : 'Atendida';
-
-
-                    return `
-
-                        <div
-                            class="pp-item ${r.id === nuevoId ? 'is-new' : ''}"
-                            data-id="${r.id}">
-
-                            ${
-                                foto
-                                    ? `
-                                        <img
-                                            src="${UI.esc(foto)}"
-                                            loading="lazy"
-                                            alt="">
-                                      `
-                                    : `
-                                        <div class="ph">
-                                            ${EMO[r.species] || '🐾'}
-                                        </div>
-                                      `
-                            }
-
-
-                            <div class="min-w-0">
-
-                                <div class="d-flex align-items-center gap-2">
-
-                                    <strong class="fs-5">
-                                        ${UI.esc(r.pet_name)}
-                                    </strong>
-
-                                    <span class="pp-tag ${estadoClase}">
-                                        ${estadoTexto}
-                                    </span>
-
-                                </div>
-
-
-                                <div class="small">
-
-                                    ${
-                                        r.species === 'perro'
-                                            ? '🐶 Perro'
-                                            : '🐱 Gato'
-                                    }
-
-                                    ·
-
-                                    ${hace(r.created_at)}
-
-                                    ·
-
-                                    ${UI.esc(r.zone)}
-
-                                </div>
-
-
-                                <div class="small text-truncate text-muted">
-
-                                    ${UI.esc(r.description)}
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    `;
-
-                }).join('')
-
-                : `
-
-                    <div class="text-center py-4">
-
-                        <i
-                            class="bi bi-geo-alt"
-                            style="font-size:2rem">
-                        </i>
-
-                        <p class="mb-0 mt-2">
-                            Todavía no hay reportes.
-                        </p>
-
-                    </div>
-
-                `;
+        return;
     }
 
+    reportes = data || [];
 
-    /* ============================================================
-       AGREGAR REPORTE
-       ============================================================ */
+    pintarReportes();
+}
 
-    function agregar(r) {
-
-        const existe = reportes.some(
-            x => x.id === r.id
-        );
-
-        if (existe) {
-            return;
-        }
-
-        reportes.unshift(r);
-
-        nuevoId = r.id;
-
-        pintar();
-
-
-        setTimeout(() => {
-
-            nuevoId = null;
-
-        }, 1800);
-    }
-
-
-    /* ============================================================
-       FILTROS
-       ============================================================ */
-
-    document
-        .getElementById('chips')
-        .addEventListener('click', e => {
-
-            const boton =
-                e.target.closest('[data-f]');
-
-            if (!boton) {
-                return;
-            }
-
-            filtro = boton.dataset.f;
-
-            pintar();
-
-        });
-
-
-    /* ============================================================
-       CLICK EN LISTA
-       ============================================================ */
-
-    document
-        .getElementById('lista')
-        .addEventListener('click', e => {
-
-            const item =
-                e.target.closest('[data-id]');
-
-            if (!item) {
-                return;
-            }
-
-            const reporte =
-                reportes.find(
-                    x => x.id === item.dataset.id
-                );
-
-            if (!reporte) {
-                return;
-            }
-
-
-            mapa.flyTo(
-                [reporte.lat, reporte.lng],
-                16
-            );
-
-
-            marcadores
-                .get(reporte.id)
-                ?.openPopup();
-
-
-            document
-                .getElementById('mapa')
-                .scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-
-        });
-
-
-    /* ============================================================
-       CARGAR REPORTES
-       ============================================================ */
-
-    (async () => {
-
-        const {
-            data,
-            error
-        } = await db
-            .from('pet_reports')
-            .select('*')
-            .order(
-                'created_at',
-                {
-                    ascending: false
-                }
-            );
-
-
-        if (error) {
-
-            console.error(error);
-
-            document.getElementById('lista').innerHTML = `
-                <div class="alert alert-danger">
-                    No pudimos cargar los reportes.
-                </div>
-            `;
-
-            return;
-        }
-
-
-        reportes = data || [];
-
-        pintar();
-
-    })();
-
-
-    /* ============================================================
-       TIEMPO REAL
-       ============================================================ */
+function iniciarRealtime() {
 
     db.channel('pet_reports_live')
-
         .on(
             'postgres_changes',
             {
@@ -873,11 +637,11 @@ function iniciar() {
             },
             payload => {
 
-                agregar(payload.new);
-
+                agregarReporte(
+                    payload.new
+                );
             }
         )
-
         .on(
             'postgres_changes',
             {
@@ -887,18 +651,25 @@ function iniciar() {
             },
             payload => {
 
-                reportes =
-                    reportes.map(r =>
-                        r.id === payload.new.id
-                            ? payload.new
-                            : r
+                const indice =
+                    reportes.findIndex(
+                        reporte =>
+                            reporte.id ===
+                            payload.new.id
                     );
 
-                pintar();
+                if (indice >= 0) {
+                    reportes[indice] =
+                        payload.new;
+                } else {
+                    reportes.unshift(
+                        payload.new
+                    );
+                }
 
+                pintarReportes();
             }
         )
-
         .on(
             'postgres_changes',
             {
@@ -910,629 +681,1002 @@ function iniciar() {
 
                 reportes =
                     reportes.filter(
-                        r => r.id !== payload.old.id
+                        reporte =>
+                            reporte.id !==
+                            payload.old.id
                     );
 
-                pintar();
-
+                pintarReportes();
             }
         )
-
         .subscribe();
+}
 
+function agregarReporte(reporte) {
 
-    /* ============================================================
-       MODAL
-       ============================================================ */
-
-    const modal =
-        new bootstrap.Modal(
-            document.getElementById('modalReporte')
+    const existe =
+        reportes.some(
+            item =>
+                item.id ===
+                reporte.id
         );
 
+    if (!existe) {
+        reportes.unshift(
+            reporte
+        );
+    }
 
-    const err = mensaje => {
+    pintarReportes();
+}
 
-        document.getElementById('err').textContent =
-            mensaje || '';
+function pintarReportes() {
 
-    };
+    const lista =
+        document.getElementById(
+            'lista'
+        );
 
+    const visibles =
+        reportes.filter(
+            reporte => {
 
-    /* ============================================================
-       FOTOS
-       ============================================================ */
+                if (
+                    filtroActual ===
+                    'todos'
+                ) {
+                    return true;
+                }
 
-    const inputFotos =
-        document.getElementById('fotos');
-
-    const previewFotos =
-        document.getElementById('previewFotos');
-
-    const TIPOS_FOTO_PERMITIDOS =
-        ['image/jpeg', 'image/jpg', 'image/png'];
-
-    const TAMANO_MAX_FOTO =
-        5 * 1024 * 1024;
-
-    const fotoEsValida = archivo =>
-        TIPOS_FOTO_PERMITIDOS.includes(archivo.type) &&
-        archivo.size <= TAMANO_MAX_FOTO;
-
-
-    inputFotos.addEventListener(
-        'change',
-        () => {
-
-            previewFotos.innerHTML = '';
-
-            const archivos =
-                Array.from(inputFotos.files);
-
-
-            if (archivos.length > 3) {
-
-                err(
-                    'Puedes seleccionar máximo 3 fotos.'
-                );
-
-                inputFotos.value = '';
-
-                return;
+                return String(
+                    reporte.status || ''
+                ).toLowerCase() ===
+                filtroActual;
             }
+        );
 
+    document.getElementById(
+        'total'
+    ).textContent =
+        reportes.length;
 
-            const fotoInvalidaPreview =
-                archivos.find(a => !fotoEsValida(a));
+    mapa.eachLayer(
+        layer => {
 
-            if (fotoInvalidaPreview) {
-
-                err(
-                    'Cada foto debe ser JPG, JPEG o PNG y pesar como máximo 5 MB.'
+            if (
+                layer instanceof L.Marker ||
+                layer instanceof L.CircleMarker
+            ) {
+                mapa.removeLayer(
+                    layer
                 );
-
-                inputFotos.value = '';
-
-                return;
             }
-
-
-            err('');
-
-
-            archivos.forEach(archivo => {
-
-                const reader =
-                    new FileReader();
-
-
-                reader.onload = e => {
-
-                    const imagen =
-                        document.createElement('img');
-
-                    imagen.src =
-                        e.target.result;
-
-                    imagen.alt =
-                        'Vista previa';
-
-
-                    previewFotos.appendChild(
-                        imagen
-                    );
-
-                };
-
-
-                reader.readAsDataURL(archivo);
-
-            });
-
         }
     );
 
+    if (visibles.length === 0) {
 
-    /* ============================================================
-       MAPA DE SELECCIÓN
-       ============================================================ */
+        lista.innerHTML = `
+            <div class="card">
+                <div class="card-body text-center py-4">
+                    <i class="bi bi-geo-alt fs-1 text-muted"></i>
+                    <p class="text-muted mb-0 mt-2">
+                        No hay reportes para este filtro.
+                    </p>
+                </div>
+            </div>
+        `;
 
-    const marcar = (lat, lng) => {
+        return;
+    }
 
-        pick = {
-            lat,
-            lng
-        };
+    lista.innerHTML =
+        visibles.map(
+            crearTarjetaReporte
+        ).join('');
 
+    visibles.forEach(
+        reporte => {
 
-        if (pickMarker) {
+            const icono =
+                iconosEspecie[
+                    String(
+                        reporte.species || ''
+                    ).toLowerCase()
+                ] || '🐾';
 
-            pickMarker.setLatLng(
-                [lat, lng]
+            const marker =
+                L.marker(
+                    [
+                        Number(reporte.lat),
+                        Number(reporte.lng)
+                    ]
+                ).addTo(mapa);
+
+            const telefono =
+                obtenerTelefonoWhatsApp(
+                    reporte
+                );
+
+            const whatsapp =
+                telefono
+                    ? `
+                        <a
+                            href="https://wa.me/${telefono}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn btn-sm btn-success">
+                            <i class="bi bi-whatsapp"></i>
+                            WhatsApp
+                        </a>
+                    `
+                    : '';
+
+            marker.bindPopup(`
+                <div style="min-width:220px">
+
+                    <strong>
+                        ${icono}
+                        ${UI.esc(reporte.pet_name)}
+                    </strong>
+
+                    <div class="small text-muted mt-1">
+                        ${UI.esc(reporte.species)}
+                    </div>
+
+                    <div class="small mt-2">
+                        ${UI.esc(reporte.zone)}
+                    </div>
+
+                    <div class="small mt-2">
+                        ${UI.esc(reporte.description)}
+                    </div>
+
+                    <div class="small mt-2">
+                        <strong>Contacto:</strong>
+                        ${UI.esc(reporte.contact_name)}
+                    </div>
+
+                    <div class="mt-3">
+                        ${whatsapp}
+                    </div>
+
+                </div>
+            `);
+        }
+    );
+}
+
+function crearTarjetaReporte(reporte) {
+
+    const foto =
+        reporte.photo_url_1 ||
+        reporte.photo_url_2 ||
+        reporte.photo_url_3;
+
+    const estado =
+        String(
+            reporte.status || ''
+        ).toLowerCase();
+
+    const estadoTexto =
+        estado === 'atendida'
+            ? 'Atendida'
+            : 'Abandonada';
+
+    const estadoClase =
+        estado === 'atendida'
+            ? 'bg-success'
+            : 'bg-warning text-dark';
+
+    return `
+        <div class="card mb-3">
+
+            <div class="row g-0">
+
+                ${
+                    foto
+                        ? `
+                            <div class="col-4">
+                                <img
+                                    src="${UI.esc(foto)}"
+                                    alt="Foto de ${UI.esc(reporte.pet_name)}"
+                                    class="w-100 h-100"
+                                    style="object-fit:cover; min-height:150px;">
+                            </div>
+                        `
+                        : ''
+                }
+
+                <div class="${
+                    foto
+                        ? 'col-8'
+                        : 'col-12'
+                }">
+
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between gap-2 mb-2">
+
+                            <h5 class="card-title mb-0">
+                                ${UI.esc(reporte.pet_name)}
+                            </h5>
+
+                            <span class="badge ${estadoClase}">
+                                ${estadoTexto}
+                            </span>
+
+                        </div>
+
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-paw"></i>
+                            ${UI.esc(reporte.species)}
+                        </p>
+
+                        <p class="small mb-2">
+                            <i class="bi bi-geo-alt"></i>
+                            ${UI.esc(reporte.zone)}
+                        </p>
+
+                        <p class="small mb-2">
+                            ${UI.esc(reporte.description)}
+                        </p>
+
+                        <p class="small text-muted mb-0">
+                            <i class="bi bi-person"></i>
+                            ${UI.esc(reporte.contact_name)}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+function obtenerTelefonoWhatsApp(reporte) {
+
+    const codigo =
+        String(
+            reporte.contact_phone_country || ''
+        ).replace(
+            /\D/g,
+            ''
+        );
+
+    const telefono =
+        String(
+            reporte.contact_phone || ''
+        ).replace(
+            /\D/g,
+            ''
+        );
+
+    if (!codigo || !telefono) {
+        return '';
+    }
+
+    const completo =
+        `${codigo}${telefono}`;
+
+    if (
+        completo.length < 8 ||
+        completo.length > 15
+    ) {
+        return '';
+    }
+
+    return completo;
+}
+
+function abrirNuevoReporte() {
+
+    document
+        .getElementById(
+            'formReporte'
+        )
+        .reset();
+
+    document
+        .getElementById(
+            'previewFotos'
+        )
+        .innerHTML = '';
+
+    document
+        .getElementById(
+            'err'
+        )
+        .textContent = '';
+
+    document
+        .querySelectorAll(
+            '#formReporte .is-invalid, #formReporte .is-valid'
+        )
+        .forEach(
+            campo => {
+                campo.classList.remove(
+                    'is-invalid',
+                    'is-valid'
+                );
+            }
+        );
+
+    latSeleccionada = null;
+    lngSeleccionada = null;
+
+    modalReporte.show();
+}
+
+function iniciarMapaPicker() {
+
+    if (mapaPick) {
+        mapaPick.invalidateSize();
+        return;
+    }
+
+    mapaPick =
+        L.map('mapaPick').setView(
+            [-14.0678, -75.7286],
+            13
+        );
+
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }
+    ).addTo(mapaPick);
+
+    mapaPick.on(
+        'click',
+        event => {
+
+            seleccionarUbicacion(
+                event.latlng.lat,
+                event.latlng.lng
+            );
+        }
+    );
+}
+
+document
+    .getElementById('modalReporte')
+    .addEventListener(
+        'shown.bs.modal',
+        () => {
+
+            iniciarMapaPicker();
+
+            if (
+                latSeleccionada !== null &&
+                lngSeleccionada !== null
+            ) {
+                mapaPick.setView(
+                    [
+                        latSeleccionada,
+                        lngSeleccionada
+                    ],
+                    15
+                );
+            }
+
+            setTimeout(
+                () => {
+                    mapaPick.invalidateSize();
+                },
+                150
+            );
+        }
+    );
+
+function seleccionarUbicacion(
+    lat,
+    lng
+) {
+
+    latSeleccionada =
+        Number(lat);
+
+    lngSeleccionada =
+        Number(lng);
+
+    if (marcadorPick) {
+        mapaPick.removeLayer(
+            marcadorPick
+        );
+    }
+
+    marcadorPick =
+        L.marker([
+            latSeleccionada,
+            lngSeleccionada
+        ]).addTo(
+            mapaPick
+        );
+
+    marcadorPick.bindPopup(
+        'Ubicación seleccionada'
+    ).openPopup();
+}
+
+function usarUbicacion() {
+
+    if (
+        !navigator.geolocation
+    ) {
+
+        UI.setFlash(
+            'error',
+            'Tu navegador no permite obtener la ubicación.'
+        );
+
+        UI.mostrarFlash();
+
+        return;
+    }
+
+    const boton =
+        document.getElementById(
+            'btnGps'
+        );
+
+    boton.disabled = true;
+
+    boton.innerHTML = `
+        <span class="spinner-border spinner-border-sm"></span>
+        Obteniendo ubicación...
+    `;
+
+    navigator.geolocation.getCurrentPosition(
+        posicion => {
+
+            seleccionarUbicacion(
+                posicion.coords.latitude,
+                posicion.coords.longitude
             );
 
-        } else {
+            mapaPick.setView(
+                [
+                    posicion.coords.latitude,
+                    posicion.coords.longitude
+                ],
+                16
+            );
 
-            pickMarker =
-                L.marker(
-                    [lat, lng]
-                ).addTo(mapaPick);
+            boton.disabled = false;
 
+            boton.innerHTML = `
+                <i class="bi bi-crosshair"></i>
+                Usar mi ubicación
+            `;
+        },
+        () => {
+
+            boton.disabled = false;
+
+            boton.innerHTML = `
+                <i class="bi bi-crosshair"></i>
+                Usar mi ubicación
+            `;
+
+            UI.setFlash(
+                'error',
+                'No se pudo obtener tu ubicación.'
+            );
+
+            UI.mostrarFlash();
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+
+function revisarFotos() {
+
+    const input =
+        document.getElementById(
+            'fotos'
+        );
+
+    const preview =
+        document.getElementById(
+            'previewFotos'
+        );
+
+    preview.innerHTML = '';
+
+    const archivos =
+        Array.from(
+            input.files || []
+        );
+
+    if (archivos.length > 3) {
+
+        input.value = '';
+
+        UI.setFlash(
+            'error',
+            'Puedes seleccionar un máximo de 3 fotos.'
+        );
+
+        UI.mostrarFlash();
+
+        return;
+    }
+
+    for (const archivo of archivos) {
+
+        if (
+            ![
+                'image/jpeg',
+                'image/jpg',
+                'image/png'
+            ].includes(
+                archivo.type
+            )
+        ) {
+
+            input.value = '';
+
+            UI.setFlash(
+                'error',
+                'Solo se permiten imágenes JPG, JPEG o PNG.'
+            );
+
+            UI.mostrarFlash();
+
+            return;
         }
 
+        if (
+            archivo.size >
+            5 * 1024 * 1024
+        ) {
 
-        mapaPick.setView(
-            [lat, lng],
-            Math.max(
-                mapaPick.getZoom(),
-                16
-            )
+            input.value = '';
+
+            UI.setFlash(
+                'error',
+                'Cada foto debe pesar como máximo 5 MB.'
+            );
+
+            UI.mostrarFlash();
+
+            return;
+        }
+    }
+
+    archivos.forEach(
+        archivo => {
+
+            const url =
+                URL.createObjectURL(
+                    archivo
+                );
+
+            const col =
+                document.createElement(
+                    'div'
+                );
+
+            col.className =
+                'col-4';
+
+            col.innerHTML = `
+                <img
+                    src="${url}"
+                    alt="Vista previa"
+                    class="img-fluid rounded"
+                    style="height:120px;width:100%;object-fit:cover;">
+            `;
+
+            preview.appendChild(
+                col
+            );
+        }
+    );
+}
+
+function validarTelefono() {
+
+    const pais =
+        document.getElementById(
+            'cPaisCodigo'
         );
 
+    const opcion =
+        pais.options[
+            pais.selectedIndex
+        ];
+
+    const iso =
+        opcion?.dataset?.iso;
+
+    const telefono =
+        document.getElementById(
+            'cTel'
+        );
+
+    const numero =
+        telefono.value.trim();
+
+    if (!numero) {
+        UI.marcarInvalido(
+            telefono,
+            true
+        );
+
+        return 'Completa el número de teléfono.';
+    }
+
+    if (
+        numero.length < 4 ||
+        numero.length > 15
+    ) {
+
+        UI.marcarInvalido(
+            telefono,
+            true
+        );
+
+        return 'El número de teléfono no es válido.';
+    }
+
+    try {
+
+        const phone =
+            libphonenumber.parsePhoneNumberFromString(
+                numero,
+                iso
+            );
+
+        if (
+            !phone ||
+            !phone.isValid()
+        ) {
+
+            UI.marcarInvalido(
+                telefono,
+                true
+            );
+
+            return 'El número de teléfono no es válido para el país seleccionado.';
+        }
+
+    } catch {
+
+        UI.marcarInvalido(
+            telefono,
+            true
+        );
+
+        return 'El número de teléfono no es válido.';
+    }
+
+    UI.marcarInvalido(
+        telefono,
+        false
+    );
+
+    return '';
+}
+
+async function subirFotos() {
+
+    const input =
+        document.getElementById(
+            'fotos'
+        );
+
+    const archivos =
+        Array.from(
+            input.files || []
+        );
+
+    if (
+        archivos.length < 1 ||
+        archivos.length > 3
+    ) {
+        return {
+            urls: [],
+            error: 'Debes seleccionar entre 1 y 3 fotos.'
+        };
+    }
+
+    const urls = [];
+
+    for (
+        let i = 0;
+        i < archivos.length;
+        i++
+    ) {
+
+        const archivo =
+            archivos[i];
+
+        if (
+            archivo.size >
+            5 * 1024 * 1024
+        ) {
+            return {
+                urls: [],
+                error: 'Cada foto debe pesar como máximo 5 MB.'
+            };
+        }
+
+        const extension =
+            archivo.name
+                .split('.')
+                .pop()
+                .toLowerCase();
+
+        const nombre =
+            `reportes/${crypto.randomUUID()}-${i + 1}.${extension}`;
+
+        const {
+            error
+        } = await db.storage
+            .from('pet-photos')
+            .upload(
+                nombre,
+                archivo,
+                {
+                    contentType:
+                        archivo.type,
+                    upsert: false
+                }
+            );
+
+        if (error) {
+
+            return {
+                urls: [],
+                error: 'No se pudo subir una de las fotos.'
+            };
+        }
+
+        const {
+            data
+        } = db.storage
+            .from('pet-photos')
+            .getPublicUrl(
+                nombre
+            );
+
+        urls.push(
+            data.publicUrl
+        );
+    }
+
+    return {
+        urls,
+        error: null
     };
+}
 
+async function publicarReporte() {
 
-    document
-        .getElementById('btnNuevo')
-        .addEventListener(
-            'click',
-            () => {
-
-                document
-                    .getElementById('form')
-                    .reset();
-
-                document
-                    .querySelectorAll('#form .is-invalid')
-                    .forEach(el => el.classList.remove('is-invalid'));
-
-                previewFotos.innerHTML = '';
-
-                pick = null;
-
-                if (pickMarker && mapaPick) {
-
-                    mapaPick.removeLayer(
-                        pickMarker
-                    );
-
-                }
-
-                pickMarker = null;
-
-                err('');
-
-                modal.show();
-
-            }
+    const err =
+        document.getElementById(
+            'err'
         );
 
+    err.textContent = '';
 
-    document
-        .getElementById('modalReporte')
-        .addEventListener(
-            'shown.bs.modal',
-            () => {
-
-                if (!mapaPick) {
-
-                    mapaPick =
-                        L.map(
-                            'mapaPick'
-                        ).setView(
-                            CENTRO,
-                            13
-                        );
-
-
-                    L.tileLayer(
-                        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        {
-                            maxZoom: 19,
-                            attribution:
-                                '© OpenStreetMap'
-                        }
-                    ).addTo(
-                        mapaPick
-                    );
-
-
-                    mapaPick.on(
-                        'click',
-                        e => {
-
-                            marcar(
-                                e.latlng.lat,
-                                e.latlng.lng
-                            );
-
-                        }
-                    );
-
-                }
-
-
-                mapaPick.invalidateSize();
-
+    const mensaje =
+        UI.validarCampos([
+            {
+                id: 'fotos',
+                etiqueta: 'Fotos'
+            },
+            {
+                id: 'nombre',
+                etiqueta: 'Nombre o referencia'
+            },
+            {
+                id: 'especie',
+                etiqueta: 'Especie'
+            },
+            {
+                id: 'zona',
+                etiqueta: 'Zona'
+            },
+            {
+                id: 'desc',
+                etiqueta: 'Descripción'
+            },
+            {
+                id: 'cNombre',
+                etiqueta: 'Nombre de contacto'
+            },
+            {
+                id: 'cPaisCodigo',
+                etiqueta: 'País'
+            },
+            {
+                id: 'cTel',
+                etiqueta: 'Teléfono'
             }
+        ]);
+
+    if (mensaje) {
+
+        err.textContent =
+            mensaje;
+
+        return;
+    }
+
+    const archivos =
+        Array.from(
+            document.getElementById(
+                'fotos'
+            ).files || []
         );
 
+    if (
+        archivos.length < 1 ||
+        archivos.length > 3
+    ) {
 
-    /* ============================================================
-       GPS
-       ============================================================ */
-
-    document
-        .getElementById('btnGps')
-        .addEventListener(
-            'click',
-            () => {
-
-                if (!navigator.geolocation) {
-
-                    err(
-                        'Tu navegador no permite obtener la ubicación.'
-                    );
-
-                    return;
-                }
-
-
-                err(
-                    'Obteniendo tu ubicación...'
-                );
-
-
-                navigator.geolocation.getCurrentPosition(
-
-                    position => {
-
-                        marcar(
-                            position.coords.latitude,
-                            position.coords.longitude
-                        );
-
-                        err('');
-
-                    },
-
-                    () => {
-
-                        err(
-                            'No pudimos obtener tu ubicación. Toca el mapa.'
-                        );
-
-                    },
-
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    }
-
-                );
-
-            }
+        UI.marcarInvalido(
+            'fotos',
+            true
         );
 
+        err.textContent =
+            'Debes seleccionar entre 1 y 3 fotos.';
 
-    /* ============================================================
-       PUBLICAR
-       ============================================================ */
+        return;
+    }
 
-    document
-        .getElementById('btnPublicar')
-        .addEventListener(
-            'click',
-            async () => {
+    if (
+        latSeleccionada === null ||
+        lngSeleccionada === null
+    ) {
 
-                err('');
+        err.textContent =
+            'Selecciona la ubicación de la mascota en el mapa.';
 
+        return;
+    }
 
-                const mensajeCampos = UI.validarCampos([
-                    { id: 'nombre', etiqueta: 'Nombre o referencia' },
-                    { id: 'zona', etiqueta: 'Zona o barrio' },
-                    { id: 'desc', etiqueta: 'Descripción' },
-                    { id: 'cNombre', etiqueta: 'Tu nombre' }
-                ]);
+    const errorTelefono =
+        validarTelefono();
 
-                if (mensajeCampos) {
-                    err(mensajeCampos);
-                    return;
-                }
+    if (errorTelefono) {
 
+        err.textContent =
+            errorTelefono;
 
-                const nombre =
-                    document.getElementById('nombre').value.trim();
+        return;
+    }
 
-                const zona =
-                    document.getElementById('zona').value.trim();
+    const pais =
+        document.getElementById(
+            'cPaisCodigo'
+        ).value;
 
-                const descripcion =
-                    document.getElementById('desc').value.trim();
-
-                const contacto =
-                    document.getElementById('cNombre').value.trim();
-
-                const telefono =
-                    document.getElementById('cTel').value.trim();
-
-                const isoPais =
-                    document.getElementById('cPaisCodigo').value;
-
-                const especie =
-                    document
-                        .getElementById('especie')
-                        .value;
-
-
-                const archivos =
-                    Array.from(
-                        inputFotos.files
-                    );
-
-
-                /* VALIDACIONES DE FORMATO */
-
-                if (!telefono) {
-
-                    UI.marcarInvalido('cTel', true);
-                    err('Deja un teléfono para que puedan contactarte.');
-                    return;
-                }
-
-
-                let numeroTelefono = null;
-
-                try {
-                    numeroTelefono =
-                        libphonenumber.parsePhoneNumberFromString(telefono, isoPais);
-                } catch (e) {
-                    numeroTelefono = null;
-                }
-
-                if (!numeroTelefono || !numeroTelefono.isValid()) {
-
-                    UI.marcarInvalido('cTel', true);
-                    err('Ingresa un número de teléfono válido para el país seleccionado.');
-                    return;
-                }
-
-                UI.marcarInvalido('cTel', false);
-
-                const telefonoNacional = numeroTelefono.nationalNumber;
-                const codigoPaisTelefono = numeroTelefono.countryCallingCode;
-
-
-                if (!pick) {
-
-                    err(
-                        'Toca el mapa para marcar la ubicación.'
-                    );
-
-                    return;
-                }
-
-
-                if (
-                    archivos.length < 1 ||
-                    archivos.length > 3
-                ) {
-
-                    err(
-                        'Debes subir entre 1 y 3 fotos.'
-                    );
-
-                    return;
-                }
-
-
-                const fotoInvalidaEnvio =
-                    archivos.find(a => !fotoEsValida(a));
-
-                if (fotoInvalidaEnvio) {
-
-                    err(
-                        'Cada foto debe ser JPG, JPEG o PNG y pesar como máximo 5 MB.'
-                    );
-
-                    return;
-                }
-
-
-                const boton =
-                    document.getElementById(
-                        'btnPublicar'
-                    );
-
-
-                boton.disabled = true;
-
-                boton.innerHTML =
-                    '<span class="spinner-border spinner-border-sm"></span> Publicando...';
-
-
-                try {
-
-                    const urls = [
-                        null,
-                        null,
-                        null
-                    ];
-
-
-                    /* SUBIR FOTOS */
-
-                    for (
-                        let i = 0;
-                        i < archivos.length;
-                        i++
-                    ) {
-
-                        const archivo =
-                            archivos[i];
-
-
-                        if (!fotoEsValida(archivo)) {
-
-                            throw new Error(
-                                'Cada foto debe ser JPG, JPEG o PNG y pesar como máximo 5 MB.'
-                            );
-
-                        }
-
-
-                        const extension =
-                            (
-                                archivo.name
-                                    .split('.')
-                                    .pop() || 'jpg'
-                            )
-                            .toLowerCase();
-
-
-                        const path =
-                            `reportes/${crypto.randomUUID()}-${i + 1}.${extension}`;
-
-
-                        const upload =
-                            await db
-                                .storage
-                                .from('pet-photos')
-                                .upload(
-                                    path,
-                                    archivo,
-                                    {
-                                        contentType:
-                                            archivo.type ||
-                                            'image/jpeg'
-                                    }
-                                );
-
-
-                        if (upload.error) {
-                            throw upload.error;
-                        }
-
-
-                        urls[i] =
-                            db
-                                .storage
-                                .from('pet-photos')
-                                .getPublicUrl(path)
-                                .data
-                                .publicUrl;
-
-                    }
-
-
-                    /* INSERTAR REPORTE */
-
-                    const {
-                        data,
-                        error
-                    } = await db
-                        .from('pet_reports')
-                        .insert({
-
-                            pet_name:
-                                nombre,
-
-                            species:
-                                especie,
-
-                            status:
-                                'abandonada',
-
-                            description:
-                                descripcion,
-
-                            zone:
-                                zona,
-
-                            lat:
-                                pick.lat,
-
-                            lng:
-                                pick.lng,
-
-                            photo_url_1:
-                                urls[0],
-
-                            photo_url_2:
-                                urls[1],
-
-                            photo_url_3:
-                                urls[2],
-
-                            contact_name:
-                                contacto,
-
-                            contact_phone:
-                                telefonoNacional,
-
-                            contact_phone_country:
-                                codigoPaisTelefono
-
-                        })
-                        .select()
-                        .single();
-
-
-                    if (error) {
-                        throw error;
-                    }
-
-
-                    agregar(data);
-
-                    modal.hide();
-
-
-                    mapa.flyTo(
-                        [
-                            data.lat,
-                            data.lng
-                        ],
-                        16
-                    );
-
-
-                    setTimeout(
-                        () => {
-
-                            marcadores
-                                .get(data.id)
-                                ?.openPopup();
-
-                        },
-                        900
-                    );
-
-
-                } catch (e) {
-
-                    console.error(e);
-
-                    err(
-                        'No pudimos guardar el reporte. ' +
-                        (
-                            e.message ||
-                            'Inténtalo nuevamente.'
-                        )
-                    );
-
-                }
-
-
-                boton.disabled = false;
-
-                boton.innerHTML =
-                    '<i class="bi bi-send-fill"></i> Publicar reporte';
-
-            }
+    const telefono =
+        document.getElementById(
+            'cTel'
+        ).value
+        .replace(
+            /\D/g,
+            ''
         );
 
+    const boton =
+        document.getElementById(
+            'btnPublicar'
+        );
+
+    boton.disabled = true;
+
+    boton.innerHTML = `
+        <span class="spinner-border spinner-border-sm"></span>
+        Publicando...
+    `;
+
+    const resultadoFotos =
+        await subirFotos();
+
+    if (resultadoFotos.error) {
+
+        boton.disabled = false;
+
+        boton.innerHTML = `
+            <i class="bi bi-send"></i>
+            Publicar reporte
+        `;
+
+        err.textContent =
+            resultadoFotos.error;
+
+        return;
+    }
+
+    const urls =
+        resultadoFotos.urls;
+
+    const {
+        error
+    } = await db
+        .from('pet_reports')
+        .insert({
+            user_id: usuario.id,
+            pet_name:
+                document.getElementById(
+                    'nombre'
+                ).value.trim(),
+            species:
+                document.getElementById(
+                    'especie'
+                ).value,
+            status: 'abandonada',
+            description:
+                document.getElementById(
+                    'desc'
+                ).value.trim(),
+            zone:
+                document.getElementById(
+                    'zona'
+                ).value.trim(),
+            lat:
+                latSeleccionada,
+            lng:
+                lngSeleccionada,
+            photo_url_1:
+                urls[0] || null,
+            photo_url_2:
+                urls[1] || null,
+            photo_url_3:
+                urls[2] || null,
+            contact_name:
+                document.getElementById(
+                    'cNombre'
+                ).value.trim(),
+            contact_phone:
+                telefono,
+            contact_phone_country:
+                pais
+        });
+
+    boton.disabled = false;
+
+    boton.innerHTML = `
+        <i class="bi bi-send"></i>
+        Publicar reporte
+    `;
+
+    if (error) {
+
+        console.error(error);
+
+        err.textContent =
+            'No se pudo publicar el reporte.';
+
+        return;
+    }
+
+    modalReporte.hide();
+
+    UI.setFlash(
+        'exito',
+        'El reporte fue publicado correctamente.'
+    );
+
+    UI.mostrarFlash();
+
+    await cargarReportes();
 }
 
 </script>
