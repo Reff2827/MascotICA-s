@@ -370,6 +370,49 @@
 </div>
 
 
+<div class="modal fade" id="modalPago" tabindex="-1" data-bs-backdrop="static">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    <i class="bi bi-credit-card"></i>
+                    Pago seguro
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    id="btnCerrarPago"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div
+                    id="errPago"
+                    class="text-danger fw-bold mb-3">
+                </div>
+
+                <div
+                    id="contenedorPago"
+                    class="w-100">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabaseClient.js"></script>
@@ -388,6 +431,8 @@
     let productosCache = [];
     let carrito = JSON.parse(localStorage.getItem(CARRITO_KEY) || '{}');
     let modalCarrito = null;
+    let modalPago = null;
+
 
     const modalEvaluacion =
         new bootstrap.Modal(
@@ -404,6 +449,11 @@
         pintarMascotas();
         pintarProductos();
         iniciarCarrito();
+
+        modalPago =
+            new bootstrap.Modal(
+                document.getElementById('modalPago')
+            );
 
     }
 
@@ -1140,41 +1190,523 @@
         document.getElementById('btnConfirmarCompra').addEventListener('click', confirmarCompra);
     }
 
+
     async function confirmarCompra() {
-        const errCont = document.getElementById('errCarrito');
+
+        const errCont =
+            document.getElementById('errCarrito');
+
         errCont.textContent = '';
 
-        const items = Object.entries(carrito).map(([id, cantidad]) => ({
-            id_producto: Number(id),
-            cantidad
-        }));
 
-        if (items.length === 0) return;
+        const items =
+            Object.entries(carrito).map(([id, cantidad]) => ({
+                id_producto: Number(id),
+                cantidad
+            }));
 
-        const boton = document.getElementById('btnConfirmarCompra');
-        boton.disabled = true;
-        boton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
 
-        const resultado = await Pedidos.crear(items);
-
-        boton.disabled = false;
-        boton.innerHTML = '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
-
-        if (resultado.error) {
-            errCont.textContent = resultado.error;
+        if (items.length === 0) {
             return;
         }
 
-        carrito = {};
-        guardarCarrito();
-        modalCarrito.hide();
 
-        UI.setFlash(
-            'exito',
-            `Pedido #${resultado.idPedido} registrado. Queda pendiente de pago (lo conectaremos con Izipay en la siguiente etapa).`
+        const total =
+            Number(totalCarrito().toFixed(2));
+
+
+        if (!Number.isFinite(total) || total <= 0) {
+
+            errCont.textContent =
+                'El total del carrito no es válido.';
+
+            return;
+
+        }
+
+
+        const boton =
+            document.getElementById('btnConfirmarCompra');
+
+        boton.disabled = true;
+
+        boton.innerHTML =
+            '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+
+
+        const resultado =
+            await Pedidos.crear(items);
+
+
+        if (resultado.error) {
+
+            boton.disabled = false;
+
+            boton.innerHTML =
+                '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
+
+            errCont.textContent =
+                resultado.error;
+
+            return;
+
+        }
+
+
+        try {
+
+            let email =
+                usuario?.email ||
+                usuario?.correo ||
+                usuario?.correoElectronico ||
+                '';
+
+
+            if (!email && typeof db !== 'undefined') {
+
+                const respuestaUsuario =
+                    await db.auth.getUser();
+
+                email =
+                    respuestaUsuario?.data?.user?.email ||
+                    '';
+
+            }
+
+
+            if (!email) {
+
+                throw new Error(
+                    'No se pudo obtener el correo electrónico de tu cuenta.'
+                );
+
+            }
+
+
+            const respuestaPago =
+                await db.functions.invoke(
+                    'izipay-crear-pago',
+                    {
+                        body: {
+
+                            amount:
+                                total,
+
+                            currency:
+                                'PEN',
+
+                            orderId:
+                                String(resultado.idPedido),
+
+                            email:
+                                email
+
+                        }
+                    }
+                );
+
+
+            if (respuestaPago.error) {
+
+                throw new Error(
+                    respuestaPago.error.message ||
+                    'No se pudo conectar con Izipay.'
+                );
+
+            }
+
+
+            const datosPago =
+                respuestaPago.data;
+
+
+            if (
+                !datosPago ||
+                !datosPago.formToken ||
+                !datosPago.publicKey
+            ) {
+
+                throw new Error(
+                    datosPago?.error ||
+                    'Izipay no devolvió los datos necesarios para iniciar el pago.'
+                );
+
+            }
+
+
+            boton.disabled = false;
+
+            boton.innerHTML =
+                '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
+
+
+            modalCarrito.hide();
+
+
+            await mostrarCheckoutIzipay(
+                datosPago,
+                resultado.idPedido,
+                total
+            );
+
+        } catch (error) {
+
+            console.error(
+                'Error al iniciar el pago:',
+                error
+            );
+
+
+            boton.disabled = false;
+
+            boton.innerHTML =
+                '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
+
+
+            errCont.textContent =
+                error.message ||
+                'No se pudo iniciar el pago.';
+
+        }
+
+    }
+
+
+    async function mostrarCheckoutIzipay(
+        datosPago,
+        idPedido,
+        total
+    ) {
+
+        const errPago =
+            document.getElementById('errPago');
+
+        const contenedor =
+            document.getElementById('contenedorPago');
+
+
+        errPago.textContent = '';
+
+
+        contenedor.innerHTML = '';
+
+
+        const mensajePedido =
+            document.createElement('div');
+
+        mensajePedido.className =
+            'alert alert-light border mb-3';
+
+        mensajePedido.innerHTML =
+            `<div class="d-flex justify-content-between">
+                <span>
+                    <strong>Pedido #${UI.esc(String(idPedido))}</strong>
+                </span>
+                <span>
+                    <strong>S/ ${Number(total).toFixed(2)}</strong>
+                </span>
+            </div>`;
+
+        contenedor.appendChild(
+            mensajePedido
         );
 
-        window.location.reload();
+
+        const formulario =
+            document.createElement('div');
+
+        formulario.className =
+            'kr-smart-form';
+
+        formulario.setAttribute(
+            'kr-form-token',
+            datosPago.formToken
+        );
+
+        formulario.setAttribute(
+            'kr-card-form-expanded',
+            ''
+        );
+
+        contenedor.appendChild(
+            formulario
+        );
+
+
+        modalPago.show();
+
+
+        try {
+
+            await cargarFormularioIzipay(
+                datosPago.publicKey
+            );
+
+            if (
+                !window.Krypton
+            ) {
+
+                throw new Error(
+                    'La librería de pago de Izipay no se pudo inicializar.'
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                'Error al cargar la librería de Izipay:',
+                error
+            );
+
+            errPago.textContent =
+                'No se pudo cargar el formulario de pago de Izipay.';
+
+        }
+
+    }
+
+
+    function cargarFormularioIzipay(publicKey) {
+
+        return new Promise((resolve, reject) => {
+
+            const libreriaExistente =
+                document.querySelector(
+                    'script[data-izipay-krypton="true"]'
+                );
+
+            if (libreriaExistente) {
+
+                resolve();
+
+                return;
+
+            }
+
+
+            const script =
+                document.createElement('script');
+
+            script.type =
+                'text/javascript';
+
+            script.src =
+                'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js';
+
+            script.setAttribute(
+                'kr-public-key',
+                publicKey
+            );
+
+            script.setAttribute(
+                'data-izipay-krypton',
+                'true'
+            );
+
+            script.onload =
+                () => {
+
+                    cargarTemaIzipay()
+                        .then(resolve)
+                        .catch(reject);
+
+                };
+
+            script.onerror =
+                () => {
+
+                    reject(
+                        new Error(
+                            'No se pudo cargar la librería de pago de Izipay.'
+                        )
+                    );
+
+                };
+
+            document.head.appendChild(
+                script
+            );
+
+        });
+
+    }
+
+
+    function cargarTemaIzipay() {
+
+        return new Promise((resolve, reject) => {
+
+            const hojaExistente =
+                document.querySelector(
+                    'link[data-izipay-neon="true"]'
+                );
+
+            const scriptExistente =
+                document.querySelector(
+                    'script[data-izipay-neon="true"]'
+                );
+
+
+            let pendientes =
+                0;
+
+
+            const terminar =
+                () => {
+
+                    pendientes--;
+
+                    if (pendientes <= 0) {
+                        resolve();
+                    }
+
+                };
+
+
+            if (!hojaExistente) {
+
+                pendientes++;
+
+                const hoja =
+                    document.createElement('link');
+
+                hoja.rel =
+                    'stylesheet';
+
+                hoja.href =
+                    'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/neon-reset.min.css';
+
+                hoja.setAttribute(
+                    'data-izipay-neon',
+                    'true'
+                );
+
+                hoja.onload =
+                    terminar;
+
+                hoja.onerror =
+                    () => {
+
+                        reject(
+                            new Error(
+                                'No se pudo cargar el estilo del formulario de pago.'
+                            )
+                        );
+
+                    };
+
+                document.head.appendChild(
+                    hoja
+                );
+
+            }
+
+
+            if (!scriptExistente) {
+
+                pendientes++;
+
+                const script =
+                    document.createElement('script');
+
+                script.type =
+                    'text/javascript';
+
+                script.src =
+                    'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/neon.js';
+
+                script.setAttribute(
+                    'data-izipay-neon',
+                    'true'
+                );
+
+                script.onload =
+                    terminar;
+
+                script.onerror =
+                    () => {
+
+                        reject(
+                            new Error(
+                                'No se pudo cargar el tema del formulario de pago.'
+                            )
+                        );
+
+                    };
+
+                document.head.appendChild(
+                    script
+                );
+
+            }
+
+
+            if (
+                pendientes === 0
+            ) {
+
+                resolve();
+
+            }
+
+        });
+
+    }
+
+
+    function obtenerFechaTransaccion() {
+
+        const ahora =
+            new Date();
+
+        const año =
+            ahora.getFullYear();
+
+        const mes =
+            String(
+                ahora.getMonth() + 1
+            ).padStart(2, '0');
+
+        const dia =
+            String(
+                ahora.getDate()
+            ).padStart(2, '0');
+
+        const hora =
+            String(
+                ahora.getHours()
+            ).padStart(2, '0');
+
+        const minutos =
+            String(
+                ahora.getMinutes()
+            ).padStart(2, '0');
+
+        const segundos =
+            String(
+                ahora.getSeconds()
+            ).padStart(2, '0');
+
+        return (
+            año +
+            mes +
+            dia +
+            hora +
+            minutos +
+            segundos
+        );
+
+    }
+
+
+    function respuestaPagoIzipay(respuesta) {
+
+        console.log(
+            'Respuesta de Izipay:',
+            respuesta
+        );
+
     }
 
 </script>

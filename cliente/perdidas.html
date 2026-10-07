@@ -230,7 +230,7 @@
                                 class="form-control"
                                 inputmode="numeric"
                                 autocomplete="tel"
-                                maxlength="14"
+                                maxlength="9"
                                 placeholder="Ej. 987 654 321">
 
                         </div>
@@ -1236,14 +1236,62 @@ function iniciar() {
     const campoTelefono =
         document.getElementById('cTel');
 
+    const selectorPais =
+        document.getElementById('cPaisCodigo');
+
+    const maximosTelefono = {
+        PE: 9,
+        BO: 8,
+        CL: 9,
+        CO: 10,
+        EC: 9,
+        AR: 10,
+        PY: 9,
+        BR: 11,
+        MX: 10,
+        ES: 9,
+        US: 10
+    };
+
+    const configurarTelefono = () => {
+
+        const pais =
+            selectorPais.value;
+
+        const maximo =
+            maximosTelefono[pais] || 14;
+
+        campoTelefono.maxLength =
+            maximo;
+
+        campoTelefono.value =
+            campoTelefono.value
+                .replace(/\D/g, '')
+                .slice(0, maximo);
+
+    };
+
+    configurarTelefono();
+
+    selectorPais.addEventListener(
+        'change',
+        configurarTelefono
+    );
+
     campoTelefono.addEventListener(
         'input',
         () => {
 
+            const pais =
+                selectorPais.value;
+
+            const maximo =
+                maximosTelefono[pais] || 14;
+
             campoTelefono.value =
                 campoTelefono.value
                     .replace(/\D/g, '')
-                    .slice(0, 14);
+                    .slice(0, maximo);
 
         }
     );
