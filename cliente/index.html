@@ -350,6 +350,60 @@
             <div class="modal-body">
                 <div id="listaCarrito"></div>
                 <div id="errCarrito" class="text-danger fw-bold mt-2"></div>
+
+                <hr>
+
+                <div class="mb-3">
+
+                    <label
+                        for="tipoDocumentoPago"
+                        class="form-label">
+                        Tipo de documento
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="tipoDocumentoPago">
+
+                        <option value="DNI">
+                            DNI
+                        </option>
+
+                        <option value="PS">
+                            Pasaporte
+                        </option>
+
+                        <option value="CE">
+                            Carnet de Extranjería
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="mb-2">
+
+                    <label
+                        for="numeroDocumentoPago"
+                        class="form-label">
+                        Número de documento
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="numeroDocumentoPago"
+                        placeholder="Ingresa tu número de documento"
+                        autocomplete="off">
+
+                    <div
+                        class="form-text"
+                        id="ayudaDocumentoPago">
+                        Ingresa los 8 dígitos de tu DNI.
+                    </div>
+
+                </div>
+
             </div>
 
             <div class="modal-footer flex-column align-items-stretch gap-2">
@@ -473,6 +527,70 @@
             document.getElementById('evalDocAyuda').textContent = esDni
                 ? 'Ingresa los 8 dígitos de tu DNI.'
                 : 'Ingresa los 11 dígitos de tu Carnet de Extranjería.';
+
+        });
+
+
+    document
+        .getElementById('tipoDocumentoPago')
+        .addEventListener('change', function () {
+
+            const campo =
+                document.getElementById('numeroDocumentoPago');
+
+            const ayuda =
+                document.getElementById('ayudaDocumentoPago');
+
+            campo.value = '';
+            campo.classList.remove('is-invalid');
+
+            if (this.value === 'DNI') {
+
+                campo.maxLength = 8;
+                campo.inputMode = 'numeric';
+
+                ayuda.textContent =
+                    'Ingresa los 8 dígitos de tu DNI.';
+
+            } else if (this.value === 'PS') {
+
+                campo.maxLength = 20;
+                campo.inputMode = 'text';
+
+                ayuda.textContent =
+                    'Ingresa tu número de pasaporte.';
+
+            } else {
+
+                campo.maxLength = 20;
+                campo.inputMode = 'text';
+
+                ayuda.textContent =
+                    'Ingresa tu número de Carnet de Extranjería.';
+
+            }
+
+        });
+
+
+    document
+        .getElementById('numeroDocumentoPago')
+        .addEventListener('input', function () {
+
+            const tipo =
+                document.getElementById('tipoDocumentoPago').value;
+
+            if (tipo === 'DNI') {
+
+                this.value =
+                    this.value.replace(/\D/g, '');
+
+            } else {
+
+                this.value =
+                    this.value.replace(/[^a-zA-Z0-9]/g, '');
+
+            }
 
         });
 
@@ -1199,6 +1317,68 @@
         errCont.textContent = '';
 
 
+        const tipoDocumentoPago =
+            document.getElementById('tipoDocumentoPago').value;
+
+        const numeroDocumentoPago =
+            document.getElementById('numeroDocumentoPago').value.trim();
+
+
+        if (!numeroDocumentoPago) {
+
+            errCont.textContent =
+                'Ingresa tu número de documento para continuar.';
+
+            document
+                .getElementById('numeroDocumentoPago')
+                .classList.add('is-invalid');
+
+            return;
+
+        }
+
+
+        let documentoValido = true;
+
+        if (tipoDocumentoPago === 'DNI') {
+
+            documentoValido =
+                /^\d{8}$/.test(numeroDocumentoPago);
+
+        } else if (tipoDocumentoPago === 'PS') {
+
+            documentoValido =
+                /^[a-zA-Z0-9]{5,20}$/.test(numeroDocumentoPago);
+
+        } else if (tipoDocumentoPago === 'CE') {
+
+            documentoValido =
+                /^[a-zA-Z0-9]{5,20}$/.test(numeroDocumentoPago);
+
+        }
+
+
+        if (!documentoValido) {
+
+            errCont.textContent =
+                tipoDocumentoPago === 'DNI'
+                    ? 'El DNI debe tener exactamente 8 números.'
+                    : 'El número de documento no es válido.';
+
+            document
+                .getElementById('numeroDocumentoPago')
+                .classList.add('is-invalid');
+
+            return;
+
+        }
+
+
+        document
+            .getElementById('numeroDocumentoPago')
+            .classList.remove('is-invalid');
+
+
         const items =
             Object.entries(carrito).map(([id, cantidad]) => ({
                 id_producto: Number(id),
@@ -1299,7 +1479,13 @@
                                 String(resultado.idPedido),
 
                             email:
-                                email
+                                email,
+
+                            identityType:
+                                tipoDocumentoPago,
+
+                            identityCode:
+                                numeroDocumentoPago
 
                         }
                     }
