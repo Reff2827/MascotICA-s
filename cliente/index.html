@@ -1602,16 +1602,11 @@
             document.createElement('div');
 
         formulario.className =
-            'kr-smart-form';
+            'kr-embedded';
 
         formulario.setAttribute(
             'kr-form-token',
             datosPago.formToken
-        );
-
-        formulario.setAttribute(
-            'kr-card-form-expanded',
-            ''
         );
 
         contenedor.appendChild(
@@ -1627,16 +1622,6 @@
             await cargarFormularioIzipay(
                 datosPago.publicKey
             );
-
-            if (
-                !window.Krypton
-            ) {
-
-                throw new Error(
-                    'La librería de pago de Izipay no se pudo inicializar.'
-                );
-
-            }
 
         } catch (error) {
 
@@ -1664,7 +1649,9 @@
 
             if (libreriaExistente) {
 
-                resolve();
+                cargarTemaIzipay()
+                    .then(resolve)
+                    .catch(reject);
 
                 return;
 
@@ -1683,6 +1670,11 @@
             script.setAttribute(
                 'kr-public-key',
                 publicKey
+            );
+
+            script.setAttribute(
+                'kr-language',
+                'es-Es'
             );
 
             script.setAttribute(
