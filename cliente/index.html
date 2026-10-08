@@ -1559,42 +1559,49 @@
 
 
     async function mostrarCheckoutIzipay(
-        datosPago,
-        idPedido,
-        total
-    ) {
+    datosPago,
+    idPedido,
+    total
+) {
 
-        const errPago =
-            document.getElementById('errPago');
+    const errPago =
+        document.getElementById('errPago');
 
-        const contenedor =
-            document.getElementById('contenedorPago');
-
-
-        errPago.textContent = '';
+    const contenedor =
+        document.getElementById('contenedorPago');
 
 
-        contenedor.innerHTML = '';
+    errPago.textContent = '';
 
 
-        const mensajePedido =
-            document.createElement('div');
+    contenedor.innerHTML = '';
 
-        mensajePedido.className =
-            'alert alert-light border mb-3';
 
-        mensajePedido.innerHTML =
-            `<div class="d-flex justify-content-between">
-                <span>
-                    <strong>Pedido #${UI.esc(String(idPedido))}</strong>
-                </span>
-                <span>
-                    <strong>S/ ${Number(total).toFixed(2)}</strong>
-                </span>
-            </div>`;
+    const mensajePedido =
+        document.createElement('div');
 
-        contenedor.appendChild(
-            mensajePedido
+    mensajePedido.className =
+        'alert alert-light border mb-3';
+
+    mensajePedido.innerHTML =
+        `<div class="d-flex justify-content-between">
+            <span>
+                <strong>Pedido #${UI.esc(String(idPedido))}</strong>
+            </span>
+            <span>
+                <strong>S/ ${Number(total).toFixed(2)}</strong>
+            </span>
+        </div>`;
+
+    contenedor.appendChild(
+        mensajePedido
+    );
+
+
+    try {
+
+        await cargarFormularioIzipay(
+            datosPago.publicKey
         );
 
 
@@ -1617,26 +1624,19 @@
         modalPago.show();
 
 
-        try {
+    } catch (error) {
 
-            await cargarFormularioIzipay(
-                datosPago.publicKey
-            );
+        console.error(
+            'Error al cargar la librería de Izipay:',
+            error
+        );
 
-        } catch (error) {
-
-            console.error(
-                'Error al cargar la librería de Izipay:',
-                error
-            );
-
-            errPago.textContent =
-                'No se pudo cargar el formulario de pago de Izipay.';
-
-        }
+        errPago.textContent =
+            'No se pudo cargar el formulario de pago de Izipay.';
 
     }
 
+}
 
     function cargarFormularioIzipay(publicKey) {
 
