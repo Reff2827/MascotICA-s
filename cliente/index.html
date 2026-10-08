@@ -467,8 +467,58 @@
 </div>
 
 
+<div class="modal fade" id="modalCompraExitosa" tabindex="-1" data-bs-backdrop="static">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    ¡Compra exitosa!
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    id="btnCerrarCompraExitosa"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div id="contenidoCompraExitosa"></div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-primary-ps"
+                    data-bs-dismiss="modal">
+
+                    <i class="bi bi-check-lg"></i>
+                    Listo
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 <script src="../js/supabaseClient.js"></script>
 <script src="../js/storage.js"></script>
 <script src="../js/auth.js"></script>
@@ -486,6 +536,7 @@
     let carrito = JSON.parse(localStorage.getItem(CARRITO_KEY) || '{}');
     let modalCarrito = null;
     let modalPago = null;
+    let modalCompraExitosa = null;
 
 
     const modalEvaluacion =
@@ -507,6 +558,11 @@
         modalPago =
             new bootstrap.Modal(
                 document.getElementById('modalPago')
+            );
+
+        modalCompraExitosa =
+            new bootstrap.Modal(
+                document.getElementById('modalCompraExitosa')
             );
 
     }
@@ -1559,118 +1615,626 @@
 
 
     async function mostrarCheckoutIzipay(
-    datosPago,
-    idPedido,
-    total
-) {
-    const errPago =
-        document.getElementById('errPago');
+        datosPago,
+        idPedido,
+        total
+    ) {
+        const errPago =
+            document.getElementById('errPago');
 
-    const contenedor =
-        document.getElementById('contenedorPago');
+        const contenedor =
+            document.getElementById('contenedorPago');
 
-    errPago.textContent = '';
-    contenedor.innerHTML = '';
+        errPago.textContent = '';
+        contenedor.innerHTML = '';
 
-    const mensajePedido =
-        document.createElement('div');
+        try {
 
-    mensajePedido.className =
-        'alert alert-light border mb-3';
-
-    mensajePedido.innerHTML =
-        `<div class="d-flex justify-content-between">
-            <span>
-                <strong>Pedido #${UI.esc(String(idPedido))}</strong>
-            </span>
-            <span>
-                <strong>S/ ${Number(total).toFixed(2)}</strong>
-            </span>
-        </div>`;
-
-    contenedor.appendChild(
-        mensajePedido
-    );
-
-    try {
-        await cargarFormularioIzipay(
-            datosPago.publicKey
-        );
-
-        if (
-            typeof KR === 'undefined'
-        ) {
-            throw new Error(
-                'La librería de pago de Izipay no está disponible.'
+            await cargarFormularioIzipay(
+                datosPago.publicKey
             );
-        }
 
-        if (
-            typeof KR.setFormConfig !== 'function'
-        ) {
-            throw new Error(
-                'No se pudo configurar el formulario de pago de Izipay.'
+            if (
+                typeof KR === 'undefined'
+            ) {
+                throw new Error(
+                    'La librería de pago de Izipay no está disponible.'
+                );
+            }
+
+            if (
+                typeof KR.setFormConfig !== 'function'
+            ) {
+                throw new Error(
+                    'No se pudo configurar el formulario de pago de Izipay.'
+                );
+            }
+
+            if (
+                typeof KR.renderElements !== 'function'
+            ) {
+                throw new Error(
+                    'No se pudo inicializar el formulario de pago de Izipay.'
+                );
+            }
+
+            await KR.setFormConfig({
+                formToken:
+                    datosPago.formToken,
+
+                'kr-language':
+                    'es-ES'
+            });
+
+            const contenedorFormulario =
+                document.createElement('div');
+
+            contenedorFormulario.id =
+                'contenedorFormularioIzipay';
+
+            const formulario =
+                document.createElement('div');
+
+            formulario.className =
+                'kr-embedded';
+
+            formulario.setAttribute(
+                'kr-form-token',
+                datosPago.formToken
             );
-        }
 
-        if (
-            typeof KR.renderElements !== 'function'
-        ) {
-            throw new Error(
-                'No se pudo inicializar el formulario de pago de Izipay.'
+            contenedorFormulario.appendChild(
+                formulario
             );
+
+            contenedor.appendChild(
+                contenedorFormulario
+            );
+
+            modalPago.show();
+
+            await KR.renderElements(
+                '#contenedorFormularioIzipay'
+            );
+
+            esperarConfirmacionPago(
+                idPedido,
+                datosPago,
+                total
+            );
+
+        } catch (error) {
+
+            console.error(
+                'Error al cargar el formulario de Izipay:',
+                error
+            );
+
+            errPago.textContent =
+                error.message ||
+                'No se pudo cargar el formulario de pago de Izipay.';
         }
-
-        await KR.setFormConfig({
-            formToken:
-                datosPago.formToken,
-
-            'kr-language':
-                'es-ES'
-        });
-
-        const contenedorFormulario =
-            document.createElement('div');
-
-        contenedorFormulario.id =
-            'contenedorFormularioIzipay';
-
-        const formulario =
-            document.createElement('div');
-
-        formulario.className =
-            'kr-embedded';
-
-        formulario.setAttribute(
-            'kr-form-token',
-            datosPago.formToken
-        );
-
-        contenedorFormulario.appendChild(
-            formulario
-        );
-
-        contenedor.appendChild(
-            contenedorFormulario
-        );
-
-        modalPago.show();
-
-        await KR.renderElements(
-            '#contenedorFormularioIzipay'
-        );
-
-    } catch (error) {
-        console.error(
-            'Error al cargar el formulario de Izipay:',
-            error
-        );
-
-        errPago.textContent =
-            error.message ||
-            'No se pudo cargar el formulario de pago de Izipay.';
     }
-}
+
+
+    function esperarConfirmacionPago(
+        idPedido,
+        datosPago,
+        total
+    ) {
+
+        let intentos = 0;
+
+        const maximoIntentos = 180;
+
+        const intervalo =
+            setInterval(async () => {
+
+                intentos++;
+
+                try {
+
+                    const pedido =
+                        await Pedidos.buscarPorId(
+                            idPedido
+                        );
+
+                    if (!pedido) {
+                        return;
+                    }
+
+
+                    if (
+                        pedido.estado === 'PAGADO' ||
+                        pedido.estado === 'ENTREGADO'
+                    ) {
+
+                        clearInterval(intervalo);
+
+                        await finalizarCompraExitosa(
+                            pedido,
+                            idPedido,
+                            total
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (
+                        pedido.estado === 'RECHAZADO' ||
+                        pedido.estado === 'VENCIDO'
+                    ) {
+
+                        clearInterval(intervalo);
+
+                        const errPago =
+                            document.getElementById('errPago');
+
+                        errPago.textContent =
+                            pedido.estado === 'RECHAZADO'
+                                ? 'El pago fue rechazado. Puedes cerrar esta ventana e intentar nuevamente.'
+                                : 'El tiempo para completar el pago ha vencido.';
+
+                        return;
+
+                    }
+
+
+                    if (intentos >= maximoIntentos) {
+
+                        clearInterval(intervalo);
+
+                        const errPago =
+                            document.getElementById('errPago');
+
+                        errPago.textContent =
+                            'No pudimos confirmar automáticamente el resultado del pago. Si el cobro fue realizado, revisa tu historial de compras antes de volver a intentar el pago.';
+
+                    }
+
+                } catch (error) {
+
+                    console.error(
+                        'Error verificando el estado del pedido:',
+                        error
+                    );
+
+                }
+
+            }, 2000);
+
+    }
+
+
+    async function finalizarCompraExitosa(
+        pedido,
+        idPedido,
+        total
+    ) {
+
+        if (modalPago) {
+            modalPago.hide();
+        }
+
+
+        const entradasCompra =
+            Object.entries(carrito)
+                .map(([id, cantidad]) => {
+
+                    const producto =
+                        productoPorId(id);
+
+                    if (!producto) {
+                        return null;
+                    }
+
+                    return {
+                        nombre: producto.nombre,
+                        cantidad: Number(cantidad),
+                        precio: Number(producto.precio),
+                        subtotal:
+                            Number(producto.precio) *
+                            Number(cantidad)
+                    };
+
+                })
+                .filter(Boolean);
+
+
+        carrito = {};
+
+        guardarCarrito();
+
+
+        const contenido =
+            document.getElementById(
+                'contenidoCompraExitosa'
+            );
+
+
+        const nombreCliente =
+            obtenerNombreCliente();
+
+        const tipoDocumento =
+            document.getElementById(
+                'tipoDocumentoPago'
+            ).value;
+
+        const numeroDocumento =
+            document.getElementById(
+                'numeroDocumentoPago'
+            ).value.trim();
+
+
+        const fechaPedido =
+            pedido.fecha
+                ? new Date(pedido.fecha)
+                : new Date();
+
+
+        const fechaTexto =
+            fechaPedido.toLocaleDateString(
+                'es-PE',
+                {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                }
+            );
+
+
+        const horaTexto =
+            fechaPedido.toLocaleTimeString(
+                'es-PE',
+                {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                }
+            );
+
+
+        const numeroBoleta =
+            pedido.numeroBoleta ||
+            'Pendiente de generación';
+
+
+        const filasProductos =
+            entradasCompra.length > 0
+                ? entradasCompra.map(item => `
+                    <tr>
+                        <td>
+                            ${UI.esc(item.nombre)}
+                        </td>
+                        <td class="text-center">
+                            ${item.cantidad}
+                        </td>
+                        <td class="text-end">
+                            S/ ${item.precio.toFixed(2)}
+                        </td>
+                        <td class="text-end">
+                            S/ ${item.subtotal.toFixed(2)}
+                        </td>
+                    </tr>
+                `).join('')
+                : `
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            No se pudo cargar el detalle local de los productos.
+                        </td>
+                    </tr>
+                `;
+
+
+        contenido.innerHTML = `
+
+            <div class="text-center mb-4">
+
+                <div
+                    class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center mb-3"
+                    style="width: 70px; height: 70px;">
+
+                    <i
+                        class="bi bi-check-lg text-success"
+                        style="font-size: 2rem;">
+                    </i>
+
+                </div>
+
+                <h4 class="fw-bold mb-2">
+                    ¡Gracias por tu compra!
+                </h4>
+
+                <p class="text-muted mb-0">
+                    Tu pago fue confirmado correctamente.
+                </p>
+
+            </div>
+
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-body p-4">
+
+                    <div class="text-center mb-4">
+
+                        <h3 class="fw-bold mb-1">
+                            MascotICA's
+                        </h3>
+
+                        <div class="text-muted">
+                            Boleta electrónica
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-3 mb-4">
+
+                        <div class="col-md-6">
+
+                            <div class="small text-muted">
+                                ID de compra
+                            </div>
+
+                            <div class="fw-semibold">
+                                ${UI.esc(String(idPedido))}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="small text-muted">
+                                Fecha
+                            </div>
+
+                            <div class="fw-semibold">
+                                ${UI.esc(fechaTexto)}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="small text-muted">
+                                Hora
+                            </div>
+
+                            <div class="fw-semibold">
+                                ${UI.esc(horaTexto)}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="border rounded p-3 mb-4">
+
+                        <h6 class="fw-bold mb-3">
+                            Datos del cliente
+                        </h6>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-7">
+
+                                <div class="small text-muted">
+                                    Nombre
+                                </div>
+
+                                <div class="fw-semibold">
+                                    ${UI.esc(nombreCliente)}
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-5">
+
+                                <div class="small text-muted">
+                                    Documento
+                                </div>
+
+                                <div class="fw-semibold">
+                                    ${UI.esc(tipoDocumento)}:
+                                    ${UI.esc(numeroDocumento)}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="table-responsive">
+
+                        <table class="table align-middle">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Producto
+                                    </th>
+
+                                    <th class="text-center">
+                                        Cant.
+                                    </th>
+
+                                    <th class="text-end">
+                                        Precio unitario
+                                    </th>
+
+                                    <th class="text-end">
+                                        Importe
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+                                ${filasProductos}
+                            </tbody>
+
+                            <tfoot>
+
+                                <tr>
+
+                                    <th
+                                        colspan="3"
+                                        class="text-end">
+                                        Total
+                                    </th>
+
+                                    <th class="text-end fs-5">
+                                        S/ ${Number(total).toFixed(2)}
+                                    </th>
+
+                                </tr>
+
+                            </tfoot>
+
+                        </table>
+
+                    </div>
+
+
+                    <div class="border-top pt-4 mt-4">
+
+                        <div class="row align-items-center">
+
+                            <div class="col-md-7">
+
+                                <div class="small text-muted mb-1">
+                                    Número de boleta
+                                </div>
+
+                                <div class="fw-bold">
+                                    ${UI.esc(String(numeroBoleta))}
+                                </div>
+
+                                <div class="small text-muted mt-3">
+                                    Esta boleta corresponde a la compra
+                                    realizada en MascotICA's.
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-5 text-center mt-3 mt-md-0">
+
+                                <canvas
+                                    id="qrBoleta"
+                                    width="180"
+                                    height="180">
+                                </canvas>
+
+                                <div class="small text-muted mt-2">
+                                    Escanea el código QR para consultar
+                                    los datos de esta boleta.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="alert alert-success mb-0">
+
+                <i class="bi bi-info-circle-fill"></i>
+
+                Tu compra ha sido registrada correctamente.
+                Puedes conservar esta boleta como comprobante
+                de tu compra.
+
+            </div>
+
+        `;
+
+
+        const canvas =
+            document.getElementById(
+                'qrBoleta'
+            );
+
+
+        if (
+            canvas &&
+            typeof QRCode !== 'undefined'
+        ) {
+
+            const datosQr =
+                [
+                    "MascotICA's",
+                    'Boleta electrónica',
+                    `ID de compra: ${idPedido}`,
+                    `Boleta: ${numeroBoleta}`,
+                    `Cliente: ${nombreCliente}`,
+                    `Documento: ${tipoDocumento} ${numeroDocumento}`,
+                    `Fecha: ${fechaTexto}`,
+                    `Hora: ${horaTexto}`,
+                    `Total: S/ ${Number(total).toFixed(2)}`
+                ].join('\n');
+
+
+            QRCode.toCanvas(
+                canvas,
+                datosQr,
+                {
+                    width: 180,
+                    margin: 2
+                },
+                error => {
+
+                    if (error) {
+
+                        console.error(
+                            'Error al generar el QR:',
+                            error
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        if (modalCompraExitosa) {
+            modalCompraExitosa.show();
+        }
+
+    }
+
+
+    function obtenerNombreCliente() {
+
+        return (
+            usuario?.nombre ||
+            usuario?.nombreCompleto ||
+            usuario?.nombre_completo ||
+            usuario?.full_name ||
+            usuario?.user_metadata?.nombre ||
+            usuario?.user_metadata?.nombre_completo ||
+            usuario?.user_metadata?.full_name ||
+            usuario?.email ||
+            'Cliente'
+        );
+
+    }
+
 
     function cargarFormularioIzipay(publicKey) {
 
