@@ -1809,336 +1809,238 @@
 
 
     async function finalizarCompraExitosa(
-        pedido,
-        idPedido,
-        total
-    ) {
+    pedido,
+    idPedido,
+    total
+) {
 
-        if (modalPago) {
-            modalPago.hide();
-        }
-
-
-        const entradasCompra =
-            Object.entries(carrito)
-                .map(([id, cantidad]) => {
-
-                    const producto =
-                        productoPorId(id);
-
-                    if (!producto) {
-                        return null;
-                    }
-
-                    return {
-                        nombre: producto.nombre,
-                        cantidad: Number(cantidad),
-                        precio: Number(producto.precio),
-                        subtotal:
-                            Number(producto.precio) *
-                            Number(cantidad)
-                    };
-
-                })
-                .filter(Boolean);
+    if (modalPago) {
+        modalPago.hide();
+    }
 
 
-        carrito = {};
+    const entradasCompra =
+        Object.entries(carrito)
+            .map(([id, cantidad]) => {
 
-        guardarCarrito();
+                const producto =
+                    productoPorId(id);
 
-
-        const contenido =
-            document.getElementById(
-                'contenidoCompraExitosa'
-            );
-
-
-        const nombreCliente =
-            obtenerNombreCliente();
-
-        const tipoDocumento =
-            document.getElementById(
-                'tipoDocumentoPago'
-            ).value;
-
-        const numeroDocumento =
-            document.getElementById(
-                'numeroDocumentoPago'
-            ).value.trim();
-
-
-        const fechaPedido =
-            pedido.fecha
-                ? new Date(pedido.fecha)
-                : new Date();
-
-
-        const fechaTexto =
-            fechaPedido.toLocaleDateString(
-                'es-PE',
-                {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
+                if (!producto) {
+                    return null;
                 }
-            );
+
+                return {
+                    nombre: producto.nombre,
+                    cantidad: Number(cantidad),
+                    precio: Number(producto.precio),
+                    subtotal:
+                        Number(producto.precio) *
+                        Number(cantidad)
+                };
+
+            })
+            .filter(Boolean);
 
 
-        const horaTexto =
-            fechaPedido.toLocaleTimeString(
-                'es-PE',
-                {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                }
-            );
+    carrito = {};
+
+    guardarCarrito();
 
 
-        const numeroBoleta =
-            pedido.numeroBoleta ||
-            'Pendiente de generación';
+    const contenido =
+        document.getElementById(
+            'contenidoCompraExitosa'
+        );
 
 
-        const filasProductos =
-            entradasCompra.length > 0
-                ? entradasCompra.map(item => `
-                    <tr>
-                        <td>
-                            ${UI.esc(item.nombre)}
-                        </td>
-                        <td class="text-center">
-                            ${item.cantidad}
-                        </td>
-                        <td class="text-end">
-                            S/ ${item.precio.toFixed(2)}
-                        </td>
-                        <td class="text-end">
-                            S/ ${item.subtotal.toFixed(2)}
-                        </td>
-                    </tr>
-                `).join('')
-                : `
-                    <tr>
-                        <td colspan="4" class="text-center text-muted">
-                            No se pudo cargar el detalle local de los productos.
-                        </td>
-                    </tr>
-                `;
+    const nombreCliente =
+        obtenerNombreCliente();
+
+    const tipoDocumento =
+        document.getElementById(
+            'tipoDocumentoPago'
+        ).value;
+
+    const numeroDocumento =
+        document.getElementById(
+            'numeroDocumentoPago'
+        ).value.trim();
 
 
-        contenido.innerHTML = `
+    const fechaPedido =
+        pedido.fecha
+            ? new Date(pedido.fecha)
+            : new Date();
 
-            <div class="text-center mb-4">
 
-                <div
-                    class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center mb-3"
-                    style="width: 70px; height: 70px;">
+    const fechaTexto =
+        fechaPedido.toLocaleDateString(
+            'es-PE',
+            {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            }
+        );
 
-                    <i
-                        class="bi bi-check-lg text-success"
-                        style="font-size: 2rem;">
-                    </i>
 
-                </div>
+    const horaTexto =
+        fechaPedido.toLocaleTimeString(
+            'es-PE',
+            {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }
+        );
 
-                <h4 class="fw-bold mb-2">
-                    ¡Gracias por tu compra!
-                </h4>
 
-                <p class="text-muted mb-0">
-                    Tu pago fue confirmado correctamente.
-                </p>
+    const numeroBoleta =
+        pedido.numeroBoleta ||
+        'Pendiente de generación';
+
+
+    const filasProductos =
+        entradasCompra.length > 0
+            ? entradasCompra.map(item => `
+                <tr>
+                    <td>
+                        ${UI.esc(item.nombre)}
+                    </td>
+                    <td class="text-center">
+                        ${item.cantidad}
+                    </td>
+                    <td class="text-end">
+                        S/ ${item.precio.toFixed(2)}
+                    </td>
+                    <td class="text-end">
+                        S/ ${item.subtotal.toFixed(2)}
+                    </td>
+                </tr>
+            `).join('')
+            : `
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        No se pudo cargar el detalle local de los productos.
+                    </td>
+                </tr>
+            `;
+
+
+    contenido.innerHTML = `
+
+        <div class="text-center mb-4">
+
+            <div
+                class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center mb-3"
+                style="width: 70px; height: 70px;">
+
+                <i
+                    class="bi bi-check-lg text-success"
+                    style="font-size: 2rem;">
+                </i>
 
             </div>
 
+            <h4 class="fw-bold mb-2">
+                ¡Gracias por tu compra!
+            </h4>
 
-            <div class="card border-0 shadow-sm mb-4">
+            <p class="text-muted mb-0">
+                Tu pago fue confirmado correctamente.
+            </p>
 
-                <div class="card-body p-4">
+        </div>
 
-                    <div class="text-center mb-4">
 
-                        <h3 class="fw-bold mb-1">
-                            MascotICA's
-                        </h3>
+        <div class="card border-0 shadow-sm mb-4">
 
-                        <div class="text-muted">
-                            Boleta electrónica
+            <div class="card-body p-4">
+
+                <div class="text-center mb-4">
+
+                    <h3 class="fw-bold mb-1">
+                        MascotICA's
+                    </h3>
+
+                    <div class="text-muted">
+                        Boleta electrónica
+                    </div>
+
+                </div>
+
+
+                <div class="row g-3 mb-4">
+
+                    <div class="col-md-6">
+
+                        <div class="small text-muted">
+                            ID de compra
+                        </div>
+
+                        <div class="fw-semibold">
+                            ${UI.esc(String(idPedido))}
                         </div>
 
                     </div>
 
+                    <div class="col-md-3">
 
-                    <div class="row g-3 mb-4">
+                        <div class="small text-muted">
+                            Fecha
+                        </div>
 
-                        <div class="col-md-6">
+                        <div class="fw-semibold">
+                            ${UI.esc(fechaTexto)}
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <div class="small text-muted">
+                            Hora
+                        </div>
+
+                        <div class="fw-semibold">
+                            ${UI.esc(horaTexto)}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="border rounded p-3 mb-4">
+
+                    <h6 class="fw-bold mb-3">
+                        Datos del cliente
+                    </h6>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-7">
 
                             <div class="small text-muted">
-                                ID de compra
+                                Nombre
                             </div>
 
                             <div class="fw-semibold">
-                                ${UI.esc(String(idPedido))}
+                                ${UI.esc(nombreCliente)}
                             </div>
 
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-5">
 
                             <div class="small text-muted">
-                                Fecha
+                                Documento
                             </div>
 
                             <div class="fw-semibold">
-                                ${UI.esc(fechaTexto)}
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-3">
-
-                            <div class="small text-muted">
-                                Hora
-                            </div>
-
-                            <div class="fw-semibold">
-                                ${UI.esc(horaTexto)}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="border rounded p-3 mb-4">
-
-                        <h6 class="fw-bold mb-3">
-                            Datos del cliente
-                        </h6>
-
-                        <div class="row g-3">
-
-                            <div class="col-md-7">
-
-                                <div class="small text-muted">
-                                    Nombre
-                                </div>
-
-                                <div class="fw-semibold">
-                                    ${UI.esc(nombreCliente)}
-                                </div>
-
-                            </div>
-
-                            <div class="col-md-5">
-
-                                <div class="small text-muted">
-                                    Documento
-                                </div>
-
-                                <div class="fw-semibold">
-                                    ${UI.esc(tipoDocumento)}:
-                                    ${UI.esc(numeroDocumento)}
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="table-responsive">
-
-                        <table class="table align-middle">
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>
-                                        Producto
-                                    </th>
-
-                                    <th class="text-center">
-                                        Cant.
-                                    </th>
-
-                                    <th class="text-end">
-                                        Precio unitario
-                                    </th>
-
-                                    <th class="text-end">
-                                        Importe
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody>
-                                ${filasProductos}
-                            </tbody>
-
-                            <tfoot>
-
-                                <tr>
-
-                                    <th
-                                        colspan="3"
-                                        class="text-end">
-                                        Total
-                                    </th>
-
-                                    <th class="text-end fs-5">
-                                        S/ ${Number(total).toFixed(2)}
-                                    </th>
-
-                                </tr>
-
-                            </tfoot>
-
-                        </table>
-
-                    </div>
-
-
-                    <div class="border-top pt-4 mt-4">
-
-                        <div class="row align-items-center">
-
-                            <div class="col-md-7">
-
-                                <div class="small text-muted mb-1">
-                                    Número de boleta
-                                </div>
-
-                                <div class="fw-bold">
-                                    ${UI.esc(String(numeroBoleta))}
-                                </div>
-
-                                <div class="small text-muted mt-3">
-                                    Esta boleta corresponde a la compra
-                                    realizada en MascotICA's.
-                                </div>
-
-                            </div>
-
-                            <div class="col-md-5 text-center mt-3 mt-md-0">
-
-                                <canvas
-                                    id="qrBoleta"
-                                    width="180"
-                                    height="180">
-                                </canvas>
-
-                                <div class="small text-muted mt-2">
-                                    Escanea el código QR para consultar
-                                    los datos de esta boleta.
-                                </div>
-
+                                ${UI.esc(tipoDocumento)}:
+                                ${UI.esc(numeroDocumento)}
                             </div>
 
                         </div>
@@ -2147,21 +2049,126 @@
 
                 </div>
 
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Producto
+                                </th>
+
+                                <th class="text-center">
+                                    Cant.
+                                </th>
+
+                                <th class="text-end">
+                                    Precio unitario
+                                </th>
+
+                                <th class="text-end">
+                                    Importe
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            ${filasProductos}
+                        </tbody>
+
+                        <tfoot>
+
+                            <tr>
+
+                                <th
+                                    colspan="3"
+                                    class="text-end">
+                                    Total
+                                </th>
+
+                                <th class="text-end fs-5">
+                                    S/ ${Number(total).toFixed(2)}
+                                </th>
+
+                            </tr>
+
+                        </tfoot>
+
+                    </table>
+
+                </div>
+
+
+                <div class="border-top pt-4 mt-4">
+
+                    <div class="row align-items-center">
+
+                        <div class="col-md-7">
+
+                            <div class="small text-muted mb-1">
+                                Número de boleta
+                            </div>
+
+                            <div class="fw-bold">
+                                ${UI.esc(String(numeroBoleta))}
+                            </div>
+
+                            <div class="small text-muted mt-3">
+                                Esta boleta corresponde a la compra
+                                realizada en MascotICA's.
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-5 text-center mt-3 mt-md-0">
+
+                            <canvas
+                                id="qrBoleta"
+                                width="180"
+                                height="180">
+                            </canvas>
+
+                            <div class="small text-muted mt-2">
+                                Escanea el código QR para consultar
+                                los datos de esta boleta.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
             </div>
 
+        </div>
 
-            <div class="alert alert-success mb-0">
 
-                <i class="bi bi-info-circle-fill"></i>
+        <div class="alert alert-success mb-0">
 
-                Tu compra ha sido registrada correctamente.
-                Puedes conservar esta boleta como comprobante
-                de tu compra.
+            <i class="bi bi-info-circle-fill"></i>
 
-            </div>
+            Tu compra ha sido registrada correctamente.
+            Puedes conservar esta boleta como comprobante
+            de tu compra.
 
-        `;
+        </div>
 
+    `;
+
+
+    if (modalCompraExitosa) {
+        modalCompraExitosa.show();
+    }
+
+
+    setTimeout(() => {
 
         const canvas =
             document.getElementById(
@@ -2169,55 +2176,78 @@
             );
 
 
-        if (
-            canvas &&
-            typeof QRCode !== 'undefined'
-        ) {
+        if (!canvas) {
 
-            const datosQr =
-                [
-                    "MascotICA's",
-                    'Boleta electrónica',
-                    `ID de compra: ${idPedido}`,
-                    `Boleta: ${numeroBoleta}`,
-                    `Cliente: ${nombreCliente}`,
-                    `Documento: ${tipoDocumento} ${numeroDocumento}`,
-                    `Fecha: ${fechaTexto}`,
-                    `Hora: ${horaTexto}`,
-                    `Total: S/ ${Number(total).toFixed(2)}`
-                ].join('\n');
-
-
-            QRCode.toCanvas(
-                canvas,
-                datosQr,
-                {
-                    width: 180,
-                    margin: 2
-                },
-                error => {
-
-                    if (error) {
-
-                        console.error(
-                            'Error al generar el QR:',
-                            error
-                        );
-
-                    }
-
-                }
+            console.error(
+                'No se encontró el canvas del QR.'
             );
 
+            return;
+
         }
 
 
-        if (modalCompraExitosa) {
-            modalCompraExitosa.show();
+        if (
+            typeof QRCode === 'undefined' ||
+            typeof QRCode.toCanvas !== 'function'
+        ) {
+
+            console.error(
+                'La librería QRCode no está disponible.'
+            );
+
+            return;
+
         }
 
-    }
 
+        const datosQr =
+            [
+                "MascotICA's",
+                'Boleta electrónica',
+                `ID de compra: ${idPedido}`,
+                `Boleta: ${numeroBoleta}`,
+                `Cliente: ${nombreCliente}`,
+                `Documento: ${tipoDocumento} ${numeroDocumento}`,
+                `Fecha: ${fechaTexto}`,
+                `Hora: ${horaTexto}`,
+                `Total: S/ ${Number(total).toFixed(2)}`
+            ].join('\n');
+
+
+        QRCode.toCanvas(
+            canvas,
+            datosQr,
+            {
+                width: 180,
+                height: 180,
+                margin: 2,
+                errorCorrectionLevel: 'M'
+            },
+            error => {
+
+                if (error) {
+
+                    console.error(
+                        'Error al generar el QR:',
+                        error
+                    );
+
+                    return;
+
+                }
+
+
+                console.log(
+                    'QR de la boleta generado correctamente.'
+                );
+
+            }
+        );
+
+    }, 150);
+
+}
 
     function obtenerNombreCliente() {
 
