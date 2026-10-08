@@ -1559,84 +1559,100 @@
 
 
     async function mostrarCheckoutIzipay(
-    datosPago,
-    idPedido,
-    total
-) {
+        datosPago,
+        idPedido,
+        total
+    ) {
 
-    const errPago =
-        document.getElementById('errPago');
+        const errPago =
+            document.getElementById('errPago');
 
-    const contenedor =
-        document.getElementById('contenedorPago');
-
-
-    errPago.textContent = '';
+        const contenedor =
+            document.getElementById('contenedorPago');
 
 
-    contenedor.innerHTML = '';
+        errPago.textContent = '';
 
 
-    const mensajePedido =
-        document.createElement('div');
-
-    mensajePedido.className =
-        'alert alert-light border mb-3';
-
-    mensajePedido.innerHTML =
-        `<div class="d-flex justify-content-between">
-            <span>
-                <strong>Pedido #${UI.esc(String(idPedido))}</strong>
-            </span>
-            <span>
-                <strong>S/ ${Number(total).toFixed(2)}</strong>
-            </span>
-        </div>`;
-
-    contenedor.appendChild(
-        mensajePedido
-    );
+        contenedor.innerHTML = '';
 
 
-    try {
-
-        await cargarFormularioIzipay(
-            datosPago.publicKey
-        );
-
-
-        const formulario =
+        const mensajePedido =
             document.createElement('div');
 
-        formulario.className =
-            'kr-embedded';
+        mensajePedido.className =
+            'alert alert-light border mb-3';
 
-        formulario.setAttribute(
-            'kr-form-token',
-            datosPago.formToken
-        );
+        mensajePedido.innerHTML =
+            `<div class="d-flex justify-content-between">
+                <span>
+                    <strong>Pedido #${UI.esc(String(idPedido))}</strong>
+                </span>
+                <span>
+                    <strong>S/ ${Number(total).toFixed(2)}</strong>
+                </span>
+            </div>`;
 
         contenedor.appendChild(
-            formulario
+            mensajePedido
         );
 
 
-        modalPago.show();
+        try {
+
+            await cargarFormularioIzipay(
+                datosPago.publicKey
+            );
 
 
-    } catch (error) {
+            const formulario =
+                document.createElement('div');
 
-        console.error(
-            'Error al cargar la librería de Izipay:',
-            error
-        );
+            formulario.className =
+                'kr-embedded';
 
-        errPago.textContent =
-            'No se pudo cargar el formulario de pago de Izipay.';
+            formulario.setAttribute(
+                'kr-form-token',
+                datosPago.formToken
+            );
+
+            contenedor.appendChild(
+                formulario
+            );
+
+
+            modalPago.show();
+
+
+            if (
+                typeof KR === 'undefined' ||
+                typeof KR.renderElements !== 'function'
+            ) {
+
+                throw new Error(
+                    'La librería de pago de Izipay no está disponible.'
+                );
+
+            }
+
+
+            await KR.renderElements();
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al cargar el formulario de Izipay:',
+                error
+            );
+
+            errPago.textContent =
+                error.message ||
+                'No se pudo cargar el formulario de pago de Izipay.';
+
+        }
 
     }
-
-}
 
     function cargarFormularioIzipay(publicKey) {
 
