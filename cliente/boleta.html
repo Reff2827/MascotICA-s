@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+<title>Boleta electrónica · MascotICA's</title>
+
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    rel="stylesheet">
+
+<link
+    rel="stylesheet"
+    href="../css/styles.css">
+
+<script src="../js/theme.js"></script>
+```
+
+</head>
+
+<body>
+
+<div class="container py-4 py-md-5">
+
+```
+<div class="row justify-content-center">
+
+    <div class="col-12 col-md-10 col-lg-8">
+
+        <div class="text-center mb-4">
+
+            <div
+                class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center mb-3"
+                style="width: 70px; height: 70px;">
+
+                <i
+                    class="bi bi-receipt-cutoff text-success"
+                    style="font-size: 2rem;">
+                </i>
+
+            </div>
+
+            <h2 class="fw-bold mb-1">
+                MascotICA's
+            </h2>
+
+            <p class="text-muted mb-0">
+                Boleta electrónica
+            </p>
+
+        </div>
+
+
+        <div
+            id="estadoBoleta"
+            class="text-center py-5">
+
+            <div
+                class="spinner-border text-primary"
+                role="status">
+
+                <span class="visually-hidden">
+                    Cargando...
+                </span>
+
+            </div>
+
+            <p class="text-muted mt-3 mb-0">
+                Cargando información de la boleta...
+            </p>
+
+        </div>
+
+
+        <div
+            id="contenidoBoleta"
+            class="d-none">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4 p-md-5">
+
+                    <div
+                        class="text-center border-bottom pb-4 mb-4">
+
+                        <div
+                            class="small text-muted mb-1">
+                            Comprobante electrónico
+                        </div>
+
+                        <h3
+                            class="fw-bold mb-2"
+                            id="numeroBoleta">
+                            -
+                        </h3>
+
+                        <div
+                            class="small text-muted"
+                            id="fechaBoleta">
+                            -
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-4">
+
+                        <h5 class="fw-bold mb-3">
+
+                            <i class="bi bi-bag-check me-1"></i>
+
+                            Detalle de compra
+
+                        </h5>
+
+                        <div
+                            class="table-responsive">
+
+                            <table
+                                class="table align-middle mb-0">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Producto
+                                        </th>
+
+                                        <th class="text-center">
+                                            Cant.
+                                        </th>
+
+                                        <th class="text-end">
+                                            Importe
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="listaProductosBoleta">
+                                </tbody>
+
+                                <tfoot>
+
+                                    <tr>
+
+                                        <th
+                                            colspan="2"
+                                            class="text-end">
+
+                                            Total
+
+                                        </th>
+
+                                        <th
+                                            class="text-end fs-5"
+                                            id="totalBoleta">
+
+                                            S/ 0.00
+
+                                        </th>
+
+                                    </tr>
+
+                                </tfoot>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="border-top pt-4 mt-4">
+
+                        <div
+                            class="alert alert-success mb-0">
+
+                            <i class="bi bi-shield-check me-1"></i>
+
+                            Esta boleta corresponde a una compra
+                            registrada en MascotICA's.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="text-center text-muted small mt-4">
+
+                Documento consultado mediante código QR.
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="errorBoleta"
+            class="d-none">
+
+            <div
+                class="card border-0 shadow-sm">
+
+                <div class="card-body text-center p-5">
+
+                    <div
+                        class="rounded-circle bg-danger-subtle d-inline-flex align-items-center justify-content-center mb-3"
+                        style="width: 70px; height: 70px;">
+
+                        <i
+                            class="bi bi-exclamation-triangle text-danger"
+                            style="font-size: 2rem;">
+                        </i>
+
+                    </div>
+
+                    <h4 class="fw-bold mb-2">
+                        No se pudo encontrar la boleta
+                    </h4>
+
+                    <p
+                        class="text-muted mb-0"
+                        id="mensajeErrorBoleta">
+
+                        El código de la boleta no es válido o
+                        la boleta ya no está disponible.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/supabaseClient.js"></script>
+
+<script>
+
+    async function cargarBoleta() {
+
+        const estado =
+            document.getElementById('estadoBoleta');
+
+        const contenido =
+            document.getElementById('contenidoBoleta');
+
+        const error =
+            document.getElementById('errorBoleta');
+
+        const mensajeError =
+            document.getElementById('mensajeErrorBoleta');
+
+
+        const parametros =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const codigo =
+            parametros.get('codigo');
+
+
+        if (!codigo) {
+
+            estado.classList.add('d-none');
+
+            error.classList.remove('d-none');
+
+            mensajeError.textContent =
+                'No se recibió el código necesario para consultar esta boleta.';
+
+            return;
+
+        }
+
+
+        try {
+
+            if (
+                typeof db === 'undefined'
+            ) {
+
+                throw new Error(
+                    'No se pudo conectar con el sistema.'
+                );
+
+            }
+
+
+            const respuesta =
+                await db.rpc(
+                    'obtener_boleta_publica',
+                    {
+                        p_codigo: codigo
+                    }
+                );
+
+
+            if (respuesta.error) {
+
+                console.error(
+                    'Error consultando la boleta:',
+                    respuesta.error
+                );
+
+                throw new Error(
+                    'No se pudo consultar la boleta.'
+                );
+
+            }
+
+
+            const boleta =
+                respuesta.data;
+
+
+            if (!boleta) {
+
+                throw new Error(
+                    'La boleta no existe o ya no está disponible.'
+                );
+
+            }
+
+
+            mostrarBoleta(boleta);
+
+        } catch (errorConsulta) {
+
+            console.error(
+                'Error cargando boleta:',
+                errorConsulta
+            );
+
+            estado.classList.add('d-none');
+
+            error.classList.remove('d-none');
+
+            mensajeError.textContent =
+                errorConsulta.message ||
+                'No se pudo cargar la información de la boleta.';
+
+        }
+
+    }
+
+
+    function mostrarBoleta(boleta) {
+
+        const estado =
+            document.getElementById('estadoBoleta');
+
+        const contenido =
+            document.getElementById('contenidoBoleta');
+
+        const numero =
+            document.getElementById('numeroBoleta');
+
+        const fecha =
+            document.getElementById('fechaBoleta');
+
+        const lista =
+            document.getElementById('listaProductosBoleta');
+
+        const total =
+            document.getElementById('totalBoleta');
+
+
+        numero.textContent =
+            boleta.numero_boleta ||
+            'Boleta electrónica';
+
+
+        if (boleta.fecha) {
+
+            const fechaObjeto =
+                new Date(boleta.fecha);
+
+            fecha.textContent =
+                fechaObjeto.toLocaleString(
+                    'es-PE',
+                    {
+                        dateStyle: 'medium',
+                        timeStyle: 'short'
+                    }
+                );
+
+        } else {
+
+            fecha.textContent =
+                'Fecha no disponible';
+
+        }
+
+
+        const items =
+            Array.isArray(boleta.items)
+                ? boleta.items
+                : [];
+
+
+        if (items.length === 0) {
+
+            lista.innerHTML = `
+                <tr>
+                    <td
+                        colspan="3"
+                        class="text-center text-muted py-4">
+
+                        No hay productos registrados
+                        en esta boleta.
+
+                    </td>
+                </tr>
+            `;
+
+        } else {
+
+            lista.innerHTML =
+                items.map(item => `
+
+                    <tr>
+
+                        <td>
+                            ${escaparHtml(
+                                item.nombre ||
+                                'Producto'
+                            )}
+                        </td>
+
+                        <td class="text-center">
+                            ${Number(
+                                item.cantidad || 0
+                            )}
+                        </td>
+
+                        <td class="text-end">
+                            S/
+                            ${Number(
+                                item.subtotal || 0
+                            ).toFixed(2)}
+                        </td>
+
+                    </tr>
+
+                `).join('');
+
+        }
+
+
+        total.textContent =
+            'S/ ' +
+            Number(
+                boleta.total || 0
+            ).toFixed(2);
+
+
+        estado.classList.add('d-none');
+
+        contenido.classList.remove('d-none');
+
+    }
+
+
+    function escaparHtml(valor) {
+
+        const elemento =
+            document.createElement('div');
+
+        elemento.textContent =
+            String(valor);
+
+        return elemento.innerHTML;
+
+    }
+
+
+    cargarBoleta();
+
+</script>
+
+</body>
+
+</html>

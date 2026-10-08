@@ -518,7 +518,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/lib/browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="../js/supabaseClient.js"></script>
 <script src="../js/storage.js"></script>
 <script src="../js/auth.js"></script>
@@ -2128,11 +2128,10 @@
 
                         <div class="col-md-5 text-center mt-3 mt-md-0">
 
-                            <canvas
+                            <div
                                 id="qrBoleta"
-                                width="180"
-                                height="180">
-                            </canvas>
+                                class="d-inline-block">
+                            </div>
 
                             <div class="small text-muted mt-2">
                                 Escanea el código QR para consultar
@@ -2170,16 +2169,16 @@
 
     setTimeout(() => {
 
-        const canvas =
+        const contenedorQr =
             document.getElementById(
                 'qrBoleta'
             );
 
 
-        if (!canvas) {
+        if (!contenedorQr) {
 
             console.error(
-                'No se encontró el canvas del QR.'
+                'No se encontró el contenedor del QR.'
             );
 
             return;
@@ -2187,10 +2186,7 @@
         }
 
 
-        if (
-            typeof QRCode === 'undefined' ||
-            typeof QRCode.toCanvas !== 'function'
-        ) {
+        if (typeof QRCode === 'undefined') {
 
             console.error(
                 'La librería QRCode no está disponible.'
@@ -2201,48 +2197,47 @@
         }
 
 
-        const datosQr =
-            [
-                "MascotICA's",
-                'Boleta electrónica',
-                `ID de compra: ${idPedido}`,
-                `Boleta: ${numeroBoleta}`,
-                `Cliente: ${nombreCliente}`,
-                `Documento: ${tipoDocumento} ${numeroDocumento}`,
-                `Fecha: ${fechaTexto}`,
-                `Hora: ${horaTexto}`,
-                `Total: S/ ${Number(total).toFixed(2)}`
-            ].join('\n');
+        if (!pedido.boletaCodigo) {
+
+            console.error(
+                'No se encontró el código público de la boleta.'
+            );
+
+            return;
+
+        }
 
 
-        QRCode.toCanvas(
-            canvas,
-            datosQr,
+        const urlBoleta =
+            new URL(
+                'boleta.html',
+                window.location.href
+            );
+
+
+        urlBoleta.searchParams.set(
+            'codigo',
+            pedido.boletaCodigo
+        );
+
+
+        contenedorQr.innerHTML = '';
+
+
+        new QRCode(
+            contenedorQr,
             {
+                text: urlBoleta.href,
                 width: 180,
                 height: 180,
-                margin: 2,
-                errorCorrectionLevel: 'M'
-            },
-            error => {
-
-                if (error) {
-
-                    console.error(
-                        'Error al generar el QR:',
-                        error
-                    );
-
-                    return;
-
-                }
-
-
-                console.log(
-                    'QR de la boleta generado correctamente.'
-                );
-
+                correctLevel: QRCode.CorrectLevel.M
             }
+        );
+
+
+        console.log(
+            'QR de la boleta generado correctamente:',
+            urlBoleta.href
         );
 
     }, 150);
