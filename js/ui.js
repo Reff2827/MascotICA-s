@@ -21,6 +21,11 @@ const UI = {
             texto: 'Productos'
         },
         {
+            href: 'compras.html',
+            icono: 'bi-bag-check',
+            texto: 'Compras'
+        },
+        {
             href: 'solicitudes.html',
             icono: 'bi-inbox',
             texto: 'Solicitudes'
