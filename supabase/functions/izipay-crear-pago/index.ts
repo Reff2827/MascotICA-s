@@ -330,9 +330,25 @@ export default {
 
                     );
 
-                const result =
+                const responseText = await response.text();
+                let result: any = null;
+                
+                try {
+                  result = responseText ? JSON.parse(responseText) : null;
+                } catch {
+                  console.error(
+                "Izipay devolvió una respuesta que no es JSON:",
+                responseText.slice(0, 1000)
+              );
+            }
 
-                    await response.json();
+            console.log(
+             "Respuesta de creación de pago:",
+             JSON.stringify({
+              httpStatus: response.status,
+               result
+              })
+            );
 
                 if (
 
