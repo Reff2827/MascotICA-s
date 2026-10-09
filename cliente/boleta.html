@@ -4,7 +4,6 @@
 
 <head>
 
-```
 <meta charset="UTF-8">
 
 <meta
@@ -26,90 +25,114 @@
     href="../css/styles.css">
 
 <script src="../js/theme.js"></script>
-```
 
 </head>
 
 <body>
 
-<div class="container py-4 py-md-5">
+<div class="boleta-page">
 
-```
 <div class="row justify-content-center">
 
-    <div class="col-12 col-md-10 col-lg-8">
+    <div class="col-12">
 
-        <div class="text-center mb-4">
+        <div class="boleta-documento">
 
-            <div
-                class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center mb-3"
-                style="width: 70px; height: 70px;">
+            <div class="boleta-cabecera">
 
-                <i
-                    class="bi bi-receipt-cutoff text-success"
-                    style="font-size: 2rem;">
-                </i>
-
-            </div>
-
-            <h2 class="fw-bold mb-1">
-                MascotICA's
-            </h2>
-
-            <p class="text-muted mb-0">
-                Boleta electrónica
-            </p>
-
-        </div>
-
-
-        <div
-            id="estadoBoleta"
-            class="text-center py-5">
-
-            <div
-                class="spinner-border text-primary"
-                role="status">
-
-                <span class="visually-hidden">
-                    Cargando...
-                </span>
-
-            </div>
-
-            <p class="text-muted mt-3 mb-0">
-                Cargando información de la boleta...
-            </p>
-
-        </div>
-
-
-        <div
-            id="contenidoBoleta"
-            class="d-none">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body p-4 p-md-5">
+                <div class="boleta-marca">
 
                     <div
-                        class="text-center border-bottom pb-4 mb-4">
+                        class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center"
+                        style="width: 58px; height: 58px; flex: 0 0 auto;">
 
-                        <div
-                            class="small text-muted mb-1">
-                            Comprobante electrónico
+                        <i
+                            class="bi bi-receipt-cutoff text-success"
+                            style="font-size: 1.7rem;">
+                        </i>
+
+                    </div>
+
+                    <div>
+
+                        <h2 class="boleta-titulo">
+                            MascotICA's
+                        </h2>
+
+                        <p class="boleta-subtitulo">
+                            Boleta electrónica de compra
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="boleta-codigo">
+
+                    <small>
+                        Comprobante electrónico
+                    </small>
+
+                    <strong id="numeroBoleta">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="estadoBoleta"
+                class="text-center py-5">
+
+                <div
+                    class="spinner-border text-primary"
+                    role="status">
+
+                    <span class="visually-hidden">
+                        Cargando...
+                    </span>
+
+                </div>
+
+                <p class="text-muted mt-3 mb-0">
+                    Cargando información de la boleta...
+                </p>
+
+            </div>
+
+
+            <div
+                id="contenidoBoleta"
+                class="d-none">
+
+                <div class="boleta-contenido">
+
+                    <div class="boleta-metadatos">
+
+                        <div class="boleta-metadato">
+
+                            <small>
+                                Número de boleta
+                            </small>
+
+                            <strong id="numeroBoletaDetalle">
+                                -
+                            </strong>
+
                         </div>
 
-                        <h3
-                            class="fw-bold mb-2"
-                            id="numeroBoleta">
-                            -
-                        </h3>
+                        <div class="boleta-metadato">
 
-                        <div
-                            class="small text-muted"
-                            id="fechaBoleta">
-                            -
+                            <small>
+                                Fecha de compra
+                            </small>
+
+                            <strong id="fechaBoleta">
+                                -
+                            </strong>
+
                         </div>
 
                     </div>
@@ -125,11 +148,9 @@
 
                         </h5>
 
-                        <div
-                            class="table-responsive">
+                        <div class="boleta-tabla-contenedor">
 
-                            <table
-                                class="table align-middle mb-0">
+                            <table class="table boleta-tabla align-middle mb-0">
 
                                 <thead>
 
@@ -154,30 +175,6 @@
                                 <tbody id="listaProductosBoleta">
                                 </tbody>
 
-                                <tfoot>
-
-                                    <tr>
-
-                                        <th
-                                            colspan="2"
-                                            class="text-end">
-
-                                            Total
-
-                                        </th>
-
-                                        <th
-                                            class="text-end fs-5"
-                                            id="totalBoleta">
-
-                                            S/ 0.00
-
-                                        </th>
-
-                                    </tr>
-
-                                </tfoot>
-
                             </table>
 
                         </div>
@@ -185,11 +182,23 @@
                     </div>
 
 
-                    <div
-                        class="border-top pt-4 mt-4">
+                    <div class="boleta-total">
 
-                        <div
-                            class="alert alert-success mb-0">
+                        <span>
+                            <i class="bi bi-receipt me-1"></i>
+                            Total de la compra
+                        </span>
+
+                        <strong id="totalBoleta">
+                            S/ 0.00
+                        </strong>
+
+                    </div>
+
+
+                    <div class="border-top pt-4 mt-4">
+
+                        <div class="alert alert-success mb-0">
 
                             <i class="bi bi-shield-check me-1"></i>
 
@@ -202,13 +211,18 @@
 
                 </div>
 
-            </div>
 
+                <div class="boleta-pie">
 
-            <div
-                class="text-center text-muted small mt-4">
+                    <p>
+                        Documento consultado mediante código QR.
+                    </p>
 
-                Documento consultado mediante código QR.
+                    <p class="mt-1">
+                        MascotICA's · Gracias por tu compra.
+                    </p>
+
+                </div>
 
             </div>
 
@@ -217,10 +231,9 @@
 
         <div
             id="errorBoleta"
-            class="d-none">
+            class="d-none mt-4">
 
-            <div
-                class="card border-0 shadow-sm">
+            <div class="boleta-documento">
 
                 <div class="card-body text-center p-5">
 
@@ -254,10 +267,38 @@
 
         </div>
 
+
+        <div
+            id="accionesBoleta"
+            class="boleta-acciones d-none no-imprimir">
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                onclick="window.print()">
+
+                <i class="bi bi-printer me-1"></i>
+
+                Imprimir o guardar como PDF
+
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-outline-secondary"
+                onclick="window.location.reload()">
+
+                <i class="bi bi-arrow-clockwise me-1"></i>
+
+                Actualizar boleta
+
+            </button>
+
+        </div>
+
     </div>
 
 </div>
-```
 
 </div>
 
@@ -367,6 +408,12 @@
 
             estado.classList.add('d-none');
 
+            contenido.classList.add('d-none');
+
+            document
+                .getElementById('accionesBoleta')
+                .classList.add('d-none');
+
             error.classList.remove('d-none');
 
             mensajeError.textContent =
@@ -389,6 +436,9 @@
         const numero =
             document.getElementById('numeroBoleta');
 
+        const numeroDetalle =
+            document.getElementById('numeroBoletaDetalle');
+
         const fecha =
             document.getElementById('fechaBoleta');
 
@@ -398,10 +448,19 @@
         const total =
             document.getElementById('totalBoleta');
 
+        const acciones =
+            document.getElementById('accionesBoleta');
 
-        numero.textContent =
+
+        const numeroTexto =
             boleta.numero_boleta ||
             'Boleta electrónica';
+
+        numero.textContent =
+            numeroTexto;
+
+        numeroDetalle.textContent =
+            numeroTexto;
 
 
         if (boleta.fecha) {
@@ -409,14 +468,23 @@
             const fechaObjeto =
                 new Date(boleta.fecha);
 
-            fecha.textContent =
-                fechaObjeto.toLocaleString(
-                    'es-PE',
-                    {
-                        dateStyle: 'medium',
-                        timeStyle: 'short'
-                    }
-                );
+            if (!Number.isNaN(fechaObjeto.getTime())) {
+
+                fecha.textContent =
+                    fechaObjeto.toLocaleString(
+                        'es-PE',
+                        {
+                            dateStyle: 'medium',
+                            timeStyle: 'short'
+                        }
+                    );
+
+            } else {
+
+                fecha.textContent =
+                    'Fecha no disponible';
+
+            }
 
         } else {
 
@@ -454,24 +522,23 @@
 
                     <tr>
 
-                        <td>
+                        <td class="boleta-producto">
                             ${escaparHtml(
                                 item.nombre ||
                                 'Producto'
                             )}
                         </td>
 
-                        <td class="text-center">
+                        <td class="text-center boleta-numero">
                             ${Number(
                                 item.cantidad || 0
                             )}
                         </td>
 
-                        <td class="text-end">
-                            S/
-                            ${Number(
-                                item.subtotal || 0
-                            ).toFixed(2)}
+                        <td class="text-end boleta-numero">
+                            ${formatearImporte(
+                                item.subtotal
+                            )}
                         </td>
 
                     </tr>
@@ -482,15 +549,35 @@
 
 
         total.textContent =
-            'S/ ' +
-            Number(
-                boleta.total || 0
-            ).toFixed(2);
+            formatearImporte(boleta.total);
 
 
         estado.classList.add('d-none');
 
         contenido.classList.remove('d-none');
+
+        acciones.classList.remove('d-none');
+
+    }
+
+
+    function formatearImporte(valor) {
+
+        const importe =
+            Number(valor ?? 0);
+
+        const importeValido =
+            Number.isFinite(importe)
+                ? importe
+                : 0;
+
+        return 'S/ ' + importeValido.toLocaleString(
+            'es-PE',
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        );
 
     }
 

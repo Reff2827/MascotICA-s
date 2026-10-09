@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="../css/styles.css">
     <script src="../js/theme.js"></script>
 </head>
-
 <body>
 
 <div id="navbar"></div>
@@ -17,44 +16,67 @@
 
 <div class="container-fluid px-4 pb-5">
 
-    <h3 class="fw-bold mb-3">
+    <h3 class="fw-bold mb-4">
         <i class="bi bi-list-check"></i>
         Mis solicitudes
     </h3>
 
-    <div class="card border-0 shadow-sm">
+    <section class="mb-5">
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-heart-fill text-danger"></i>
+            Mis adopciones
+        </h4>
 
-        <div class="table-responsive">
-
-            <table class="table table-hover align-middle mb-0">
-
-                <thead class="table-light">
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                     <tr>
-                        <th>Tipo</th>
-                        <th>Detalle</th>
-                        <th>Cantidad</th>
-                        <th>Fecha</th>
+                        <th>Mascota</th>
+                        <th>Fecha de solicitud</th>
                         <th>Estado</th>
-                        <th>Acción</th>
+                        <th>Ficha</th>
                     </tr>
-                </thead>
+                    </thead>
+                    <tbody id="filasSolicitudes"></tbody>
+                </table>
 
-                <tbody id="filasSolicitudes"></tbody>
-
-            </table>
-
-            <p
-                class="text-muted p-3 mb-0 d-none"
-                id="sinSolicitudes">
-                Aun no has enviado ninguna solicitud.
-            </p>
-
+                <p class="text-muted p-3 mb-0 d-none" id="sinSolicitudes">
+                    Aún no has enviado solicitudes de adopción.
+                </p>
+            </div>
         </div>
+    </section>
 
-    </div>
+    <section>
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-bag-check text-primary"></i>
+            Mis compras
+        </h4>
+
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Pedido</th>
+                        <th>Fecha y hora</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Boleta</th>
+                    </tr>
+                    </thead>
+                    <tbody id="filasCompras"></tbody>
+                </table>
+
+                <p class="text-muted p-3 mb-0 d-none" id="sinCompras">
+                    Todavía no tienes compras registradas.
+                </p>
+            </div>
+        </div>
+    </section>
 
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -64,122 +86,195 @@
 <script src="../js/ui.js"></script>
 
 <script>
+    const usuario = Auth.requireCliente();
 
-const usuario =
-    Auth.requireCliente();
+    const formatoDinero = new Intl.NumberFormat('es-PE', {
+        style: 'currency',
+        currency: 'PEN'
+    });
 
+    if (usuario) {
+        UI.navbarCliente(usuario);
+        UI.mostrarFlash();
+        cargarPagina();
+    }
 
-if (usuario) {
+    function escapar(valor) {
+        return UI.esc(String(valor ?? ''));
+    }
 
-    UI.navbarCliente(usuario);
+    function fechaHora(valor) {
+        if (!valor) return '—';
 
-    UI.mostrarFlash();
+        const fecha = new Date(valor);
 
-    pintarTabla();
+        if (Number.isNaN(fecha.getTime())) return '—';
 
-}
+        return fecha.toLocaleString('es-PE', {
+            dateStyle: 'short',
+            timeStyle: 'short'
+        });
+    }
 
+    function dinero(valor) {
+        return formatoDinero.format(Number(valor) || 0);
+    }
 
-async function pintarTabla() {
+    function estadoPedido(estado) {
+        const etiquetas = {
+            PENDIENTE_PAGO: 'Pendiente de pago',
+            PAGADO: 'Pagado',
+            ENTREGADO: 'Entregado',
+            VENCIDO: 'Vencido',
+            CANCELADO: 'Cancelado',
+            RECHAZADO: 'Rechazado'
+        };
 
-    const solicitudes =
-        await Solicitudes.listarPorUsuario(
-            usuario.idUsuario
-        );
+        return etiquetas[estado] || estado || 'Sin estado';
+    }
 
+    async function cargarPagina() {
+        await Promise.all([
+            cargarAdopciones(),
+            cargarCompras()
+        ]);
+    }
 
-    const descripciones =
-        await Promise.all(
-            solicitudes.map(
-                s => Solicitudes.descripcion(s)
-            )
-        );
+    async function cargarAdopciones() {
+        const tbody = document.getElementById('filasSolicitudes');
+        const mensajeVacio = document.getElementById('sinSolicitudes');
 
+        try {
+            const todas = await Solicitudes.listarPorUsuario(usuario.idUsuario);
 
-    const tbody =
-        document.getElementById(
-            'filasSolicitudes'
-        );
+            const solicitudes = todas.filter(
+                solicitud => solicitud.tipo === 'ADOPCION'
+            );
 
+            const descripciones = await Promise.all(
+                solicitudes.map(solicitud => Solicitudes.descripcion(solicitud))
+            );
 
-    document.getElementById(
-        'sinSolicitudes'
-    ).classList.toggle(
-        'd-none',
-        solicitudes.length > 0
-    );
+            mensajeVacio.classList.toggle(
+                'd-none',
+                solicitudes.length > 0
+            );
 
-
-    tbody.innerHTML =
-        solicitudes.map(
-            (s, i) => `
-
+            tbody.innerHTML = solicitudes.map((solicitud, i) => `
                 <tr>
-
                     <td>
-                        ${s.tipo === 'ADOPCION'
-                            ? '<span class="text-danger"><i class="bi bi-heart-fill"></i> Adopcion</span>'
-                            : '<span class="text-primary"><i class="bi bi-cart-fill"></i> Compra</span>'
-                        }
+                        <i class="bi bi-heart text-danger me-1"></i>
+                        ${escapar(descripciones[i])}
                     </td>
 
+                    <td>${escapar(fechaHora(solicitud.fecha))}</td>
 
                     <td>
-                        ${UI.esc(descripciones[i])}
-                    </td>
-
-
-                    <td>
-                        ${s.cantidad}
-                    </td>
-
-
-                    <td>
-                        ${UI.formatoFecha(s.fecha)}
-                    </td>
-
-
-                    <td>
-                        <span class="badge badge-estado-${s.estado}">
-                            ${s.estado}
+                        <span class="badge badge-estado-${escapar(solicitud.estado)}">
+                            ${escapar(solicitud.estado)}
                         </span>
                     </td>
 
-
                     <td>
-
-                        ${
-                            s.tipo === 'ADOPCION' &&
-                            s.estado === 'APROBADA'
-
-                                ? `
-                                    <a
-                                        href="ficha-adopcion.html?id=${s.idSolicitud}"
-                                        class="btn btn-primary-ps btn-sm">
-
-                                        <i class="bi bi-file-earmark-text"></i>
-                                        Ver ficha
-
-                                    </a>
-                                  `
-
-                                : `
-                                    <span class="text-muted">
-                                        —
-                                    </span>
-                                  `
-                        }
-
+                        ${solicitud.estado === 'APROBADA' ? `
+                            <a
+                                href="ficha-adopcion.html?id=${encodeURIComponent(solicitud.idSolicitud)}"
+                                class="btn btn-primary-ps btn-sm">
+                                <i class="bi bi-file-earmark-text"></i>
+                                Ver ficha
+                            </a>
+                        ` : `
+                            <span class="text-muted">Aún no disponible</span>
+                        `}
                     </td>
-
                 </tr>
+            `).join('');
 
-            `
-        ).join('');
+        } catch (error) {
+            console.error('Error al cargar adopciones:', error);
 
-}
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-danger p-3">
+                        No se pudieron cargar tus solicitudes de adopción.
+                    </td>
+                </tr>
+            `;
 
+            mensajeVacio.classList.add('d-none');
+        }
+    }
+
+    async function cargarCompras() {
+        const tbody = document.getElementById('filasCompras');
+        const mensajeVacio = document.getElementById('sinCompras');
+
+        try {
+            const pedidos = await Pedidos.listarPropios();
+
+            mensajeVacio.classList.toggle(
+                'd-none',
+                pedidos.length > 0
+            );
+
+            tbody.innerHTML = pedidos.map(pedido => {
+                const tieneBoleta =
+                    ['PAGADO', 'ENTREGADO'].includes(pedido.estado) &&
+                    Boolean(pedido.boletaCodigo);
+
+                return `
+                    <tr>
+                        <td>
+                            <strong>#${escapar(pedido.idPedido)}</strong>
+                        </td>
+
+                        <td>${escapar(fechaHora(pedido.fecha))}</td>
+
+                        <td>${dinero(pedido.total)}</td>
+
+                        <td>
+                            <span class="badge ${
+                                pedido.estado === 'PAGADO' ||
+                                pedido.estado === 'ENTREGADO'
+                                    ? 'text-bg-success'
+                                    : 'text-bg-secondary'
+                            }">
+                                ${escapar(estadoPedido(pedido.estado))}
+                            </span>
+                        </td>
+
+                        <td>
+                            ${tieneBoleta ? `
+                                <a
+                                    href="boleta.html?codigo=${encodeURIComponent(pedido.boletaCodigo)}"
+                                    class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-receipt"></i>
+                                    Ver boleta
+                                </a>
+                            ` : `
+                                <span class="text-muted small">
+                                    No disponible
+                                </span>
+                            `}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+        } catch (error) {
+            console.error('Error al cargar compras:', error);
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-danger p-3">
+                        No se pudieron cargar tus compras.
+                    </td>
+                </tr>
+            `;
+
+            mensajeVacio.classList.add('d-none');
+        }
+    }
 </script>
-
 </body>
 </html>

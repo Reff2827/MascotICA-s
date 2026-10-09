@@ -14,10 +14,16 @@
 <div id="alertas"></div>
 
 <div class="container-fluid px-4 pb-5">
-    <h3 class="fw-bold mb-3"><i class="bi bi-inbox"></i> Solicitudes de adopcion y compra</h3>
+    <h3 class="fw-bold mb-3">
+        <i class="bi bi-inbox"></i> Solicitudes de adopción
+    </h3>
+
+    <p class="text-muted">
+        Aquí puedes revisar las solicitudes de adopción y gestionar su aprobación.
+    </p>
 
     <div class="mb-3">
-        <div class="btn-group" id="filtroEstado"></div>
+        <div class="btn-group flex-wrap" id="filtroEstado"></div>
     </div>
 
     <div class="card border-0 shadow-sm">
@@ -25,13 +31,20 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                 <tr>
-                    <th>#</th><th>Tipo</th><th>Detalle</th><th>Solicitante</th>
-                    <th>Cantidad</th><th>Fecha</th><th>Estado</th><th class="text-end">Accion</th>
+                    <th>#</th>
+                    <th>Mascota</th>
+                    <th>Solicitante</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th class="text-end">Acción</th>
                 </tr>
                 </thead>
                 <tbody id="filasSolicitudes"></tbody>
             </table>
-            <p class="text-muted p-3 mb-0 d-none" id="sinSolicitudes">No hay solicitudes con ese filtro.</p>
+
+            <p class="text-muted p-3 mb-0 d-none" id="sinSolicitudes">
+                No hay solicitudes de adopción con ese filtro.
+            </p>
         </div>
     </div>
 </div>
@@ -40,12 +53,17 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-clipboard-heart"></i> Evaluación de adopción responsable</h5>
+                <h5 class="modal-title">
+                    <i class="bi bi-clipboard-heart"></i>
+                    Evaluación de adopción responsable
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="contenidoEvaluacion"></div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
             </div>
         </div>
     </div>
@@ -57,11 +75,25 @@
 <script src="../js/storage.js"></script>
 <script src="../js/auth.js"></script>
 <script src="../js/ui.js"></script>
+
 <script>
     const usuario = Auth.requireAdmin();
     const ESTADOS = ['PENDIENTE', 'APROBADA', 'RECHAZADA'];
+
     let solicitudesActuales = [];
-    const modalVerEvaluacion = new bootstrap.Modal(document.getElementById('modalVerEvaluacion'));
+
+    const modalVerEvaluacion = new bootstrap.Modal(
+        document.getElementById('modalVerEvaluacion')
+    );
+
+    const ETIQUETAS_EVAL = {
+        vivienda: 'Tipo de vivienda',
+        espacioAdecuado: 'Espacio adecuado',
+        horasDisponibles: 'Horas disponibles al día',
+        experienciaPrevia: 'Experiencia previa con mascotas',
+        acuerdoHogar: 'Acuerdo de todo el hogar',
+        motivo: 'Motivo de la adopción'
+    };
 
     if (usuario) {
         UI.navbarAdmin(usuario);
@@ -76,82 +108,221 @@
 
     function pintarFiltro() {
         const activo = filtroActivo();
-        const botones = [`<a href="solicitudes.html" class="btn btn-sm ${!activo ? 'btn-dark' : 'btn-outline-dark'}">Todas</a>`]
-            .concat(ESTADOS.map(e => `<a href="solicitudes.html?estado=${e}" class="btn btn-sm ${activo === e ? 'btn-dark' : 'btn-outline-dark'}">${e}</a>`));
+
+        const botones = [
+            `<a href="solicitudes.html"
+                class="btn btn-sm ${!activo ? 'btn-dark' : 'btn-outline-dark'}">
+                Todas
+            </a>`
+        ].concat(
+            ESTADOS.map(estado => `
+                <a href="solicitudes.html?estado=${estado}"
+                   class="btn btn-sm ${activo === estado ? 'btn-dark' : 'btn-outline-dark'}">
+                    ${estado}
+                </a>
+            `)
+        );
+
         document.getElementById('filtroEstado').innerHTML = botones.join('');
     }
 
-    const ETIQUETAS_EVAL = {
-        vivienda: 'Tipo de vivienda',
-        espacioAdecuado: 'Espacio adecuado',
-        horasDisponibles: 'Horas disponibles al dia',
-        experienciaPrevia: 'Experiencia previa con mascotas',
-        acuerdoHogar: 'Acuerdo de todo el hogar',
-        motivo: 'Motivo de la adopcion'
-    };
-
     async function pintarTabla() {
-        const activo = filtroActivo();
-        const solicitudes = activo ? await Solicitudes.listarPorEstado(activo) : await Solicitudes.listar();
-        solicitudesActuales = solicitudes;
-        const descripciones = await Promise.all(solicitudes.map(s => Solicitudes.descripcion(s)));
         const tbody = document.getElementById('filasSolicitudes');
-        document.getElementById('sinSolicitudes').classList.toggle('d-none', solicitudes.length > 0);
+        const mensajeVacio = document.getElementById('sinSolicitudes');
 
-        tbody.innerHTML = solicitudes.map((s, i) => `
+        tbody.innerHTML = `
             <tr>
-                <td>${s.idSolicitud}</td>
-                <td>${s.tipo === 'ADOPCION'
-                    ? '<span class="text-danger"><i class="bi bi-heart-fill"></i> Adopcion</span>'
-                    : '<span class="text-primary"><i class="bi bi-cart-fill"></i> Compra</span>'}</td>
-                <td>${UI.esc(descripciones[i])}</td>
-                <td>${UI.esc(s.nombreUsuario)}</td>
-                <td>${s.cantidad}</td>
-                <td>${UI.formatoFecha(s.fecha)}</td>
-                <td><span class="badge badge-estado-${s.estado}">${s.estado}</span></td>
-                <td class="text-end">
-                    <div class="d-flex gap-1 justify-content-end flex-wrap">
-                        ${s.tipo === 'ADOPCION' ? `
-                            <button class="btn btn-sm btn-outline-secondary" data-id="${s.idSolicitud}" data-action="ver-evaluacion">
-                                <i class="bi bi-clipboard-heart"></i> Evaluacion
-                            </button>` : ''}
-                        ${s.estado === 'PENDIENTE' ? `
-                            <button class="btn btn-sm btn-success" data-id="${s.idSolicitud}" data-action="aprobar"><i class="bi bi-check-lg"></i> Aprobar</button>
-                            <button class="btn btn-sm btn-outline-danger" data-id="${s.idSolicitud}" data-action="rechazar"><i class="bi bi-x-lg"></i> Rechazar</button>
-                        ` : `<span class="text-muted small align-self-center">Procesada</span>`}
-                    </div>
+                <td colspan="6" class="text-center py-4">
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    Cargando solicitudes...
                 </td>
-            </tr>`).join('');
+            </tr>
+        `;
+
+        try {
+            const activo = filtroActivo();
+
+            // Solo se muestran solicitudes de adopción.
+            const todas = await Solicitudes.listar();
+
+            let solicitudes = todas.filter(
+                solicitud => solicitud.tipo === 'ADOPCION'
+            );
+
+            if (activo && ESTADOS.includes(activo)) {
+                solicitudes = solicitudes.filter(
+                    solicitud => solicitud.estado === activo
+                );
+            }
+
+            solicitudesActuales = solicitudes;
+
+            const descripciones = await Promise.all(
+                solicitudes.map(solicitud =>
+                    Solicitudes.descripcion(solicitud)
+                )
+            );
+
+            mensajeVacio.classList.toggle(
+                'd-none',
+                solicitudes.length > 0
+            );
+
+            tbody.innerHTML = solicitudes.map((solicitud, i) => `
+                <tr>
+                    <td>${solicitud.idSolicitud}</td>
+
+                    <td>${UI.esc(descripciones[i])}</td>
+
+                    <td>${UI.esc(solicitud.nombreUsuario)}</td>
+
+                    <td>${UI.formatoFecha(solicitud.fecha)}</td>
+
+                    <td>
+                        <span class="badge badge-estado-${solicitud.estado}">
+                            ${solicitud.estado}
+                        </span>
+                    </td>
+
+                    <td class="text-end">
+                        <div class="d-flex gap-1 justify-content-end flex-wrap">
+                            <button
+                                class="btn btn-sm btn-outline-secondary"
+                                data-id="${solicitud.idSolicitud}"
+                                data-action="ver-evaluacion">
+                                <i class="bi bi-clipboard-heart"></i>
+                                Evaluación
+                            </button>
+
+                            ${solicitud.estado === 'PENDIENTE' ? `
+                                <button
+                                    class="btn btn-sm btn-success"
+                                    data-id="${solicitud.idSolicitud}"
+                                    data-action="aprobar">
+                                    <i class="bi bi-check-lg"></i>
+                                    Aprobar
+                                </button>
+
+                                <button
+                                    class="btn btn-sm btn-outline-danger"
+                                    data-id="${solicitud.idSolicitud}"
+                                    data-action="rechazar">
+                                    <i class="bi bi-x-lg"></i>
+                                    Rechazar
+                                </button>
+                            ` : `
+                                <span class="text-muted small align-self-center">
+                                    Procesada
+                                </span>
+                            `}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            configurarBotones();
+
+        } catch (error) {
+            console.error('Error al cargar solicitudes:', error);
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-danger py-4">
+                        No se pudieron cargar las solicitudes.
+                        Recarga la página e inténtalo nuevamente.
+                    </td>
+                </tr>
+            `;
+
+            mensajeVacio.classList.add('d-none');
+        }
+    }
+
+    function configurarBotones() {
+        const tbody = document.getElementById('filasSolicitudes');
 
         tbody.querySelectorAll('[data-action="ver-evaluacion"]').forEach(btn => {
             btn.addEventListener('click', () => {
-                const s = solicitudesActuales.find(x => String(x.idSolicitud) === btn.dataset.id);
-                const cont = document.getElementById('contenidoEvaluacion');
-                if (!s || !s.evaluacion) {
-                    cont.innerHTML = `<p class="text-muted mb-0">Esta solicitud no tiene una evaluacion registrada.</p>`;
+                const solicitud = solicitudesActuales.find(
+                    item => String(item.idSolicitud) === btn.dataset.id
+                );
+
+                const contenido = document.getElementById('contenidoEvaluacion');
+
+                if (!solicitud || !solicitud.evaluacion) {
+                    contenido.innerHTML = `
+                        <p class="text-muted mb-0">
+                            Esta solicitud no tiene una evaluación registrada.
+                        </p>
+                    `;
                 } else {
-                    cont.innerHTML = Object.keys(ETIQUETAS_EVAL).map(clave => `
+                    contenido.innerHTML = Object.keys(ETIQUETAS_EVAL).map(clave => `
                         <p class="mb-2">
                             <strong>${ETIQUETAS_EVAL[clave]}:</strong><br>
-                            ${UI.esc(s.evaluacion[clave] || 'No especificado')}
-                        </p>`).join('');
+                            ${UI.esc(solicitud.evaluacion[clave] || 'No especificado')}
+                        </p>
+                    `).join('');
                 }
+
                 modalVerEvaluacion.show();
             });
         });
 
         tbody.querySelectorAll('[data-action="aprobar"]').forEach(btn => {
             btn.addEventListener('click', async () => {
-                const error = await Solicitudes.aprobar(btn.dataset.id);
-                UI.setFlash(error ? 'error' : 'exito', error || 'Solicitud aprobada.');
-                window.location.reload();
+                if (!confirm('¿Deseas aprobar esta solicitud de adopción?')) {
+                    return;
+                }
+
+                btn.disabled = true;
+
+                try {
+                    const error = await Solicitudes.aprobar(btn.dataset.id);
+
+                    UI.setFlash(
+                        error ? 'error' : 'exito',
+                        error || 'Solicitud de adopción aprobada. La ficha se ha generado.'
+                    );
+
+                    if (!error) {
+                        window.location.reload();
+                    } else {
+                        btn.disabled = false;
+                    }
+                } catch (error) {
+                    console.error(error);
+                    UI.setFlash('error', 'No se pudo aprobar la solicitud.');
+                    btn.disabled = false;
+                }
             });
         });
+
         tbody.querySelectorAll('[data-action="rechazar"]').forEach(btn => {
             btn.addEventListener('click', async () => {
-                const error = await Solicitudes.rechazar(btn.dataset.id);
-                UI.setFlash(error ? 'error' : 'exito', error || 'Solicitud rechazada.');
-                window.location.reload();
+                if (!confirm('¿Deseas rechazar esta solicitud de adopción?')) {
+                    return;
+                }
+
+                btn.disabled = true;
+
+                try {
+                    const error = await Solicitudes.rechazar(btn.dataset.id);
+
+                    UI.setFlash(
+                        error ? 'error' : 'exito',
+                        error || 'Solicitud de adopción rechazada.'
+                    );
+
+                    if (!error) {
+                        window.location.reload();
+                    } else {
+                        btn.disabled = false;
+                    }
+                } catch (error) {
+                    console.error(error);
+                    UI.setFlash('error', 'No se pudo rechazar la solicitud.');
+                    btn.disabled = false;
+                }
             });
         });
     }
