@@ -573,6 +573,9 @@
                         boleta_codigo,
                         pago_referencia,
                         motivo_rechazo,
+                        nombre_comprador, 
+                        tipo_documento, 
+                        numero_documento,
                         perfiles (
                             nombre
                         )
@@ -658,6 +661,21 @@
                 perfil?.nombre ||
                 'Cliente no disponible';
 
+            const nombreComprador =
+                pedido.nombre_comprador ||
+                cliente;
+
+            const tipoDocumento =
+                pedido.tipo_documento || '';
+                
+            const numeroDocumento =
+                pedido.numero_documento || '';
+
+            const documentoComprador =
+                [tipoDocumento, numeroDocumento]
+        .filter(Boolean)
+        .join(': ') || 'No registrado';    
+
             cont.innerHTML = `
 
                 <div class="row g-3 mb-4">
@@ -729,6 +747,47 @@
                             <div class="mt-1">
                                 ${obtenerEstadoCompra(
                                     pedido.estado
+                                )}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Datos del comprador -->
+                <div class="row g-3 mb-4">
+
+                    <div class="col-md-6">
+
+                        <div class="border rounded p-3 h-100">
+
+                            <div class="text-muted small">
+                                Nombre del comprador
+                            </div>
+
+                            <div class="fw-bold">
+                                ${UI.esc(
+                                    nombreComprador
+                                )}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="border rounded p-3 h-100">
+
+                            <div class="text-muted small">
+                                Documento de identidad
+                            </div>
+
+                            <div class="fw-bold">
+                                ${UI.esc(
+                                    documentoComprador
                                 )}
                             </div>
 
