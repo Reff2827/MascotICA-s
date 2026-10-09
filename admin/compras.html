@@ -961,6 +961,27 @@
 
                 </div>
 
+                ${
+                    ['PAGADO', 'ENTREGADO'].includes(
+                        String(pedido.estado || '').toUpperCase()
+                    ) && pedido.boleta_codigo
+                        ? `
+                            <div class="d-flex justify-content-end mt-4">
+                                <a
+                                    href="../cliente/boleta.html?pedido=${encodeURIComponent(String(pedido.id_pedido))}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="btn btn-primary">
+
+                                    <i class="bi bi-receipt"></i>
+                                    Ver boleta imprimible
+
+                                </a>
+                            </div>
+                        `
+                        : ''
+                }
+
             `;
 
         } catch (error) {

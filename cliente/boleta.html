@@ -1,310 +1,284 @@
 <!DOCTYPE html>
-
 <html lang="es">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta charset="UTF-8">
+    <title>Boleta de compra · MascotICA's</title>
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 
-<title>Boleta electrónica · MascotICA's</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet">
 
-<link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet">
+    <link
+        rel="stylesheet"
+        href="../css/styles.css">
 
-<link
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-    rel="stylesheet">
-
-<link
-    rel="stylesheet"
-    href="../css/styles.css">
-
-<script src="../js/theme.js"></script>
-
+    <script src="../js/theme.js"></script>
 </head>
 
 <body>
 
 <div class="boleta-page">
 
-<div class="row justify-content-center">
-
-    <div class="col-12">
-
-        <div class="boleta-documento">
-
-            <div class="boleta-cabecera">
-
-                <div class="boleta-marca">
-
-                    <div
-                        class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center"
-                        style="width: 58px; height: 58px; flex: 0 0 auto;">
-
-                        <i
-                            class="bi bi-receipt-cutoff text-success"
-                            style="font-size: 1.7rem;">
-                        </i>
-
-                    </div>
-
-                    <div>
-
-                        <h2 class="boleta-titulo">
-                            MascotICA's
-                        </h2>
-
-                        <p class="boleta-subtitulo">
-                            Boleta electrónica de compra
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <div class="boleta-codigo">
-
-                    <small>
-                        Comprobante electrónico
-                    </small>
-
-                    <strong id="numeroBoleta">
-                        -
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="estadoBoleta"
-                class="text-center py-5">
-
-                <div
-                    class="spinner-border text-primary"
-                    role="status">
-
-                    <span class="visually-hidden">
-                        Cargando...
-                    </span>
-
-                </div>
-
-                <p class="text-muted mt-3 mb-0">
-                    Cargando información de la boleta...
-                </p>
-
-            </div>
-
-
-            <div
-                id="contenidoBoleta"
-                class="d-none">
-
-                <div class="boleta-contenido">
-
-                    <div class="boleta-metadatos">
-
-                        <div class="boleta-metadato">
-
-                            <small>
-                                Número de boleta
-                            </small>
-
-                            <strong id="numeroBoletaDetalle">
-                                -
-                            </strong>
-
-                        </div>
-
-                        <div class="boleta-metadato">
-
-                            <small>
-                                Fecha de compra
-                            </small>
-
-                            <strong id="fechaBoleta">
-                                -
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="mb-4">
-
-                        <h5 class="fw-bold mb-3">
-
-                            <i class="bi bi-bag-check me-1"></i>
-
-                            Detalle de compra
-
-                        </h5>
-
-                        <div class="boleta-tabla-contenedor">
-
-                            <table class="table boleta-tabla align-middle mb-0">
-
-                                <thead>
-
-                                    <tr>
-
-                                        <th>
-                                            Producto
-                                        </th>
-
-                                        <th class="text-center">
-                                            Cant.
-                                        </th>
-
-                                        <th class="text-end">
-                                            Importe
-                                        </th>
-
-                                    </tr>
-
-                                </thead>
-
-                                <tbody id="listaProductosBoleta">
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="boleta-total">
-
-                        <span>
-                            <i class="bi bi-receipt me-1"></i>
-                            Total de la compra
-                        </span>
-
-                        <strong id="totalBoleta">
-                            S/ 0.00
-                        </strong>
-
-                    </div>
-
-
-                    <div class="border-top pt-4 mt-4">
-
-                        <div class="alert alert-success mb-0">
-
-                            <i class="bi bi-shield-check me-1"></i>
-
-                            Esta boleta corresponde a una compra
-                            registrada en MascotICA's.
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="boleta-pie">
-
-                    <p>
-                        Documento consultado mediante código QR.
-                    </p>
-
-                    <p class="mt-1">
-                        MascotICA's · Gracias por tu compra.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div
-            id="errorBoleta"
-            class="d-none mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12">
 
             <div class="boleta-documento">
 
-                <div class="card-body text-center p-5">
+                <div class="boleta-cabecera">
 
-                    <div
-                        class="rounded-circle bg-danger-subtle d-inline-flex align-items-center justify-content-center mb-3"
-                        style="width: 70px; height: 70px;">
+                    <div class="boleta-marca">
 
-                        <i
-                            class="bi bi-exclamation-triangle text-danger"
-                            style="font-size: 2rem;">
-                        </i>
+                        <img
+                            src="../logo.png"
+                            alt="Logo de MascotICA's"
+                            class="boleta-logo"
+                            onerror="this.style.display='none'">
+
+                        <div>
+                            <h2 class="boleta-titulo">
+                                MascotICA's
+                            </h2>
+
+                            <p class="boleta-subtitulo">
+                                Boleta de compra
+                            </p>
+                        </div>
 
                     </div>
 
-                    <h4 class="fw-bold mb-2">
-                        No se pudo encontrar la boleta
-                    </h4>
+                    <div class="boleta-codigo">
+                        <small>Comprobante de compra</small>
+                        <strong id="numeroBoleta">-</strong>
+                    </div>
 
-                    <p
-                        class="text-muted mb-0"
-                        id="mensajeErrorBoleta">
+                </div>
 
-                        El código de la boleta no es válido o
-                        la boleta ya no está disponible.
+                <div
+                    id="estadoBoleta"
+                    class="text-center py-5">
 
+                    <div
+                        class="spinner-border text-primary"
+                        role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+
+                    <p class="text-muted mt-3 mb-0">
+                        Cargando información de la boleta...
                     </p>
+
+                </div>
+
+                <div id="contenidoBoleta" class="d-none">
+
+                    <div class="boleta-contenido">
+
+                        <div class="boleta-metadatos">
+
+                            <div class="boleta-metadato">
+                                <small>Número de boleta</small>
+                                <strong id="numeroBoletaDetalle">-</strong>
+                            </div>
+
+                            <div class="boleta-metadato">
+                                <small>Fecha de compra</small>
+                                <strong id="fechaBoleta">-</strong>
+                            </div>
+
+                            <div class="boleta-metadato">
+                                <small>Número de pedido</small>
+                                <strong id="idPedidoBoleta">-</strong>
+                            </div>
+
+                            <div class="boleta-metadato">
+                                <small>Estado del pago</small>
+                                <strong id="estadoPagoBoleta">-</strong>
+                            </div>
+
+                        </div>
+
+                        <div id="datosClienteBoleta" class="mb-4 d-none">
+
+                            <h5 class="fw-bold mb-3">
+                                <i class="bi bi-person-vcard me-1"></i>
+                                Datos del comprador
+                            </h5>
+
+                            <div class="boleta-metadatos">
+
+                                <div class="boleta-metadato">
+                                    <small>Nombre del comprador</small>
+                                    <strong id="nombreCompradorBoleta">-</strong>
+                                </div>
+
+                                <div class="boleta-metadato">
+                                    <small>Documento de identidad</small>
+                                    <strong id="documentoCompradorBoleta">-</strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <h5 class="fw-bold mb-3">
+                                <i class="bi bi-bag-check me-1"></i>
+                                Detalle de compra
+                            </h5>
+
+                            <div class="boleta-tabla-contenedor">
+
+                                <table class="table boleta-tabla align-middle mb-0">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th class="text-center">Cant.</th>
+                                            <th class="text-end">P. unitario</th>
+                                            <th class="text-end">Importe</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="listaProductosBoleta"></tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                        <div class="boleta-total">
+                            <span>
+                                <i class="bi bi-receipt me-1"></i>
+                                Total de la compra
+                            </span>
+
+                            <strong id="totalBoleta">S/ 0.00</strong>
+                        </div>
+
+                        <div class="border-top pt-4 mt-4">
+
+                            <div class="alert alert-success mb-0">
+                                <i class="bi bi-shield-check me-1"></i>
+                                Compra registrada en MascotICA's.
+                            </div>
+
+                        </div>
+
+                        <div class="text-center border-top mt-4 pt-4">
+
+                            <h5 class="fw-bold mb-2">
+                                Boleta electrónica
+                            </h5>
+
+                            <p class="text-muted mb-3">
+                                Escanea el código QR para consultar
+                                la información pública de esta boleta.
+                            </p>
+
+                            <div class="d-flex justify-content-center mb-3">
+                                <div
+                                    id="qrBoleta"
+                                    class="p-3 bg-white border rounded"
+                                    style="min-width: 180px; min-height: 180px;">
+                                </div>
+                            </div>
+
+                            <p
+                                id="mensajeQr"
+                                class="small text-muted mb-0">
+                                El código QR estará disponible cuando
+                                la boleta electrónica haya sido generada.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="boleta-pie">
+                        <p>MascotICA's · Gracias por tu compra.</p>
+                        <p class="mt-1">
+                            Conserva este comprobante como constancia de tu compra.
+                        </p>
+                    </div>
 
                 </div>
 
             </div>
 
+            <div id="errorBoleta" class="d-none mt-4">
+
+                <div class="boleta-documento">
+                    <div class="card-body text-center p-5">
+
+                        <div
+                            class="rounded-circle bg-danger-subtle d-inline-flex align-items-center justify-content-center mb-3"
+                            style="width: 70px; height: 70px;">
+
+                            <i
+                                class="bi bi-exclamation-triangle text-danger"
+                                style="font-size: 2rem;">
+                            </i>
+
+                        </div>
+
+                        <h4 class="fw-bold mb-2">
+                            No se pudo encontrar la boleta
+                        </h4>
+
+                        <p
+                            class="text-muted mb-0"
+                            id="mensajeErrorBoleta">
+                            El código no es válido o no tienes permiso
+                            para consultar esta compra.
+                        </p>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div
+                id="accionesBoleta"
+                class="boleta-acciones d-none no-imprimir">
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="window.print()">
+
+                    <i class="bi bi-printer me-1"></i>
+                    Imprimir o guardar como PDF
+
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    onclick="window.location.reload()">
+
+                    <i class="bi bi-arrow-clockwise me-1"></i>
+                    Actualizar boleta
+
+                </button>
+
+            </div>
+
         </div>
-
-
-        <div
-            id="accionesBoleta"
-            class="boleta-acciones d-none no-imprimir">
-
-            <button
-                type="button"
-                class="btn btn-primary"
-                onclick="window.print()">
-
-                <i class="bi bi-printer me-1"></i>
-
-                Imprimir o guardar como PDF
-
-            </button>
-
-            <button
-                type="button"
-                class="btn btn-outline-secondary"
-                onclick="window.location.reload()">
-
-                <i class="bi bi-arrow-clockwise me-1"></i>
-
-                Actualizar boleta
-
-            </button>
-
-        </div>
-
     </div>
 
 </div>
 
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap.bundle@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
 <script src="../js/supabaseClient.js"></script>
 
@@ -312,108 +286,142 @@
 
     async function cargarBoleta() {
 
-        const estado =
-            document.getElementById('estadoBoleta');
+        const estado = document.getElementById('estadoBoleta');
+        const contenido = document.getElementById('contenidoBoleta');
+        const error = document.getElementById('errorBoleta');
+        const mensajeError = document.getElementById('mensajeErrorBoleta');
+        const parametros = new URLSearchParams(window.location.search);
 
-        const contenido =
-            document.getElementById('contenidoBoleta');
-
-        const error =
-            document.getElementById('errorBoleta');
-
-        const mensajeError =
-            document.getElementById('mensajeErrorBoleta');
-
-
-        const parametros =
-            new URLSearchParams(
-                window.location.search
-            );
-
-        const codigo =
-            parametros.get('codigo');
-
-
-        if (!codigo) {
-
-            estado.classList.add('d-none');
-
-            error.classList.remove('d-none');
-
-            mensajeError.textContent =
-                'No se recibió el código necesario para consultar esta boleta.';
-
-            return;
-
-        }
-
+        const codigo = parametros.get('codigo');
+        const idPedido = parametros.get('pedido');
 
         try {
 
-            if (
-                typeof db === 'undefined'
-            ) {
-
-                throw new Error(
-                    'No se pudo conectar con el sistema.'
-                );
-
+            if (typeof db === 'undefined') {
+                throw new Error('No se pudo conectar con el sistema.');
             }
 
+            let boleta;
+            let esPublica = false;
 
-            const respuesta =
-                await db.rpc(
+            if (codigo) {
+
+                esPublica = true;
+
+                const respuesta = await db.rpc(
                     'obtener_boleta_publica',
-                    {
-                        p_codigo: codigo
-                    }
+                    { p_codigo: codigo }
                 );
 
+                if (respuesta.error) {
+                    console.error('Error consultando la boleta pública:', respuesta.error);
+                    throw new Error('No se pudo consultar la boleta electrónica.');
+                }
 
-            if (respuesta.error) {
+                if (!respuesta.data) {
+                    throw new Error('La boleta no existe o ya no está disponible.');
+                }
 
-                console.error(
-                    'Error consultando la boleta:',
-                    respuesta.error
-                );
+                boleta = respuesta.data;
 
-                throw new Error(
-                    'No se pudo consultar la boleta.'
-                );
+            } else if (idPedido) {
+
+                const sesion = await db.auth.getUser();
+
+                if (sesion.error || !sesion.data.user) {
+                    throw new Error('Inicia sesión para consultar la boleta de compra.');
+                }
+
+                const respuestaPedido = await db
+                    .from('pedidos')
+                    .select(`
+                        id_pedido,
+                        id_usuario,
+                        fecha,
+                        pagado_en,
+                        total,
+                        estado,
+                        numero_boleta,
+                        boleta_codigo,
+                        nombre_comprador,
+                        tipo_documento,
+                        numero_documento
+                    `)
+                    .eq('id_pedido', Number(idPedido))
+                    .maybeSingle();
+
+                if (respuestaPedido.error) {
+                    console.error('Error consultando el pedido:', respuestaPedido.error);
+                    throw new Error('No se pudo consultar el pedido.');
+                }
+
+                const pedido = respuestaPedido.data;
+
+                if (!pedido) {
+                    throw new Error('No se encontró la compra seleccionada.');
+                }
+
+                if (
+                    pedido.id_usuario !== sesion.data.user.id &&
+                    !(await esAdministrador())
+                ) {
+                    throw new Error('No tienes permiso para consultar esta compra.');
+                }
+
+                if (!['PAGADO', 'ENTREGADO'].includes(String(pedido.estado).toUpperCase())) {
+                    throw new Error('La boleta estará disponible cuando el pago esté confirmado.');
+                }
+
+                const respuestaItems = await db
+                    .from('pedido_items')
+                    .select(`
+                        id_item,
+                        nombre_producto,
+                        cantidad,
+                        precio_unitario,
+                        subtotal
+                    `)
+                    .eq('id_pedido', Number(idPedido))
+                    .order('id_item', { ascending: true });
+
+                if (respuestaItems.error) {
+                    console.error('Error consultando los productos:', respuestaItems.error);
+                    throw new Error('No se pudo consultar el detalle de la compra.');
+                }
+
+                boleta = {
+                    numero_boleta: pedido.numero_boleta,
+                    fecha: pedido.pagado_en || pedido.fecha,
+                    total: pedido.total,
+                    estado: pedido.estado,
+                    id_pedido: pedido.id_pedido,
+                    nombre_comprador: pedido.nombre_comprador,
+                    tipo_documento: pedido.tipo_documento,
+                    numero_documento: pedido.numero_documento,
+                    boleta_codigo: pedido.boleta_codigo,
+                    items: (respuestaItems.data || []).map(item => ({
+                        nombre: item.nombre_producto,
+                        cantidad: item.cantidad,
+                        precio_unitario: item.precio_unitario,
+                        subtotal: item.subtotal
+                    }))
+                };
+
+            } else {
+
+                throw new Error('No se recibió el código o número de pedido necesario para consultar esta boleta.');
 
             }
 
-
-            const boleta =
-                respuesta.data;
-
-
-            if (!boleta) {
-
-                throw new Error(
-                    'La boleta no existe o ya no está disponible.'
-                );
-
-            }
-
-
-            mostrarBoleta(boleta);
+            mostrarBoleta(boleta, esPublica);
 
         } catch (errorConsulta) {
 
-            console.error(
-                'Error cargando boleta:',
-                errorConsulta
-            );
+            console.error('Error cargando boleta:', errorConsulta);
 
             estado.classList.add('d-none');
-
             contenido.classList.add('d-none');
-
-            document
-                .getElementById('accionesBoleta')
-                .classList.add('d-none');
-
+            document.getElementById('accionesBoleta').classList.add('d-none');
             error.classList.remove('d-none');
 
             mensajeError.textContent =
@@ -424,181 +432,205 @@
 
     }
 
+    async function esAdministrador() {
 
-    function mostrarBoleta(boleta) {
+        try {
 
-        const estado =
-            document.getElementById('estadoBoleta');
+            const respuesta = await db.rpc('es_admin');
 
-        const contenido =
-            document.getElementById('contenidoBoleta');
+            if (!respuesta.error) {
+                return respuesta.data === true;
+            }
 
-        const numero =
-            document.getElementById('numeroBoleta');
+        } catch (error) {
+            console.error('No se pudo verificar el rol de administrador:', error);
+        }
 
-        const numeroDetalle =
-            document.getElementById('numeroBoletaDetalle');
+        return false;
 
-        const fecha =
-            document.getElementById('fechaBoleta');
+    }
 
-        const lista =
-            document.getElementById('listaProductosBoleta');
+    function mostrarBoleta(boleta, esPublica) {
 
-        const total =
-            document.getElementById('totalBoleta');
+        const estado = document.getElementById('estadoBoleta');
+        const contenido = document.getElementById('contenidoBoleta');
+        const lista = document.getElementById('listaProductosBoleta');
+        const items = Array.isArray(boleta.items) ? boleta.items : [];
 
-        const acciones =
-            document.getElementById('accionesBoleta');
+        const numeroTexto = boleta.numero_boleta || 'Boleta electrónica';
 
+        document.getElementById('numeroBoleta').textContent = numeroTexto;
+        document.getElementById('numeroBoletaDetalle').textContent = numeroTexto;
+        document.getElementById('idPedidoBoleta').textContent =
+            boleta.id_pedido ? '#' + boleta.id_pedido : 'Consulta pública';
 
-        const numeroTexto =
-            boleta.numero_boleta ||
-            'Boleta electrónica';
-
-        numero.textContent =
-            numeroTexto;
-
-        numeroDetalle.textContent =
-            numeroTexto;
-
+        document.getElementById('estadoPagoBoleta').textContent =
+            boleta.estado || 'Pago confirmado';
 
         if (boleta.fecha) {
 
-            const fechaObjeto =
-                new Date(boleta.fecha);
+            const fechaObjeto = new Date(boleta.fecha);
 
-            if (!Number.isNaN(fechaObjeto.getTime())) {
-
-                fecha.textContent =
-                    fechaObjeto.toLocaleString(
-                        'es-PE',
-                        {
-                            dateStyle: 'medium',
-                            timeStyle: 'short'
-                        }
-                    );
-
-            } else {
-
-                fecha.textContent =
-                    'Fecha no disponible';
-
-            }
+            document.getElementById('fechaBoleta').textContent =
+                !Number.isNaN(fechaObjeto.getTime())
+                    ? fechaObjeto.toLocaleString('es-PE', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short'
+                    })
+                    : 'Fecha no disponible';
 
         } else {
 
-            fecha.textContent =
-                'Fecha no disponible';
+            document.getElementById('fechaBoleta').textContent = 'Fecha no disponible';
 
         }
 
+        const datosCliente = document.getElementById('datosClienteBoleta');
 
-        const items =
-            Array.isArray(boleta.items)
-                ? boleta.items
-                : [];
+        if (!esPublica) {
 
+            datosCliente.classList.remove('d-none');
+
+            document.getElementById('nombreCompradorBoleta').textContent =
+                boleta.nombre_comprador || 'No registrado';
+
+            const tipoDocumento = boleta.tipo_documento || '';
+            const numeroDocumento = boleta.numero_documento || '';
+
+            document.getElementById('documentoCompradorBoleta').textContent =
+                [tipoDocumento, numeroDocumento].filter(Boolean).join(': ') || 'No registrado';
+
+        } else {
+
+            datosCliente.classList.add('d-none');
+
+        }
 
         if (items.length === 0) {
 
             lista.innerHTML = `
                 <tr>
-                    <td
-                        colspan="3"
-                        class="text-center text-muted py-4">
-
-                        No hay productos registrados
-                        en esta boleta.
-
+                    <td colspan="4" class="text-center text-muted py-4">
+                        No hay productos registrados en esta boleta.
                     </td>
-                </tr>
-            `;
+                </tr>`;
 
         } else {
 
-            lista.innerHTML =
-                items.map(item => `
+            lista.innerHTML = items.map(item => {
 
+                const cantidad = Number(item.cantidad || 0);
+                const subtotal = Number(item.subtotal || 0);
+
+                const precioUnitario =
+                    item.precio_unitario !== undefined &&
+                    item.precio_unitario !== null
+                        ? Number(item.precio_unitario)
+                        : (cantidad > 0 ? subtotal / cantidad : 0);
+
+                return `
                     <tr>
-
                         <td class="boleta-producto">
-                            ${escaparHtml(
-                                item.nombre ||
-                                'Producto'
-                            )}
+                            ${escaparHtml(item.nombre || item.nombre_producto || 'Producto')}
                         </td>
 
                         <td class="text-center boleta-numero">
-                            ${Number(
-                                item.cantidad || 0
-                            )}
+                            ${cantidad}
                         </td>
 
                         <td class="text-end boleta-numero">
-                            ${formatearImporte(
-                                item.subtotal
-                            )}
+                            ${formatearImporte(precioUnitario)}
                         </td>
 
-                    </tr>
+                        <td class="text-end boleta-numero">
+                            ${formatearImporte(subtotal)}
+                        </td>
+                    </tr>`;
 
-                `).join('');
+            }).join('');
 
         }
 
-
-        total.textContent =
+        document.getElementById('totalBoleta').textContent =
             formatearImporte(boleta.total);
 
-
         estado.classList.add('d-none');
-
         contenido.classList.remove('d-none');
+        document.getElementById('accionesBoleta').classList.remove('d-none');
 
-        acciones.classList.remove('d-none');
+        generarQr(boleta.boleta_codigo);
 
     }
 
+    function generarQr(codigo) {
+
+        const contenedor = document.getElementById('qrBoleta');
+        const mensaje = document.getElementById('mensajeQr');
+
+        contenedor.innerHTML = '';
+
+        if (!codigo) {
+
+            mensaje.textContent =
+                'El código QR todavía no está disponible. Verifica que el pago haya generado la boleta electrónica.';
+
+            return;
+
+        }
+
+        if (typeof QRCode === 'undefined') {
+
+            mensaje.textContent =
+                'No se pudo cargar el generador de QR. Comprueba tu conexión a internet.';
+
+            return;
+
+        }
+
+        const urlPublica =
+            new URL('boleta.html', window.location.href);
+
+        urlPublica.search = '';
+        urlPublica.searchParams.set('codigo', codigo);
+
+        new QRCode(contenedor, {
+            text: urlPublica.href,
+            width: 180,
+            height: 180,
+            colorDark: '#111111',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        mensaje.textContent =
+            'Escanea el QR para consultar la versión pública de la boleta, sin datos personales del comprador.';
+
+    }
 
     function formatearImporte(valor) {
 
-        const importe =
-            Number(valor ?? 0);
+        const importe = Number(valor ?? 0);
+        const importeValido = Number.isFinite(importe) ? importe : 0;
 
-        const importeValido =
-            Number.isFinite(importe)
-                ? importe
-                : 0;
-
-        return 'S/ ' + importeValido.toLocaleString(
-            'es-PE',
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }
-        );
+        return 'S/ ' + importeValido.toLocaleString('es-PE', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
 
     }
 
-
     function escaparHtml(valor) {
 
-        const elemento =
-            document.createElement('div');
-
-        elemento.textContent =
-            String(valor);
+        const elemento = document.createElement('div');
+        elemento.textContent = String(valor);
 
         return elemento.innerHTML;
 
     }
-
 
     cargarBoleta();
 
 </script>
 
 </body>
-
 </html>
