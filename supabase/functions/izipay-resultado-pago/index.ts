@@ -2,6 +2,20 @@ import "@supabase/functions-js/edge-runtime.d.ts";
 
 console.log("Izipay result function started");
 
+async function leerRespuesta(response: Response) {
+    const texto = await response.text();
+
+    if (!texto.trim()) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(texto);
+    } catch {
+        return { respuesta: texto };
+    }
+}
+
 async function validarHash(
     krAnswer: string,
     krHash: string,
@@ -180,14 +194,18 @@ export default {
                 );
 
             }
-
             console.log(
-                "Resultado Izipay:",
-                JSON.stringify({
-                    orderId,
-                    orderStatus,
-                    transactionUuid
-                })
+              "Resultado Izipay:",
+              JSON.stringify({
+                orderId,
+                orderStatus,
+                transactionUuid,
+                errorCode: answer?.transactions?.[0]?.errorCode,
+                errorMessage: answer?.transactions?.[0]?.errorMessage,
+                detailedErrorMessage:
+                answer?.transactions?.[0]?.detailedErrorMessage,
+                answerErrorMessage: answer?.answer?.errorMessage
+              })
             );
 
             const supabaseUrl =
@@ -253,8 +271,7 @@ export default {
                         }
                     );
 
-                const data =
-                    await response.json();
+                const data = await leerRespuesta(response);
 
                 if (!response.ok) {
 
@@ -320,8 +337,7 @@ export default {
                         }
                     );
 
-                const data =
-                    await response.json();
+                const data = await leerRespuesta(response);
 
                 if (!response.ok) {
 
