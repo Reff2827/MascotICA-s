@@ -167,7 +167,7 @@
 
                         </div>
 
-                        <div class="text-center border-top mt-4 pt-4">
+                        <div id="seccionQrBoleta" class="text-center border-top mt-4 pt-4">
 
                             <h5 class="fw-bold mb-2">
                                 Boleta electrónica
@@ -546,13 +546,17 @@
         }
 
         document.getElementById('totalBoleta').textContent =
-            formatearImporte(boleta.total);
-
+        formatearImporte(boleta.total);
         estado.classList.add('d-none');
         contenido.classList.remove('d-none');
         document.getElementById('accionesBoleta').classList.remove('d-none');
-
-        generarQr(boleta.boleta_codigo);
+        const seccionQr = document.getElementById('seccionQrBoleta');
+        if (esPublica) {
+            seccionQr.classList.add('d-none');
+        } else {
+            seccionQr.classList.remove('d-none');
+            generarQr(boleta.boleta_codigo);
+        }
 
     }
 

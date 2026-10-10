@@ -246,10 +246,10 @@
                         <td>
                             ${tieneBoleta ? `
                                 <a
-                                    href="boleta.html?codigo=${encodeURIComponent(pedido.boletaCodigo)}"
-                                    class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-receipt"></i>
-                                    Ver boleta
+                                href="boleta.html?pedido=${encodeURIComponent(pedido.idPedido)}"
+                                class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-receipt"></i>
+                                Ver boleta
                                 </a>
                             ` : `
                                 <span class="text-muted small">
