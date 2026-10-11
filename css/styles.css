@@ -3441,11 +3441,15 @@ body > .container-fluid > *:nth-child(n+5) {
         border-radius: 3px !important;
     }
 
-    #qrBoleta canvas,
+    #qrBoleta canvas {
+        display: none !important;
+    }
     #qrBoleta img {
         display: block !important;
-        width: 105px !important;
-        height: 105px !important;
+        width: 130px !important;
+        height: 130px !important;
+        max-width: none !important;
+        object-fit: contain !important;
     }
 
     .boleta-pie {
