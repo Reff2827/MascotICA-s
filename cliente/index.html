@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -457,7 +456,7 @@
        DOCUMENTO DE COMPRA
        DNI: 8 dígitos.
        RUC: 11 dígitos.
-       CE: entre 1 y 11 dígitos, sin consulta externa.
+       CE: entre 9 y 11 dígitos, sin consulta externa.
        ================================================================ */
 
     function limpiarConsultaDocumento() {
@@ -544,7 +543,7 @@
             campo.placeholder = 'Ingresa tu número de CE';
 
             ayuda.textContent =
-                'Ingresa entre 1 y 11 dígitos de tu Carnet de Extranjería.';
+                'Ingresa entre 9 y 11 dígitos de tu Carnet de Extranjería.';
 
             boton.classList.add('d-none');
 
@@ -603,7 +602,7 @@
         }
 
         if (tipo === 'CE') {
-            return /^\d{1,11}$/.test(numero);
+            return /^\d{9,11}$/.test(numero);
         }
 
         return false;
@@ -837,6 +836,10 @@
         } finally {
 
             consultaDocumentoEnCurso = false;
+
+            // CAMBIO 1: reactivar el botón al terminar la consulta.
+            // Esto permite volver a consultar después de cambiar de documento.
+            boton.disabled = false;
 
             if (tipo === 'DNI') {
                 boton.innerHTML =
@@ -1547,7 +1550,7 @@
                     ? 'El DNI debe tener exactamente 8 números.'
                     : tipoDocumentoPago === 'RUC'
                         ? 'El RUC debe tener exactamente 11 números.'
-                        : 'El CE debe tener entre 1 y 11 números.';
+                        : 'El CE debe tener entre 9 y 11 números.';
 
             document
                 .getElementById('numeroDocumentoPago')
