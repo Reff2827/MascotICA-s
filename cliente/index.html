@@ -724,8 +724,6 @@
 
         try {
 
-            // La clave de PeruAPI permanece en Supabase.
-            // La sesión del usuario se envía a la Edge Function.
             const respuesta =
                 await db.functions.invoke(
                     'intifact-consultar-documento',
