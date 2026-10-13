@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,7 +10,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
     <script src="../js/theme.js"></script>
-
 </head>
 
 <body>
@@ -44,24 +44,16 @@
 <div class="modal fade" id="modalEvaluacion" tabindex="-1" data-bs-backdrop="static">
 
     <div class="modal-dialog">
-
         <div class="modal-content">
 
             <div class="modal-header">
-
                 <h5 class="modal-title">
                     <i class="bi bi-clipboard-heart"></i>
                     Evaluación de adopción responsable
                 </h5>
 
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal">
-                </button>
-
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
 
             <div class="modal-body">
 
@@ -72,33 +64,21 @@
                     a evaluar mejor tu solicitud.
                 </p>
 
-
                 <form id="formEvaluacion" novalidate>
 
                     <div class="row g-2 mb-3">
 
                         <div class="col-5">
+                            <label class="form-label">Tipo de documento</label>
 
-                            <label class="form-label">
-                                Tipo de documento
-                            </label>
-
-                            <select
-                                class="form-select"
-                                id="evalTipoDocumento">
-
+                            <select class="form-select" id="evalTipoDocumento">
                                 <option value="DNI">DNI</option>
                                 <option value="CE">Carnet de Extranjería</option>
-
                             </select>
-
                         </div>
 
                         <div class="col-7">
-
-                            <label class="form-label">
-                                Número de documento
-                            </label>
+                            <label class="form-label">Número de documento</label>
 
                             <input
                                 type="text"
@@ -111,232 +91,110 @@
                             <div class="form-text" id="evalDocAyuda">
                                 Ingresa los 8 dígitos de tu DNI.
                             </div>
-
                         </div>
 
                     </div>
 
-
                     <div class="mb-3">
+                        <label class="form-label">Fecha de nacimiento</label>
 
-                        <label class="form-label">
-                            Fecha de nacimiento
-                        </label>
-
-                        <input
-                            type="date"
-                            class="form-control"
-                            id="evalFechaNacimiento">
+                        <input type="date" class="form-control" id="evalFechaNacimiento">
 
                         <div class="form-text">
                             Debes ser mayor de 18 años para adoptar.
                         </div>
-
                     </div>
 
-
                     <div class="mb-3">
+                        <label class="form-label">Tipo de vivienda</label>
 
-                        <label class="form-label">
-                            Tipo de vivienda
-                        </label>
-
-                        <select
-                            class="form-select"
-                            id="evalVivienda"
-                            required>
-
-                            <option value="">
-                                Selecciona...
-                            </option>
-
-                            <option value="Casa">
-                                Casa
-                            </option>
-
-                            <option value="Departamento">
-                                Departamento
-                            </option>
-
+                        <select class="form-select" id="evalVivienda" required>
+                            <option value="">Selecciona...</option>
+                            <option value="Casa">Casa</option>
+                            <option value="Departamento">Departamento</option>
                         </select>
-
                     </div>
 
-
                     <div class="mb-3">
-
                         <label class="form-label">
                             ¿Cuentas con espacio adecuado para la mascota?
                         </label>
 
-                        <select
-                            class="form-select"
-                            id="evalEspacio"
-                            required>
-
-                            <option value="">
-                                Selecciona...
-                            </option>
-
-                            <option value="Si">
-                                Sí
-                            </option>
-
-                            <option value="No">
-                                No
-                            </option>
-
+                        <select class="form-select" id="evalEspacio" required>
+                            <option value="">Selecciona...</option>
+                            <option value="Si">Sí</option>
+                            <option value="No">No</option>
                         </select>
-
                     </div>
 
-
                     <div class="mb-3">
-
                         <label class="form-label">
                             ¿Cuántas horas al día podrías dedicarle?
                         </label>
 
-                        <select
-                            class="form-select"
-                            id="evalTiempo"
-                            required>
-
-                            <option value="">
-                                Selecciona...
-                            </option>
-
-                            <option value="Menos de 2 horas">
-                                Menos de 2 horas
-                            </option>
-
-                            <option value="2 a 4 horas">
-                                2 a 4 horas
-                            </option>
-
-                            <option value="4 a 8 horas">
-                                4 a 8 horas
-                            </option>
-
-                            <option value="Mas de 8 horas">
-                                Más de 8 horas
-                            </option>
-
+                        <select class="form-select" id="evalTiempo" required>
+                            <option value="">Selecciona...</option>
+                            <option value="Menos de 2 horas">Menos de 2 horas</option>
+                            <option value="2 a 4 horas">2 a 4 horas</option>
+                            <option value="4 a 8 horas">4 a 8 horas</option>
+                            <option value="Mas de 8 horas">Más de 8 horas</option>
                         </select>
-
                     </div>
 
-
                     <div class="mb-3">
-
                         <label class="form-label">
                             ¿Has tenido mascotas anteriormente?
                         </label>
 
-                        <select
-                            class="form-select"
-                            id="evalExperiencia"
-                            required>
-
-                            <option value="">
-                                Selecciona...
-                            </option>
-
-                            <option value="Si">
-                                Sí
-                            </option>
-
-                            <option value="No">
-                                No
-                            </option>
-
+                        <select class="form-select" id="evalExperiencia" required>
+                            <option value="">Selecciona...</option>
+                            <option value="Si">Sí</option>
+                            <option value="No">No</option>
                         </select>
-
                     </div>
 
-
                     <div class="mb-3">
-
                         <label class="form-label">
                             ¿Todos en tu hogar están de acuerdo con esta adopción?
                         </label>
 
-                        <select
-                            class="form-select"
-                            id="evalAcuerdo"
-                            required>
-
-                            <option value="">
-                                Selecciona...
-                            </option>
-
-                            <option value="Si">
-                                Sí
-                            </option>
-
-                            <option value="No">
-                                No
-                            </option>
-
+                        <select class="form-select" id="evalAcuerdo" required>
+                            <option value="">Selecciona...</option>
+                            <option value="Si">Sí</option>
+                            <option value="No">No</option>
                         </select>
-
                     </div>
 
-
                     <div class="mb-1">
-
                         <label class="form-label">
                             ¿Por qué deseas adoptar a esta mascota?
                         </label>
 
-                        <textarea
-                            class="form-control"
-                            id="evalMotivo"
-                            rows="2"
-                            required>
-                        </textarea>
-
+                        <textarea class="form-control" id="evalMotivo" rows="2" required></textarea>
                     </div>
 
                 </form>
-
             </div>
 
-
             <div class="modal-footer">
-
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal">
-
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cancelar
-
                 </button>
 
-                <button
-                    type="button"
-                    class="btn btn-primary-ps"
-                    id="btnEnviarEvaluacion">
-
+                <button type="button" class="btn btn-primary-ps" id="btnEnviarEvaluacion">
                     <i class="bi bi-send"></i>
                     Enviar solicitud
-
                 </button>
-
             </div>
 
         </div>
-
     </div>
-
 </div>
 
 
 <div class="modal fade" id="modalCarrito" tabindex="-1">
 
     <div class="modal-dialog modal-dialog-scrollable">
-
         <div class="modal-content">
 
             <div class="modal-header">
@@ -344,6 +202,7 @@
                     <i class="bi bi-cart3"></i>
                     Tu carrito
                 </h5>
+
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -354,38 +213,19 @@
                 <hr>
 
                 <div class="mb-3">
-
-                    <label
-                        for="tipoDocumentoPago"
-                        class="form-label">
+                    <label for="tipoDocumentoPago" class="form-label">
                         Tipo de documento
                     </label>
 
-                    <select
-                        class="form-select"
-                        id="tipoDocumentoPago">
-
-                        <option value="DNI">
-                            DNI
-                        </option>
-
-                        <option value="PS">
-                            Pasaporte
-                        </option>
-
-                        <option value="CE">
-                            Carnet de Extranjería
-                        </option>
-
+                    <select class="form-select" id="tipoDocumentoPago">
+                        <option value="DNI">DNI</option>
+                        <option value="CE">Carnet de Extranjería</option>
+                        <option value="RUC">RUC</option>
                     </select>
-
                 </div>
 
                 <div class="mb-2">
-
-                    <label
-                        for="numeroDocumentoPago"
-                        class="form-label">
+                    <label for="numeroDocumentoPago" class="form-label">
                         Número de documento
                     </label>
 
@@ -394,44 +234,82 @@
                         class="form-control"
                         id="numeroDocumentoPago"
                         placeholder="Ingresa tu número de documento"
-                        autocomplete="off">
+                        inputmode="numeric"
+                        autocomplete="off"
+                        maxlength="8"
+                        aria-describedby="ayudaDocumentoPago">
 
-                    <div
-                        class="form-text"
-                        id="ayudaDocumentoPago">
+                    <div class="form-text" id="ayudaDocumentoPago">
                         Ingresa los 8 dígitos de tu DNI.
                     </div>
+                </div>
 
+                <div class="d-grid gap-2 mt-3" id="contenedorConsultaDocumento">
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        id="btnConsultarDocumento">
+
+                        <i class="bi bi-search"></i>
+                        Consultar DNI
+                    </button>
+                </div>
+
+                <div
+                    id="estadoConsultaDocumento"
+                    class="small mt-2"
+                    role="status"
+                    aria-live="polite">
+                </div>
+
+                <div
+                    id="resultadoDocumento"
+                    class="alert alert-success mt-3 mb-0 d-none"
+                    aria-live="polite">
+
+                    <div class="small text-muted" id="etiquetaNombreDocumento">
+                        Nombre consultado
+                    </div>
+
+                    <div class="fw-bold" id="nombreDocumentoConsultado"></div>
+                </div>
+
+                <div class="form-text mt-2" id="ayudaConsultaDocumento">
+                    Consulta tu documento antes de confirmar la compra.
                 </div>
 
             </div>
 
             <div class="modal-footer flex-column align-items-stretch gap-2">
+
                 <div class="d-flex justify-content-between fw-bold fs-5 px-1">
                     <span>Total</span>
                     <span id="totalCarrito">S/ 0.00</span>
                 </div>
-                <button type="button" class="btn btn-primary-ps w-100" id="btnConfirmarCompra" disabled>
+
+                <button
+                    type="button"
+                    class="btn btn-primary-ps w-100"
+                    id="btnConfirmarCompra"
+                    disabled>
+
                     <i class="bi bi-bag-check-fill"></i>
                     Confirmar compra
                 </button>
+
             </div>
 
         </div>
-
     </div>
-
 </div>
 
 
 <div class="modal fade" id="modalPago" tabindex="-1" data-bs-backdrop="static">
 
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-
         <div class="modal-content">
 
             <div class="modal-header">
-
                 <h5 class="modal-title">
                     <i class="bi bi-credit-card"></i>
                     Pago seguro
@@ -443,38 +321,24 @@
                     id="btnCerrarPago"
                     data-bs-dismiss="modal">
                 </button>
-
             </div>
 
             <div class="modal-body">
-
-                <div
-                    id="errPago"
-                    class="text-danger fw-bold mb-3">
-                </div>
-
-                <div
-                    id="contenedorPago"
-                    class="w-100">
-                </div>
-
+                <div id="errPago" class="text-danger fw-bold mb-3"></div>
+                <div id="contenedorPago" class="w-100"></div>
             </div>
 
         </div>
-
     </div>
-
 </div>
 
 
 <div class="modal fade" id="modalCompraExitosa" tabindex="-1" data-bs-backdrop="static">
 
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-
         <div class="modal-content">
 
             <div class="modal-header">
-
                 <h5 class="modal-title">
                     <i class="bi bi-check-circle-fill text-success"></i>
                     ¡Compra exitosa!
@@ -486,17 +350,13 @@
                     id="btnCerrarCompraExitosa"
                     data-bs-dismiss="modal">
                 </button>
-
             </div>
 
             <div class="modal-body">
-
                 <div id="contenidoCompraExitosa"></div>
-
             </div>
 
             <div class="modal-footer">
-
                 <button
                     type="button"
                     class="btn btn-primary-ps"
@@ -504,15 +364,11 @@
 
                     <i class="bi bi-check-lg"></i>
                     Listo
-
                 </button>
-
             </div>
 
         </div>
-
     </div>
-
 </div>
 
 
@@ -537,6 +393,12 @@
     let modalCarrito = null;
     let modalPago = null;
     let modalCompraExitosa = null;
+
+    // Datos devueltos por la consulta de DNI/RUC.
+    // Se invalidan si el usuario cambia el tipo o número de documento.
+    let documentoConsultadoPago = null;
+    let nombreCompradorPagoActual = null;
+    let consultaDocumentoEnCurso = false;
 
 
     const modalEvaluacion =
@@ -568,7 +430,11 @@
     }
 
 
-    /* Ajusta el largo esperado del documento segun el tipo elegido */
+    /* ================================================================
+       DOCUMENTO DE EVALUACIÓN DE ADOPCIÓN
+       Se conserva separado del documento de compra.
+       ================================================================ */
+
     document
         .getElementById('evalTipoDocumento')
         .addEventListener('change', function () {
@@ -587,46 +453,114 @@
         });
 
 
+    /* ================================================================
+       DOCUMENTO DE COMPRA
+       DNI: 8 dígitos.
+       RUC: 11 dígitos.
+       CE: entre 1 y 11 dígitos, sin consulta externa.
+       ================================================================ */
+
+    function limpiarConsultaDocumento() {
+
+        documentoConsultadoPago = null;
+
+        const resultado =
+            document.getElementById('resultadoDocumento');
+
+        const nombre =
+            document.getElementById('nombreDocumentoConsultado');
+
+        const estado =
+            document.getElementById('estadoConsultaDocumento');
+
+        resultado.classList.add('d-none');
+        nombre.textContent = '';
+        estado.textContent = '';
+        estado.className = 'small mt-2';
+
+        actualizarBotonConfirmarCompra();
+
+    }
+
+
+    function actualizarInterfazDocumentoPago() {
+
+        const tipo =
+            document.getElementById('tipoDocumentoPago').value;
+
+        const campo =
+            document.getElementById('numeroDocumentoPago');
+
+        const ayuda =
+            document.getElementById('ayudaDocumentoPago');
+
+        const boton =
+            document.getElementById('btnConsultarDocumento');
+
+        const ayudaConsulta =
+            document.getElementById('ayudaConsultaDocumento');
+
+        campo.value = '';
+        campo.classList.remove('is-invalid');
+
+        limpiarConsultaDocumento();
+
+        if (tipo === 'DNI') {
+
+            campo.maxLength = 8;
+            campo.inputMode = 'numeric';
+            campo.placeholder = 'Ej: 12345678';
+
+            ayuda.textContent =
+                'Ingresa los 8 dígitos de tu DNI.';
+
+            boton.classList.remove('d-none');
+            boton.innerHTML =
+                '<i class="bi bi-search"></i> Consultar DNI';
+
+            ayudaConsulta.textContent =
+                'Consulta tu DNI para completar automáticamente tu primer nombre y apellido paterno.';
+
+        } else if (tipo === 'RUC') {
+
+            campo.maxLength = 11;
+            campo.inputMode = 'numeric';
+            campo.placeholder = 'Ej: 20123456789';
+
+            ayuda.textContent =
+                'Ingresa los 11 dígitos de tu RUC.';
+
+            boton.classList.remove('d-none');
+            boton.innerHTML =
+                '<i class="bi bi-search"></i> Consultar RUC';
+
+            ayudaConsulta.textContent =
+                'Consulta tu RUC para obtener la razón social registrada.';
+
+        } else {
+
+            campo.maxLength = 11;
+            campo.inputMode = 'numeric';
+            campo.placeholder = 'Ingresa tu número de CE';
+
+            ayuda.textContent =
+                'Ingresa entre 1 y 11 dígitos de tu Carnet de Extranjería.';
+
+            boton.classList.add('d-none');
+
+            ayudaConsulta.textContent =
+                'Para el CE no se realiza consulta externa. Se utilizará el nombre de tu cuenta.';
+
+        }
+
+        actualizarBotonConfirmarCompra();
+
+    }
+
+
     document
         .getElementById('tipoDocumentoPago')
-        .addEventListener('change', function () {
-
-            const campo =
-                document.getElementById('numeroDocumentoPago');
-
-            const ayuda =
-                document.getElementById('ayudaDocumentoPago');
-
-            campo.value = '';
-            campo.classList.remove('is-invalid');
-
-            if (this.value === 'DNI') {
-
-                campo.maxLength = 8;
-                campo.inputMode = 'numeric';
-
-                ayuda.textContent =
-                    'Ingresa los 8 dígitos de tu DNI.';
-
-            } else if (this.value === 'PS') {
-
-                campo.maxLength = 20;
-                campo.inputMode = 'text';
-
-                ayuda.textContent =
-                    'Ingresa tu número de pasaporte.';
-
-            } else {
-
-                campo.maxLength = 20;
-                campo.inputMode = 'text';
-
-                ayuda.textContent =
-                    'Ingresa tu número de Carnet de Extranjería.';
-
-            }
-
-        });
+        .addEventListener('change', actualizarInterfazDocumentoPago);
 
 
     document
@@ -636,19 +570,287 @@
             const tipo =
                 document.getElementById('tipoDocumentoPago').value;
 
-            if (tipo === 'DNI') {
+            // Los tres documentos admitidos en compra son numéricos.
+            this.value = this.value.replace(/\D/g, '');
 
-                this.value =
-                    this.value.replace(/\D/g, '');
+            if (tipo === 'DNI' && this.value.length > 8) {
+                this.value = this.value.slice(0, 8);
+            }
 
-            } else {
+            if (tipo === 'RUC' && this.value.length > 11) {
+                this.value = this.value.slice(0, 11);
+            }
 
-                this.value =
-                    this.value.replace(/[^a-zA-Z0-9]/g, '');
+            if (tipo === 'CE' && this.value.length > 11) {
+                this.value = this.value.slice(0, 11);
+            }
+
+            this.classList.remove('is-invalid');
+
+            limpiarConsultaDocumento();
+
+        });
+
+
+    function documentoPagoEsValido(tipo, numero) {
+
+        if (tipo === 'DNI') {
+            return /^\d{8}$/.test(numero);
+        }
+
+        if (tipo === 'RUC') {
+            return /^\d{11}$/.test(numero);
+        }
+
+        if (tipo === 'CE') {
+            return /^\d{1,11}$/.test(numero);
+        }
+
+        return false;
+
+    }
+
+
+    function actualizarBotonConfirmarCompra() {
+
+        const boton =
+            document.getElementById('btnConfirmarCompra');
+
+        const tipo =
+            document.getElementById('tipoDocumentoPago').value;
+
+        const numero =
+            document.getElementById('numeroDocumentoPago').value.trim();
+
+        const documentoValido =
+            documentoPagoEsValido(tipo, numero);
+
+        const consultaRequerida =
+            tipo === 'DNI' || tipo === 'RUC';
+
+        const consultaCorrecta =
+            documentoConsultadoPago &&
+            documentoConsultadoPago.tipoDocumento === tipo &&
+            documentoConsultadoPago.numeroDocumento === numero;
+
+        const carritoTieneProductos =
+            Object.entries(carrito).some(([id, cantidad]) =>
+                productoPorId(id) && Number(cantidad) > 0
+            );
+
+        boton.disabled =
+            consultaDocumentoEnCurso ||
+            !documentoValido ||
+            !carritoTieneProductos ||
+            (consultaRequerida && !consultaCorrecta);
+
+    }
+
+
+    document
+        .getElementById('btnConsultarDocumento')
+        .addEventListener('click', consultarDocumentoPago);
+
+
+    async function consultarDocumentoPago() {
+
+        const tipo =
+            document.getElementById('tipoDocumentoPago').value;
+
+        const campo =
+            document.getElementById('numeroDocumentoPago');
+
+        const numero =
+            campo.value.trim();
+
+        const boton =
+            document.getElementById('btnConsultarDocumento');
+
+        const estado =
+            document.getElementById('estadoConsultaDocumento');
+
+        const resultado =
+            document.getElementById('resultadoDocumento');
+
+        const etiquetaNombre =
+            document.getElementById('etiquetaNombreDocumento');
+
+        const nombreMostrado =
+            document.getElementById('nombreDocumentoConsultado');
+
+        const errCont =
+            document.getElementById('errCarrito');
+
+        errCont.textContent = '';
+        limpiarConsultaDocumento();
+
+        if (tipo !== 'DNI' && tipo !== 'RUC') {
+            return;
+        }
+
+        if (!documentoPagoEsValido(tipo, numero)) {
+
+            campo.classList.add('is-invalid');
+
+            estado.className = 'small mt-2 text-danger';
+            estado.textContent =
+                tipo === 'DNI'
+                    ? 'El DNI debe tener exactamente 8 dígitos.'
+                    : 'El RUC debe tener exactamente 11 dígitos.';
+
+            return;
+
+        }
+
+        if (typeof db === 'undefined' || !db.functions) {
+
+            estado.className = 'small mt-2 text-danger';
+            estado.textContent =
+                'No está disponible la conexión con el servicio de consulta.';
+
+            return;
+
+        }
+
+        consultaDocumentoEnCurso = true;
+
+        boton.disabled = true;
+        boton.innerHTML =
+            '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Consultando...';
+
+        estado.className = 'small mt-2 text-muted';
+        estado.textContent = 'Consultando el documento. Espera un momento.';
+
+        actualizarBotonConfirmarCompra();
+
+        try {
+
+            // La clave de PeruAPI permanece en Supabase.
+            // La sesión del usuario se envía a la Edge Function.
+            const respuesta =
+                await db.functions.invoke(
+                    'peruapi-consultar-documento',
+                    {
+                        body: {
+                            tipoDocumento: tipo,
+                            numeroDocumento: numero
+                        }
+                    }
+                );
+
+            if (respuesta.error) {
+
+                let mensaje =
+                    respuesta.error.message ||
+                    'No se pudo completar la consulta.';
+
+                if (respuesta.data && respuesta.data.error) {
+                    mensaje = respuesta.data.error;
+                }
+
+                throw new Error(mensaje);
 
             }
 
-        });
+            const datos = respuesta.data;
+
+            if (!datos || datos.error) {
+                throw new Error(
+                    datos?.error ||
+                    'El servicio no devolvió los datos esperados.'
+                );
+            }
+
+            // Evita utilizar el resultado si el usuario cambió
+            // el tipo o número mientras la consulta estaba en curso.
+            const tipoActual =
+                document.getElementById('tipoDocumentoPago').value;
+
+            const numeroActual =
+                document.getElementById('numeroDocumentoPago').value.trim();
+
+            if (tipoActual !== tipo || numeroActual !== numero) {
+                return;
+            }
+
+            let nombreComprador = '';
+
+            if (tipo === 'DNI') {
+
+                const primerNombre =
+                    String(datos.primerNombre || '').trim();
+
+                const apellidoPaterno =
+                    String(datos.apellidoPaterno || '').trim();
+
+                nombreComprador =
+                    `${primerNombre} ${apellidoPaterno}`.trim();
+
+                etiquetaNombre.textContent =
+                    'Nombre y apellido paterno consultados';
+
+            } else {
+
+                nombreComprador =
+                    String(datos.razonSocial || '').trim();
+
+                etiquetaNombre.textContent =
+                    'Razón social consultada';
+
+            }
+
+            if (!nombreComprador) {
+                throw new Error(
+                    'La consulta no devolvió un nombre válido para este documento.'
+                );
+            }
+
+            documentoConsultadoPago = {
+                tipoDocumento: tipo,
+                numeroDocumento: numero,
+                nombre: nombreComprador
+            };
+
+            nombreMostrado.textContent = nombreComprador;
+            resultado.classList.remove('d-none');
+
+            estado.className = 'small mt-2 text-success';
+            estado.textContent =
+                'Documento consultado correctamente. Puedes continuar con la compra.';
+
+        } catch (error) {
+
+            console.error(
+                'Error al consultar el documento:',
+                error
+            );
+
+            documentoConsultadoPago = null;
+
+            resultado.classList.add('d-none');
+
+            estado.className = 'small mt-2 text-danger';
+            estado.textContent =
+                error.message ||
+                'No se pudo consultar el documento. Inténtalo nuevamente.';
+
+        } finally {
+
+            consultaDocumentoEnCurso = false;
+
+            if (tipo === 'DNI') {
+                boton.innerHTML =
+                    '<i class="bi bi-search"></i> Consultar DNI';
+            } else {
+                boton.innerHTML =
+                    '<i class="bi bi-search"></i> Consultar RUC';
+            }
+
+            actualizarBotonConfirmarCompra();
+
+        }
+
+    }
 
 
     async function pintarMascotas() {
@@ -658,7 +860,6 @@
 
         const cont =
             document.getElementById('listaMascotas');
-
 
         if (mascotas.length === 0) {
 
@@ -673,7 +874,6 @@
 
         }
 
-
         cont.innerHTML = mascotas.map(m => `
 
             <div class="col-md-3 col-sm-6">
@@ -683,8 +883,7 @@
                     <img
                         src="${UI.imagenOPlaceholder(m.imagenUrl, m.nombre)}"
                         class="img-top"
-                        alt="Foto de ${UI.esc(m.nombre)}"
-                    >
+                        alt="Foto de ${UI.esc(m.nombre)}">
 
                     <div class="card-body">
 
@@ -715,13 +914,10 @@
 
                             <i class="bi bi-heart-fill"></i>
                             Solicitar adopcion
-
                         </button>
 
                     </div>
-
                 </div>
-
             </div>
 
         `).join('');
@@ -733,13 +929,11 @@
 
                 btn.addEventListener('click', () => {
 
-                    mascotaSeleccionada =
-                        btn.dataset.id;
+                    mascotaSeleccionada = btn.dataset.id;
 
                     document
                         .getElementById('evalNombreMascota')
-                        .textContent =
-                            btn.dataset.nombre;
+                        .textContent = btn.dataset.nombre;
 
                     document
                         .getElementById('formEvaluacion')
@@ -750,6 +944,7 @@
                         .forEach(el => el.classList.remove('is-invalid'));
 
                     document.getElementById('evalNumeroDocumento').maxLength = 8;
+
                     document.getElementById('evalDocAyuda').textContent =
                         'Ingresa los 8 dígitos de tu DNI.';
 
@@ -783,7 +978,6 @@
                 return;
             }
 
-
             const tipoDocumento =
                 document.getElementById('evalTipoDocumento').value;
 
@@ -807,7 +1001,6 @@
                 return;
 
             }
-
 
             const fechaNacimientoValor =
                 document.getElementById('evalFechaNacimiento').value;
@@ -833,42 +1026,27 @@
 
             }
 
-
             const evaluacion = {
 
                 vivienda:
-                    document
-                        .getElementById('evalVivienda')
-                        .value,
+                    document.getElementById('evalVivienda').value,
 
                 espacioAdecuado:
-                    document
-                        .getElementById('evalEspacio')
-                        .value,
+                    document.getElementById('evalEspacio').value,
 
                 horasDisponibles:
-                    document
-                        .getElementById('evalTiempo')
-                        .value,
+                    document.getElementById('evalTiempo').value,
 
                 experienciaPrevia:
-                    document
-                        .getElementById('evalExperiencia')
-                        .value,
+                    document.getElementById('evalExperiencia').value,
 
                 acuerdoHogar:
-                    document
-                        .getElementById('evalAcuerdo')
-                        .value,
+                    document.getElementById('evalAcuerdo').value,
 
                 motivo:
-                    document
-                        .getElementById('evalMotivo')
-                        .value
-                        .trim()
+                    document.getElementById('evalMotivo').value.trim()
 
             };
-
 
             const error =
                 await Solicitudes.crearSolicitudAdopcion(
@@ -880,18 +1058,12 @@
                     fechaNacimientoValor
                 );
 
-
             if (error) {
 
-                UI.setFlash(
-                    'error',
-                    error
-                );
-
+                UI.setFlash('error', error);
                 return;
 
             }
-
 
             modalEvaluacion.hide();
 
@@ -899,7 +1071,6 @@
                 'exito',
                 'Tu solicitud de adopcion fue enviada. Un administrador la revisara pronto.'
             );
-
 
             window.location.reload();
 
@@ -914,7 +1085,6 @@
         const cont =
             document.getElementById('listaProductos');
 
-
         if (productos.length === 0) {
 
             cont.innerHTML = `
@@ -928,7 +1098,6 @@
 
         }
 
-
         cont.innerHTML = productos.map(p => `
 
             <div class="col-md-3 col-sm-6">
@@ -938,8 +1107,7 @@
                     <img
                         src="${UI.imagenOPlaceholder(p.imagenUrl, p.nombre)}"
                         class="img-top"
-                        alt="Foto de ${UI.esc(p.nombre)}"
-                    >
+                        alt="Foto de ${UI.esc(p.nombre)}">
 
                     <div class="card-body">
 
@@ -967,7 +1135,6 @@
                                 data-restar-producto="${p.idProducto}">
 
                                 <i class="bi bi-dash"></i>
-
                             </button>
 
                             <input
@@ -985,7 +1152,6 @@
                                 data-sumar-producto="${p.idProducto}">
 
                                 <i class="bi bi-plus"></i>
-
                             </button>
 
                         </div>
@@ -997,7 +1163,6 @@
 
                             <i class="bi bi-cart-plus"></i>
                             Agregar al carrito
-
                         </button>
 
                         <div
@@ -1007,9 +1172,7 @@
                         </div>
 
                     </div>
-
                 </div>
-
             </div>
 
         `).join('');
@@ -1027,23 +1190,18 @@
                     const id =
                         input.id.replace('cantidadProducto_', '');
 
-                    const producto =
-                        productoPorId(id);
+                    const producto = productoPorId(id);
 
                     const maximo =
-                        producto
-                            ? Number(producto.stock)
-                            : 1;
+                        producto ? Number(producto.stock) : 1;
 
-                    input.value =
-                        input.value.replace(/\D/g, '');
+                    input.value = input.value.replace(/\D/g, '');
 
                     if (input.value === '') {
                         return;
                     }
 
-                    const cantidad =
-                        Number(input.value);
+                    const cantidad = Number(input.value);
 
                     if (cantidad < 1) {
                         input.value = '1';
@@ -1062,22 +1220,14 @@
 
                 btn.addEventListener('click', () => {
 
-                    const id =
-                        btn.dataset.restarProducto;
+                    const id = btn.dataset.restarProducto;
 
                     const input =
-                        document.getElementById(
-                            `cantidadProducto_${id}`
-                        );
+                        document.getElementById(`cantidadProducto_${id}`);
 
-                    const actual =
-                        Number(input.value) || 1;
+                    const actual = Number(input.value) || 1;
 
-                    input.value =
-                        Math.max(
-                            1,
-                            actual - 1
-                        );
+                    input.value = Math.max(1, actual - 1);
 
                 });
 
@@ -1090,30 +1240,18 @@
 
                 btn.addEventListener('click', () => {
 
-                    const id =
-                        btn.dataset.sumarProducto;
-
-                    const producto =
-                        productoPorId(id);
+                    const id = btn.dataset.sumarProducto;
+                    const producto = productoPorId(id);
 
                     const input =
-                        document.getElementById(
-                            `cantidadProducto_${id}`
-                        );
+                        document.getElementById(`cantidadProducto_${id}`);
 
-                    const actual =
-                        Number(input.value) || 1;
+                    const actual = Number(input.value) || 1;
 
                     const maximo =
-                        producto
-                            ? Number(producto.stock)
-                            : 1;
+                        producto ? Number(producto.stock) : 1;
 
-                    input.value =
-                        Math.min(
-                            maximo,
-                            actual + 1
-                        );
+                    input.value = Math.min(maximo, actual + 1);
 
                 });
 
@@ -1126,32 +1264,21 @@
 
                 btn.addEventListener('click', () => {
 
-                    const id =
-                        btn.dataset.id;
+                    const id = btn.dataset.id;
 
                     const input =
-                        document.getElementById(
-                            `cantidadProducto_${id}`
-                        );
+                        document.getElementById(`cantidadProducto_${id}`);
 
-                    const cantidad =
-                        Number(input.value) || 1;
+                    const cantidad = Number(input.value) || 1;
 
-                    const agregado =
-                        agregarAlCarrito(
-                            id,
-                            cantidad
-                        );
+                    const agregado = agregarAlCarrito(id, cantidad);
 
                     if (agregado) {
 
-                        const producto =
-                            productoPorId(id);
+                        const producto = productoPorId(id);
 
                         const mensaje =
-                            document.getElementById(
-                                `mensajeProducto_${id}`
-                            );
+                            document.getElementById(`mensajeProducto_${id}`);
 
                         mensaje.textContent =
                             `✓ ${producto.nombre} agregado al carrito.`;
@@ -1199,50 +1326,28 @@
 
     function agregarAlCarrito(idProducto, cantidad = 1) {
 
-        const producto =
-            productoPorId(idProducto);
+        const producto = productoPorId(idProducto);
 
         if (!producto) {
             return false;
         }
 
+        const cantidadSolicitada = Number(cantidad);
 
-        const cantidadSolicitada =
-            Number(cantidad);
+        if (!Number.isInteger(cantidadSolicitada) || cantidadSolicitada < 1) {
 
-
-        if (
-            !Number.isInteger(cantidadSolicitada) ||
-            cantidadSolicitada < 1
-        ) {
-
-            UI.setFlash(
-                'error',
-                'La cantidad seleccionada no es válida.'
-            );
-
+            UI.setFlash('error', 'La cantidad seleccionada no es válida.');
             UI.mostrarFlash();
 
             return false;
 
         }
 
+        const actual = carrito[idProducto] || 0;
 
-        const actual =
-            carrito[idProducto] || 0;
+        if (actual + cantidadSolicitada > producto.stock) {
 
-
-        if (
-            actual + cantidadSolicitada >
-            producto.stock
-        ) {
-
-            const disponible =
-                Math.max(
-                    0,
-                    producto.stock - actual
-                );
-
+            const disponible = Math.max(0, producto.stock - actual);
 
             UI.setFlash(
                 'error',
@@ -1257,19 +1362,11 @@
 
         }
 
-
-        carrito[idProducto] =
-            actual + cantidadSolicitada;
-
+        carrito[idProducto] = actual + cantidadSolicitada;
 
         guardarCarrito();
 
-
-        UI.setFlash(
-            'exito',
-            `${producto.nombre} fue agregado al carrito.`
-        );
-
+        UI.setFlash('exito', `${producto.nombre} fue agregado al carrito.`);
         UI.mostrarFlash();
 
         return true;
@@ -1277,11 +1374,14 @@
     }
 
     function cambiarCantidadCarrito(idProducto, delta) {
+
         const producto = productoPorId(idProducto);
         const actual = carrito[idProducto] || 0;
         let nueva = actual + delta;
 
-        if (producto) nueva = Math.min(nueva, producto.stock);
+        if (producto) {
+            nueva = Math.min(nueva, producto.stock);
+        }
 
         if (nueva <= 0) {
             delete carrito[idProducto];
@@ -1291,6 +1391,7 @@
 
         guardarCarrito();
         pintarCarrito();
+
     }
 
     function quitarDelCarrito(idProducto) {
@@ -1300,85 +1401,131 @@
     }
 
     function totalCarrito() {
+
         return Object.entries(carrito).reduce((total, [id, cantidad]) => {
+
             const producto = productoPorId(id);
-            return total + (producto ? producto.precio * cantidad : 0);
+
+            return total + (
+                producto ? producto.precio * cantidad : 0
+            );
+
         }, 0);
+
     }
 
     function pintarCarrito() {
+
         const cont = document.getElementById('listaCarrito');
-        const entradas = Object.entries(carrito).filter(([id]) => productoPorId(id));
+
+        const entradas =
+            Object.entries(carrito)
+                .filter(([id]) => productoPorId(id));
 
         if (entradas.length === 0) {
-            cont.innerHTML = '<p class="text-muted text-center py-4 mb-0">Tu carrito está vacío.</p>';
+
+            cont.innerHTML =
+                '<p class="text-muted text-center py-4 mb-0">Tu carrito está vacío.</p>';
+
         } else {
+
             cont.innerHTML = entradas.map(([id, cantidad]) => {
+
                 const p = productoPorId(id);
+
                 return `
                     <div class="fila-carrito">
+
                         <div class="fila-carrito__info">
                             <strong>${UI.esc(p.nombre)}</strong>
                             <span class="text-muted small">S/ ${Number(p.precio).toFixed(2)} c/u</span>
                         </div>
+
                         <div class="fila-carrito__cant">
+
                             <button type="button" class="btn btn-sm btn-outline-secondary" data-restar="${id}">
                                 <i class="bi bi-dash"></i>
                             </button>
+
                             <span>${cantidad}</span>
+
                             <button type="button" class="btn btn-sm btn-outline-secondary" data-sumar="${id}">
                                 <i class="bi bi-plus"></i>
                             </button>
+
                         </div>
-                        <strong class="text-nowrap">S/ ${(p.precio * cantidad).toFixed(2)}</strong>
+
+                        <strong class="text-nowrap">
+                            S/ ${(p.precio * cantidad).toFixed(2)}
+                        </strong>
+
                         <button type="button" class="btn btn-sm btn-outline-danger" data-quitar="${id}">
                             <i class="bi bi-trash"></i>
                         </button>
+
                     </div>`;
+
             }).join('');
+
         }
 
         document.getElementById('totalCarrito').textContent =
             'S/ ' + totalCarrito().toFixed(2);
 
-        document.getElementById('btnConfirmarCompra').disabled = entradas.length === 0;
-
         cont.querySelectorAll('[data-sumar]').forEach(b =>
-            b.addEventListener('click', () => cambiarCantidadCarrito(b.dataset.sumar, 1)));
+            b.addEventListener('click', () =>
+                cambiarCantidadCarrito(b.dataset.sumar, 1)));
+
         cont.querySelectorAll('[data-restar]').forEach(b =>
-            b.addEventListener('click', () => cambiarCantidadCarrito(b.dataset.restar, -1)));
+            b.addEventListener('click', () =>
+                cambiarCantidadCarrito(b.dataset.restar, -1)));
+
         cont.querySelectorAll('[data-quitar]').forEach(b =>
-            b.addEventListener('click', () => quitarDelCarrito(b.dataset.quitar)));
+            b.addEventListener('click', () =>
+                quitarDelCarrito(b.dataset.quitar)));
+
+        actualizarBotonConfirmarCompra();
+
     }
 
     function iniciarCarrito() {
-        modalCarrito = new bootstrap.Modal(document.getElementById('modalCarrito'));
+
+        modalCarrito =
+            new bootstrap.Modal(document.getElementById('modalCarrito'));
+
         actualizarBadgeCarrito();
 
-        document.getElementById('btnAbrirCarrito').addEventListener('click', () => {
-            document.getElementById('errCarrito').textContent = '';
-            pintarCarrito();
-            modalCarrito.show();
-        });
+        actualizarInterfazDocumentoPago();
 
-        document.getElementById('btnConfirmarCompra').addEventListener('click', confirmarCompra);
+        document
+            .getElementById('btnAbrirCarrito')
+            .addEventListener('click', () => {
+
+                document.getElementById('errCarrito').textContent = '';
+
+                pintarCarrito();
+                modalCarrito.show();
+
+            });
+
+        document
+            .getElementById('btnConfirmarCompra')
+            .addEventListener('click', confirmarCompra);
+
     }
 
 
     async function confirmarCompra() {
 
-        const errCont =
-            document.getElementById('errCarrito');
+        const errCont = document.getElementById('errCarrito');
 
         errCont.textContent = '';
-
 
         const tipoDocumentoPago =
             document.getElementById('tipoDocumentoPago').value;
 
         const numeroDocumentoPago =
             document.getElementById('numeroDocumentoPago').value.trim();
-
 
         if (!numeroDocumentoPago) {
 
@@ -1393,33 +1540,14 @@
 
         }
 
-
-        let documentoValido = true;
-
-        if (tipoDocumentoPago === 'DNI') {
-
-            documentoValido =
-                /^\d{8}$/.test(numeroDocumentoPago);
-
-        } else if (tipoDocumentoPago === 'PS') {
-
-            documentoValido =
-                /^[a-zA-Z0-9]{5,20}$/.test(numeroDocumentoPago);
-
-        } else if (tipoDocumentoPago === 'CE') {
-
-            documentoValido =
-                /^[a-zA-Z0-9]{5,20}$/.test(numeroDocumentoPago);
-
-        }
-
-
-        if (!documentoValido) {
+        if (!documentoPagoEsValido(tipoDocumentoPago, numeroDocumentoPago)) {
 
             errCont.textContent =
                 tipoDocumentoPago === 'DNI'
                     ? 'El DNI debe tener exactamente 8 números.'
-                    : 'El número de documento no es válido.';
+                    : tipoDocumentoPago === 'RUC'
+                        ? 'El RUC debe tener exactamente 11 números.'
+                        : 'El CE debe tener entre 1 y 11 números.';
 
             document
                 .getElementById('numeroDocumentoPago')
@@ -1429,56 +1557,81 @@
 
         }
 
-
         document
             .getElementById('numeroDocumentoPago')
             .classList.remove('is-invalid');
 
+        const requiereConsulta =
+            tipoDocumentoPago === 'DNI' ||
+            tipoDocumentoPago === 'RUC';
+
+        if (
+            requiereConsulta &&
+            (
+                !documentoConsultadoPago ||
+                documentoConsultadoPago.tipoDocumento !== tipoDocumentoPago ||
+                documentoConsultadoPago.numeroDocumento !== numeroDocumentoPago
+            )
+        ) {
+
+            errCont.textContent =
+                'Primero consulta el documento y verifica el nombre obtenido.';
+
+            return;
+
+        }
 
         const items =
-            Object.entries(carrito).map(([id, cantidad]) => ({
-                id_producto: Number(id),
-                cantidad
-            }));
-
+            Object.entries(carrito)
+                .filter(([id, cantidad]) =>
+                    productoPorId(id) && Number(cantidad) > 0
+                )
+                .map(([id, cantidad]) => ({
+                    id_producto: Number(id),
+                    cantidad
+                }));
 
         if (items.length === 0) {
+            errCont.textContent = 'Tu carrito está vacío.';
             return;
         }
 
-
-        const total =
-            Number(totalCarrito().toFixed(2));
-
+        const total = Number(totalCarrito().toFixed(2));
 
         if (!Number.isFinite(total) || total <= 0) {
 
-            errCont.textContent =
-                'El total del carrito no es válido.';
-
+            errCont.textContent = 'El total del carrito no es válido.';
             return;
 
         }
 
+        // DNI/RUC: usar el nombre validado por la consulta.
+        // CE: conservar el nombre de la cuenta del cliente.
+        nombreCompradorPagoActual =
+            requiereConsulta
+                ? documentoConsultadoPago.nombre
+                : obtenerNombreCliente();
 
-        const boton =
-            document.getElementById('btnConfirmarCompra');
+        const boton = document.getElementById('btnConfirmarCompra');
 
         boton.disabled = true;
 
         boton.innerHTML =
             '<span class="spinner-border spinner-border-sm"></span> Procesando...';
 
+        let resultado;
 
-        const resultado =
-    await Pedidos.crear(items, {
-        nombre: obtenerNombreCliente(),
-        tipoDocumento: tipoDocumentoPago,
-        numeroDocumento: numeroDocumentoPago
-    });
+        try {
 
+            resultado = await Pedidos.crear(items, {
+                nombre: nombreCompradorPagoActual,
+                tipoDocumento: tipoDocumentoPago,
+                numeroDocumento: numeroDocumentoPago
+            });
 
-        if (resultado.error) {
+        } catch (error) {
+
+            console.error('Error al crear el pedido:', error);
 
             boton.disabled = false;
 
@@ -1486,12 +1639,25 @@
                 '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
 
             errCont.textContent =
-                resultado.error;
+                error.message || 'No se pudo crear el pedido.';
 
             return;
 
         }
 
+        if (!resultado || resultado.error) {
+
+            boton.disabled = false;
+
+            boton.innerHTML =
+                '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
+
+            errCont.textContent =
+                resultado?.error || 'No se pudo crear el pedido.';
+
+            return;
+
+        }
 
         try {
 
@@ -1501,56 +1667,35 @@
                 usuario?.correoElectronico ||
                 '';
 
-
             if (!email && typeof db !== 'undefined') {
 
-                const respuestaUsuario =
-                    await db.auth.getUser();
+                const respuestaUsuario = await db.auth.getUser();
 
                 email =
-                    respuestaUsuario?.data?.user?.email ||
-                    '';
+                    respuestaUsuario?.data?.user?.email || '';
 
             }
 
-
             if (!email) {
-
                 throw new Error(
                     'No se pudo obtener el correo electrónico de tu cuenta.'
                 );
-
             }
-
 
             const respuestaPago =
                 await db.functions.invoke(
                     'izipay-crear-pago',
                     {
                         body: {
-
-                            amount:
-                                total,
-
-                            currency:
-                                'PEN',
-
-                            orderId:
-                                String(resultado.idPedido),
-
-                            email:
-                                email,
-
-                            identityType:
-                                tipoDocumentoPago,
-
-                            identityCode:
-                                numeroDocumentoPago
-
+                            amount: total,
+                            currency: 'PEN',
+                            orderId: String(resultado.idPedido),
+                            email: email,
+                            identityType: tipoDocumentoPago,
+                            identityCode: numeroDocumentoPago
                         }
                     }
                 );
-
 
             if (respuestaPago.error) {
 
@@ -1561,10 +1706,7 @@
 
             }
 
-
-            const datosPago =
-                respuestaPago.data;
-
+            const datosPago = respuestaPago.data;
 
             if (
                 !datosPago ||
@@ -1579,15 +1721,12 @@
 
             }
 
-
             boton.disabled = false;
 
             boton.innerHTML =
                 '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
 
-
             modalCarrito.hide();
-
 
             await mostrarCheckoutIzipay(
                 datosPago,
@@ -1597,656 +1736,445 @@
 
         } catch (error) {
 
-            console.error(
-                'Error al iniciar el pago:',
-                error
-            );
-
+            console.error('Error al iniciar el pago:', error);
 
             boton.disabled = false;
 
             boton.innerHTML =
                 '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
 
-
             errCont.textContent =
-                error.message ||
-                'No se pudo iniciar el pago.';
+                error.message || 'No se pudo iniciar el pago.';
 
         }
 
     }
 
 
-    async function mostrarCheckoutIzipay(
-        datosPago,
-        idPedido,
-        total
-    ) {
-        const errPago =
-            document.getElementById('errPago');
+    async function mostrarCheckoutIzipay(datosPago, idPedido, total) {
 
-        const contenedor =
-            document.getElementById('contenedorPago');
+        const errPago = document.getElementById('errPago');
+        const contenedor = document.getElementById('contenedorPago');
 
         errPago.textContent = '';
         contenedor.innerHTML = '';
 
         try {
 
-            await cargarFormularioIzipay(
-                datosPago.publicKey
-            );
+            await cargarFormularioIzipay(datosPago.publicKey);
 
-            if (
-                typeof KR === 'undefined'
-            ) {
-                throw new Error(
-                    'La librería de pago de Izipay no está disponible.'
-                );
+            if (typeof KR === 'undefined') {
+                throw new Error('La librería de pago de Izipay no está disponible.');
             }
 
-            if (
-                typeof KR.setFormConfig !== 'function'
-            ) {
-                throw new Error(
-                    'No se pudo configurar el formulario de pago de Izipay.'
-                );
+            if (typeof KR.setFormConfig !== 'function') {
+                throw new Error('No se pudo configurar el formulario de pago de Izipay.');
             }
 
-            if (
-                typeof KR.renderElements !== 'function'
-            ) {
-                throw new Error(
-                    'No se pudo inicializar el formulario de pago de Izipay.'
-                );
+            if (typeof KR.renderElements !== 'function') {
+                throw new Error('No se pudo inicializar el formulario de pago de Izipay.');
             }
 
             await KR.setFormConfig({
-                formToken:
-                    datosPago.formToken,
-
-                'kr-language':
-                    'es-ES'
+                formToken: datosPago.formToken,
+                'kr-language': 'es-ES'
             });
 
-            const contenedorFormulario =
-                document.createElement('div');
+            const contenedorFormulario = document.createElement('div');
+            contenedorFormulario.id = 'contenedorFormularioIzipay';
 
-            contenedorFormulario.id =
-                'contenedorFormularioIzipay';
-
-            const formulario =
-                document.createElement('div');
-
-            formulario.className =
-                'kr-embedded';
+            const formulario = document.createElement('div');
+            formulario.className = 'kr-embedded';
 
             formulario.setAttribute(
                 'kr-form-token',
                 datosPago.formToken
             );
 
-            contenedorFormulario.appendChild(
-                formulario
-            );
-
-            contenedor.appendChild(
-                contenedorFormulario
-            );
+            contenedorFormulario.appendChild(formulario);
+            contenedor.appendChild(contenedorFormulario);
 
             modalPago.show();
 
-            await KR.renderElements(
-                '#contenedorFormularioIzipay'
-            );
+            await KR.renderElements('#contenedorFormularioIzipay');
 
-            esperarConfirmacionPago(
-                idPedido,
-                datosPago,
-                total
-            );
+            esperarConfirmacionPago(idPedido, datosPago, total);
 
         } catch (error) {
 
-            console.error(
-                'Error al cargar el formulario de Izipay:',
-                error
-            );
+            console.error('Error al cargar el formulario de Izipay:', error);
 
             errPago.textContent =
                 error.message ||
                 'No se pudo cargar el formulario de pago de Izipay.';
+
         }
+
     }
 
 
-    function esperarConfirmacionPago(
-        idPedido,
-        datosPago,
-        total
-    ) {
+    function esperarConfirmacionPago(idPedido, datosPago, total) {
 
         let intentos = 0;
-
         const maximoIntentos = 180;
 
-        const intervalo =
-            setInterval(async () => {
+        const intervalo = setInterval(async () => {
 
-                intentos++;
+            intentos++;
 
-                try {
+            try {
 
-                    const pedido =
-                        await Pedidos.buscarPorId(
-                            idPedido
-                        );
+                const pedido = await Pedidos.buscarPorId(idPedido);
 
-                    if (!pedido) {
-                        return;
-                    }
+                if (!pedido) {
+                    return;
+                }
 
+                if (
+                    pedido.estado === 'PAGADO' ||
+                    pedido.estado === 'ENTREGADO'
+                ) {
 
-                    if (
-                        pedido.estado === 'PAGADO' ||
-                        pedido.estado === 'ENTREGADO'
-                    ) {
+                    clearInterval(intervalo);
 
-                        clearInterval(intervalo);
-
-                        await finalizarCompraExitosa(
-                            pedido,
-                            idPedido,
-                            total
-                        );
-
-                        return;
-
-                    }
-
-
-                    if (
-                        pedido.estado === 'RECHAZADO' ||
-                        pedido.estado === 'VENCIDO'
-                    ) {
-
-                        clearInterval(intervalo);
-
-                        const errPago =
-                            document.getElementById('errPago');
-
-                        errPago.textContent =
-                            pedido.estado === 'RECHAZADO'
-                                ? 'El pago fue rechazado. Puedes cerrar esta ventana e intentar nuevamente.'
-                                : 'El tiempo para completar el pago ha vencido.';
-
-                        return;
-
-                    }
-
-
-                    if (intentos >= maximoIntentos) {
-
-                        clearInterval(intervalo);
-
-                        const errPago =
-                            document.getElementById('errPago');
-
-                        errPago.textContent =
-                            'No pudimos confirmar automáticamente el resultado del pago. Si el cobro fue realizado, revisa tu historial de compras antes de volver a intentar el pago.';
-
-                    }
-
-                } catch (error) {
-
-                    console.error(
-                        'Error verificando el estado del pedido:',
-                        error
+                    await finalizarCompraExitosa(
+                        pedido,
+                        idPedido,
+                        total
                     );
 
+                    return;
+
                 }
 
-            }, 2000);
+                if (
+                    pedido.estado === 'RECHAZADO' ||
+                    pedido.estado === 'VENCIDO'
+                ) {
+
+                    clearInterval(intervalo);
+
+                    const errPago = document.getElementById('errPago');
+
+                    errPago.textContent =
+                        pedido.estado === 'RECHAZADO'
+                            ? 'El pago fue rechazado. Puedes cerrar esta ventana e intentar nuevamente.'
+                            : 'El tiempo para completar el pago ha vencido.';
+
+                    return;
+
+                }
+
+                if (intentos >= maximoIntentos) {
+
+                    clearInterval(intervalo);
+
+                    const errPago = document.getElementById('errPago');
+
+                    errPago.textContent =
+                        'No pudimos confirmar automáticamente el resultado del pago. Si el cobro fue realizado, revisa tu historial de compras antes de volver a intentar el pago.';
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    'Error verificando el estado del pedido:',
+                    error
+                );
+
+            }
+
+        }, 2000);
 
     }
 
 
-    async function finalizarCompraExitosa(
-    pedido,
-    idPedido,
-    total
-) {
+    async function finalizarCompraExitosa(pedido, idPedido, total) {
 
-    if (modalPago) {
-        modalPago.hide();
-    }
+        if (modalPago) {
+            modalPago.hide();
+        }
 
+        const entradasCompra =
+            Object.entries(carrito)
+                .map(([id, cantidad]) => {
 
-    const entradasCompra =
-        Object.entries(carrito)
-            .map(([id, cantidad]) => {
+                    const producto = productoPorId(id);
 
-                const producto =
-                    productoPorId(id);
+                    if (!producto) {
+                        return null;
+                    }
 
-                if (!producto) {
-                    return null;
-                }
+                    return {
+                        nombre: producto.nombre,
+                        cantidad: Number(cantidad),
+                        precio: Number(producto.precio),
+                        subtotal:
+                            Number(producto.precio) *
+                            Number(cantidad)
+                    };
 
-                return {
-                    nombre: producto.nombre,
-                    cantidad: Number(cantidad),
-                    precio: Number(producto.precio),
-                    subtotal:
-                        Number(producto.precio) *
-                        Number(cantidad)
-                };
+                })
+                .filter(Boolean);
 
-            })
-            .filter(Boolean);
+        carrito = {};
 
+        guardarCarrito();
 
-    carrito = {};
+        const contenido =
+            document.getElementById('contenidoCompraExitosa');
 
-    guardarCarrito();
+        const nombreCliente =
+            nombreCompradorPagoActual ||
+            pedido.nombreComprador ||
+            obtenerNombreCliente();
 
+        const tipoDocumento =
+            document.getElementById('tipoDocumentoPago').value;
 
-    const contenido =
-        document.getElementById(
-            'contenidoCompraExitosa'
-        );
+        const numeroDocumento =
+            document.getElementById('numeroDocumentoPago').value.trim();
 
+        const fechaPedido =
+            pedido.fecha ? new Date(pedido.fecha) : new Date();
 
-    const nombreCliente =
-        obtenerNombreCliente();
-
-    const tipoDocumento =
-        document.getElementById(
-            'tipoDocumentoPago'
-        ).value;
-
-    const numeroDocumento =
-        document.getElementById(
-            'numeroDocumentoPago'
-        ).value.trim();
-
-
-    const fechaPedido =
-        pedido.fecha
-            ? new Date(pedido.fecha)
-            : new Date();
-
-
-    const fechaTexto =
-        fechaPedido.toLocaleDateString(
-            'es-PE',
-            {
+        const fechaTexto =
+            fechaPedido.toLocaleDateString('es-PE', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric'
-            }
-        );
+            });
 
-
-    const horaTexto =
-        fechaPedido.toLocaleTimeString(
-            'es-PE',
-            {
+        const horaTexto =
+            fechaPedido.toLocaleTimeString('es-PE', {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit'
+            });
+
+        const numeroBoleta =
+            pedido.numeroBoleta || 'Pendiente de generación';
+
+        const filasProductos =
+            entradasCompra.length > 0
+                ? entradasCompra.map(item => `
+                    <tr>
+                        <td>${UI.esc(item.nombre)}</td>
+                        <td class="text-center">${item.cantidad}</td>
+                        <td class="text-end">S/ ${item.precio.toFixed(2)}</td>
+                        <td class="text-end">S/ ${item.subtotal.toFixed(2)}</td>
+                    </tr>
+                `).join('')
+                : `
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            No se pudo cargar el detalle local de los productos.
+                        </td>
+                    </tr>
+                `;
+
+        contenido.innerHTML = `
+
+            <div class="text-center mb-4">
+
+                <div
+                    class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center mb-3"
+                    style="width: 70px; height: 70px;">
+
+                    <i class="bi bi-check-lg text-success" style="font-size: 2rem;"></i>
+
+                </div>
+
+                <h4 class="fw-bold mb-2">¡Gracias por tu compra!</h4>
+
+                <p class="text-muted mb-0">
+                    Tu pago fue confirmado correctamente.
+                </p>
+
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-body p-4">
+
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold mb-1">MascotICA's</h3>
+                        <div class="text-muted">Boleta electrónica</div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+
+                        <div class="col-md-6">
+                            <div class="small text-muted">ID de compra</div>
+                            <div class="fw-semibold">${UI.esc(String(idPedido))}</div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="small text-muted">Fecha</div>
+                            <div class="fw-semibold">${UI.esc(fechaTexto)}</div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="small text-muted">Hora</div>
+                            <div class="fw-semibold">${UI.esc(horaTexto)}</div>
+                        </div>
+
+                    </div>
+
+                    <div class="border rounded p-3 mb-4">
+
+                        <h6 class="fw-bold mb-3">Datos del cliente</h6>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-7">
+                                <div class="small text-muted">
+                                    ${tipoDocumento === 'RUC' ? 'Razón social' : 'Nombre'}
+                                </div>
+
+                                <div class="fw-semibold">
+                                    ${UI.esc(nombreCliente)}
+                                </div>
+                            </div>
+
+                            <div class="col-md-5">
+                                <div class="small text-muted">Documento</div>
+
+                                <div class="fw-semibold">
+                                    ${UI.esc(tipoDocumento)}:
+                                    ${UI.esc(numeroDocumento)}
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="table align-middle">
+
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th class="text-center">Cant.</th>
+                                    <th class="text-end">Precio unitario</th>
+                                    <th class="text-end">Importe</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                ${filasProductos}
+                            </tbody>
+
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" class="text-end">Total</th>
+                                    <th class="text-end fs-5">
+                                        S/ ${Number(total).toFixed(2)}
+                                    </th>
+                                </tr>
+                            </tfoot>
+
+                        </table>
+
+                    </div>
+
+                    <div class="border-top pt-4 mt-4">
+
+                        <div class="row align-items-center">
+
+                            <div class="col-md-7">
+
+                                <div class="small text-muted mb-1">
+                                    Número de boleta
+                                </div>
+
+                                <div class="fw-bold">
+                                    ${UI.esc(String(numeroBoleta))}
+                                </div>
+
+                                <div class="small text-muted mt-3">
+                                    Esta boleta corresponde a la compra
+                                    realizada en MascotICA's.
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-5 text-center mt-3 mt-md-0">
+
+                                <div id="qrBoleta" class="d-inline-block"></div>
+
+                                <div class="small text-muted mt-2">
+                                    Escanea el código QR para consultar
+                                    los datos de esta boleta.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="alert alert-success mb-0">
+                <i class="bi bi-info-circle-fill"></i>
+                Tu compra ha sido registrada correctamente.
+                Puedes conservar esta boleta como comprobante de tu compra.
+            </div>
+
+        `;
+
+        if (modalCompraExitosa) {
+            modalCompraExitosa.show();
+        }
+
+        setTimeout(() => {
+
+            const contenedorQr = document.getElementById('qrBoleta');
+
+            if (!contenedorQr) {
+                console.error('No se encontró el contenedor del QR.');
+                return;
             }
-        );
 
+            if (typeof QRCode === 'undefined') {
+                console.error('La librería QRCode no está disponible.');
+                return;
+            }
 
-    const numeroBoleta =
-        pedido.numeroBoleta ||
-        'Pendiente de generación';
+            if (!pedido.boletaCodigo) {
+                console.error('No se encontró el código público de la boleta.');
+                return;
+            }
 
+            const urlBoleta =
+                new URL('boleta.html', window.location.href);
 
-    const filasProductos =
-        entradasCompra.length > 0
-            ? entradasCompra.map(item => `
-                <tr>
-                    <td>
-                        ${UI.esc(item.nombre)}
-                    </td>
-                    <td class="text-center">
-                        ${item.cantidad}
-                    </td>
-                    <td class="text-end">
-                        S/ ${item.precio.toFixed(2)}
-                    </td>
-                    <td class="text-end">
-                        S/ ${item.subtotal.toFixed(2)}
-                    </td>
-                </tr>
-            `).join('')
-            : `
-                <tr>
-                    <td colspan="4" class="text-center text-muted">
-                        No se pudo cargar el detalle local de los productos.
-                    </td>
-                </tr>
-            `;
+            urlBoleta.searchParams.set('codigo', pedido.boletaCodigo);
 
+            contenedorQr.innerHTML = '';
 
-    contenido.innerHTML = `
-
-        <div class="text-center mb-4">
-
-            <div
-                class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center mb-3"
-                style="width: 70px; height: 70px;">
-
-                <i
-                    class="bi bi-check-lg text-success"
-                    style="font-size: 2rem;">
-                </i>
-
-            </div>
-
-            <h4 class="fw-bold mb-2">
-                ¡Gracias por tu compra!
-            </h4>
-
-            <p class="text-muted mb-0">
-                Tu pago fue confirmado correctamente.
-            </p>
-
-        </div>
-
-
-        <div class="card border-0 shadow-sm mb-4">
-
-            <div class="card-body p-4">
-
-                <div class="text-center mb-4">
-
-                    <h3 class="fw-bold mb-1">
-                        MascotICA's
-                    </h3>
-
-                    <div class="text-muted">
-                        Boleta electrónica
-                    </div>
-
-                </div>
-
-
-                <div class="row g-3 mb-4">
-
-                    <div class="col-md-6">
-
-                        <div class="small text-muted">
-                            ID de compra
-                        </div>
-
-                        <div class="fw-semibold">
-                            ${UI.esc(String(idPedido))}
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <div class="small text-muted">
-                            Fecha
-                        </div>
-
-                        <div class="fw-semibold">
-                            ${UI.esc(fechaTexto)}
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <div class="small text-muted">
-                            Hora
-                        </div>
-
-                        <div class="fw-semibold">
-                            ${UI.esc(horaTexto)}
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="border rounded p-3 mb-4">
-
-                    <h6 class="fw-bold mb-3">
-                        Datos del cliente
-                    </h6>
-
-                    <div class="row g-3">
-
-                        <div class="col-md-7">
-
-                            <div class="small text-muted">
-                                Nombre
-                            </div>
-
-                            <div class="fw-semibold">
-                                ${UI.esc(nombreCliente)}
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-5">
-
-                            <div class="small text-muted">
-                                Documento
-                            </div>
-
-                            <div class="fw-semibold">
-                                ${UI.esc(tipoDocumento)}:
-                                ${UI.esc(numeroDocumento)}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="table-responsive">
-
-                    <table class="table align-middle">
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Producto
-                                </th>
-
-                                <th class="text-center">
-                                    Cant.
-                                </th>
-
-                                <th class="text-end">
-                                    Precio unitario
-                                </th>
-
-                                <th class="text-end">
-                                    Importe
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-                            ${filasProductos}
-                        </tbody>
-
-                        <tfoot>
-
-                            <tr>
-
-                                <th
-                                    colspan="3"
-                                    class="text-end">
-                                    Total
-                                </th>
-
-                                <th class="text-end fs-5">
-                                    S/ ${Number(total).toFixed(2)}
-                                </th>
-
-                            </tr>
-
-                        </tfoot>
-
-                    </table>
-
-                </div>
-
-
-                <div class="border-top pt-4 mt-4">
-
-                    <div class="row align-items-center">
-
-                        <div class="col-md-7">
-
-                            <div class="small text-muted mb-1">
-                                Número de boleta
-                            </div>
-
-                            <div class="fw-bold">
-                                ${UI.esc(String(numeroBoleta))}
-                            </div>
-
-                            <div class="small text-muted mt-3">
-                                Esta boleta corresponde a la compra
-                                realizada en MascotICA's.
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-5 text-center mt-3 mt-md-0">
-
-                            <div
-                                id="qrBoleta"
-                                class="d-inline-block">
-                            </div>
-
-                            <div class="small text-muted mt-2">
-                                Escanea el código QR para consultar
-                                los datos de esta boleta.
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="alert alert-success mb-0">
-
-            <i class="bi bi-info-circle-fill"></i>
-
-            Tu compra ha sido registrada correctamente.
-            Puedes conservar esta boleta como comprobante
-            de tu compra.
-
-        </div>
-
-    `;
-
-
-    if (modalCompraExitosa) {
-        modalCompraExitosa.show();
-    }
-
-
-    setTimeout(() => {
-
-        const contenedorQr =
-            document.getElementById(
-                'qrBoleta'
-            );
-
-
-        if (!contenedorQr) {
-
-            console.error(
-                'No se encontró el contenedor del QR.'
-            );
-
-            return;
-
-        }
-
-
-        if (typeof QRCode === 'undefined') {
-
-            console.error(
-                'La librería QRCode no está disponible.'
-            );
-
-            return;
-
-        }
-
-
-        if (!pedido.boletaCodigo) {
-
-            console.error(
-                'No se encontró el código público de la boleta.'
-            );
-
-            return;
-
-        }
-
-
-        const urlBoleta =
-            new URL(
-                'boleta.html',
-                window.location.href
-            );
-
-
-        urlBoleta.searchParams.set(
-            'codigo',
-            pedido.boletaCodigo
-        );
-
-
-        contenedorQr.innerHTML = '';
-
-
-        new QRCode(
-            contenedorQr,
-            {
+            new QRCode(contenedorQr, {
                 text: urlBoleta.href,
                 width: 180,
                 height: 180,
                 correctLevel: QRCode.CorrectLevel.M
-            }
-        );
+            });
 
+            console.log(
+                'QR de la boleta generado correctamente:',
+                urlBoleta.href
+            );
 
-        console.log(
-            'QR de la boleta generado correctamente:',
-            urlBoleta.href
-        );
+        }, 150);
 
-    }, 150);
+    }
 
-}
 
     function obtenerNombreCliente() {
 
@@ -2270,9 +2198,7 @@
         return new Promise((resolve, reject) => {
 
             const libreriaExistente =
-                document.querySelector(
-                    'script[data-izipay-krypton="true"]'
-                );
+                document.querySelector('script[data-izipay-krypton="true"]');
 
             if (libreriaExistente) {
 
@@ -2284,54 +2210,36 @@
 
             }
 
+            const script = document.createElement('script');
 
-            const script =
-                document.createElement('script');
-
-            script.type =
-                'text/javascript';
+            script.type = 'text/javascript';
 
             script.src =
                 'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js';
 
-            script.setAttribute(
-                'kr-public-key',
-                publicKey
-            );
+            script.setAttribute('kr-public-key', publicKey);
+            script.setAttribute('kr-language', 'es-Es');
+            script.setAttribute('data-izipay-krypton', 'true');
 
-            script.setAttribute(
-                'kr-language',
-                'es-Es'
-            );
+            script.onload = () => {
 
-            script.setAttribute(
-                'data-izipay-krypton',
-                'true'
-            );
+                cargarTemaIzipay()
+                    .then(resolve)
+                    .catch(reject);
 
-            script.onload =
-                () => {
+            };
 
-                    cargarTemaIzipay()
-                        .then(resolve)
-                        .catch(reject);
+            script.onerror = () => {
 
-                };
+                reject(
+                    new Error(
+                        'No se pudo cargar la librería de pago de Izipay.'
+                    )
+                );
 
-            script.onerror =
-                () => {
+            };
 
-                    reject(
-                        new Error(
-                            'No se pudo cargar la librería de pago de Izipay.'
-                        )
-                    );
-
-                };
-
-            document.head.appendChild(
-                script
-            );
+            document.head.appendChild(script);
 
         });
 
@@ -2343,116 +2251,94 @@
         return new Promise((resolve, reject) => {
 
             const hojaExistente =
-                document.querySelector(
-                    'link[data-izipay-neon="true"]'
-                );
+                document.querySelector('link[data-izipay-neon="true"]');
 
             const scriptExistente =
-                document.querySelector(
-                    'script[data-izipay-neon="true"]'
-                );
+                document.querySelector('script[data-izipay-neon="true"]');
 
+            let pendientes = 0;
+            let terminado = false;
 
-            let pendientes =
-                0;
+            const terminar = () => {
 
+                pendientes--;
 
-            const terminar =
-                () => {
+                if (pendientes <= 0 && !terminado) {
+                    terminado = true;
+                    resolve();
+                }
 
-                    pendientes--;
-
-                    if (pendientes <= 0) {
-                        resolve();
-                    }
-
-                };
-
+            };
 
             if (!hojaExistente) {
 
                 pendientes++;
 
-                const hoja =
-                    document.createElement('link');
+                const hoja = document.createElement('link');
 
-                hoja.rel =
-                    'stylesheet';
+                hoja.rel = 'stylesheet';
 
                 hoja.href =
                     'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/neon-reset.min.css';
 
-                hoja.setAttribute(
-                    'data-izipay-neon',
-                    'true'
-                );
+                hoja.setAttribute('data-izipay-neon', 'true');
 
-                hoja.onload =
-                    terminar;
+                hoja.onload = terminar;
 
-                hoja.onerror =
-                    () => {
+                hoja.onerror = () => {
+
+                    if (!terminado) {
+                        terminado = true;
 
                         reject(
                             new Error(
                                 'No se pudo cargar el estilo del formulario de pago.'
                             )
                         );
+                    }
 
-                    };
+                };
 
-                document.head.appendChild(
-                    hoja
-                );
+                document.head.appendChild(hoja);
 
             }
-
 
             if (!scriptExistente) {
 
                 pendientes++;
 
-                const script =
-                    document.createElement('script');
+                const script = document.createElement('script');
 
-                script.type =
-                    'text/javascript';
+                script.type = 'text/javascript';
 
                 script.src =
                     'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/neon.js';
 
-                script.setAttribute(
-                    'data-izipay-neon',
-                    'true'
-                );
+                script.setAttribute('data-izipay-neon', 'true');
 
-                script.onload =
-                    terminar;
+                script.onload = terminar;
 
-                script.onerror =
-                    () => {
+                script.onerror = () => {
+
+                    if (!terminado) {
+                        terminado = true;
 
                         reject(
                             new Error(
                                 'No se pudo cargar el tema del formulario de pago.'
                             )
                         );
+                    }
 
-                    };
+                };
 
-                document.head.appendChild(
-                    script
-                );
+                document.head.appendChild(script);
 
             }
 
-
-            if (
-                pendientes === 0
-            ) {
-
+            if (pendientes === 0 && !terminado) {
+                terminado = true;
                 resolve();
-
             }
 
         });
@@ -2462,36 +2348,14 @@
 
     function obtenerFechaTransaccion() {
 
-        const ahora =
-            new Date();
+        const ahora = new Date();
 
-        const año =
-            ahora.getFullYear();
-
-        const mes =
-            String(
-                ahora.getMonth() + 1
-            ).padStart(2, '0');
-
-        const dia =
-            String(
-                ahora.getDate()
-            ).padStart(2, '0');
-
-        const hora =
-            String(
-                ahora.getHours()
-            ).padStart(2, '0');
-
-        const minutos =
-            String(
-                ahora.getMinutes()
-            ).padStart(2, '0');
-
-        const segundos =
-            String(
-                ahora.getSeconds()
-            ).padStart(2, '0');
+        const año = ahora.getFullYear();
+        const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+        const dia = String(ahora.getDate()).padStart(2, '0');
+        const hora = String(ahora.getHours()).padStart(2, '0');
+        const minutos = String(ahora.getMinutes()).padStart(2, '0');
+        const segundos = String(ahora.getSeconds()).padStart(2, '0');
 
         return (
             año +
@@ -2507,10 +2371,7 @@
 
     function respuestaPagoIzipay(respuesta) {
 
-        console.log(
-            'Respuesta de Izipay:',
-            respuesta
-        );
+        console.log('Respuesta de Izipay:', respuesta);
 
     }
 
