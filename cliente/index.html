@@ -736,20 +736,54 @@
                         }
                     }
                 );
+                
+        if (respuesta.error) {
+            const errorFuncion = respuesta.error;
+            const estadoHTTP = errorFuncion.context?.status;
 
-            if (respuesta.error) {
+            let mensajeServidor = '';
 
-                let mensaje =
-                    respuesta.error.message ||
-                    'No se pudo completar la consulta.';
-
-                if (respuesta.data && respuesta.data.error) {
-                    mensaje = respuesta.data.error;
-                }
-
-                throw new Error(mensaje);
-
+    // Intenta recuperar el mensaje enviado por la Edge Function.
+        try {
+            if (errorFuncion.context instanceof Response) {
+                const cuerpo = await errorFuncion.context.clone().json();
+                mensajeServidor = String(cuerpo?.error || '').trim();
             }
+        } catch {
+        // Si no hay respuesta JSON, se utilizará un mensaje general.
+        }
+
+        if (estadoHTTP === 404) {
+            
+            throw new Error(
+            'No se encontraron datos para ese documento. Verifica el número e inténtalo nuevamente.'
+        );
+    
+    }
+        if (estadoHTTP === 400) {
+
+            throw new Error(
+            mensajeServidor ||
+            'El número o tipo de documento no es válido.'
+        );
+
+    }
+
+        if (estadoHTTP === 429) {
+
+        throw new Error(
+            'Se alcanzó el límite de consultas. Inténtalo más tarde.'
+        );
+
+    }
+
+        throw new Error(
+        mensajeServidor ||
+        'No se pudo consultar el documento en este momento. Inténtalo nuevamente más tarde.'
+    );
+
+}
+
 
             const datos = respuesta.data;
 
