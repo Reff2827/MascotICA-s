@@ -106,9 +106,8 @@
                             </h5>
 
                             <div class="boleta-metadatos">
-
                                 <div class="boleta-metadato">
-                                    <small>Nombre / Razon Social</small>
+                                    <small id="etiquetaNombreCompradorBoleta">Nombre del comprador</small>
                                     <strong id="nombreCompradorBoleta">-</strong>
                                 </div>
 
@@ -484,11 +483,19 @@
         if (!esPublica) {
 
             datosCliente.classList.remove('d-none');
-
+            
+            const tipoDocumento = String(
+                boleta.tipo_documento || ''
+            ).trim().toUpperCase();
+            
+            document.getElementById('etiquetaNombreCompradorBoleta').textContent =
+            tipoDocumento === 'RUC'
+            ? 'Razón social'
+            : 'Nombre del comprador';
+            
             document.getElementById('nombreCompradorBoleta').textContent =
-                boleta.nombre_comprador || 'No registrado';
-
-            const tipoDocumento = boleta.tipo_documento || '';
+            boleta.nombre_comprador || 'No registrado';
+            
             const numeroDocumento = boleta.numero_documento || '';
 
             document.getElementById('documentoCompradorBoleta').textContent =
