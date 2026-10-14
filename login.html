@@ -185,26 +185,29 @@
 
                     <form id="formPin">
 
-                        <div class="mb-3">
-
-                            <label
-                                for="codigoPin"
-                                class="form-label"
-                            >
-                                Código de verificación
-                            </label>
-
-                            <input
-                                type="text"
-                                class="form-control text-center fs-4"
-                                id="codigoPin"
-                                inputmode="numeric"
-                                autocomplete="one-time-code"
-                                maxlength="8"
-                                required
-                            >
-
+                        <div
+                            class="otp"
+                            id="otpCaja"
+                            role="group"
+                            aria-label="Código de verificación de 8 dígitos"
+                            data-estado="orbita"
+                        >
+                            <span class="otp-centro" aria-hidden="true"></span>
+                            <div class="otp-pista">
+                                <input class="otp-slot" type="text" inputmode="numeric" maxlength="8" autocomplete="one-time-code" pattern="[0-9]*">
+                                <input class="otp-slot" type="text" inputmode="numeric" maxlength="8" autocomplete="off" pattern="[0-9]*">
+                                <input class="otp-slot" type="text" inputmode="numeric" maxlength="8" autocomplete="off" pattern="[0-9]*">
+                                <input class="otp-slot" type="text" inputmode="numeric" maxlength="8" autocomplete="off" pattern="[0-9]*">
+                                <input class="otp-slot" type="text" inputmode="numeric" maxlength="8" autocomplete="off" pattern="[0-9]*">
+                                <input class="otp-slot" type="text" inputmode="numeric" maxlength="8" autocomplete="off" pattern="[0-9]*">
+                                <input class="otp-slot" type="text" inputmode="numeric" maxlength="8" autocomplete="off" pattern="[0-9]*">
+                                <input class="otp-slot" type="text" inputmode="numeric" maxlength="8" autocomplete="off" pattern="[0-9]*">
+                            </div>
                         </div>
+
+                        <p class="otp-ayuda">
+                            Escríbelo, pégalo o deja que tu correo lo autocomplete.
+                        </p>
 
 
                         <button
@@ -530,6 +533,7 @@
 
 <script src="js/supabaseClient.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/otp.js"></script>
 
     <script>
         /* =========================
@@ -881,6 +885,8 @@
                 'click',
                 () => {
 
+                    OtpAnim.reiniciar();
+
                     mostrarPanel(panelLogin);
                 }
             );
@@ -984,9 +990,7 @@
 
                     mostrarPanel(panelPin);
 
-                    document
-                        .getElementById('codigoPin')
-                        .focus();
+                    OtpAnim.mostrar();
 
 
                     btn.disabled = false;
@@ -1013,11 +1017,18 @@
 
                     limpiarMensaje();
 
-                    const codigo =
-                        document
-                            .getElementById('codigoPin')
-                            .value
-                            .trim();
+                    const codigo = OtpAnim.valor();
+
+                    if (codigo.length < 8) {
+
+                        mostrarMensaje(
+                            'Ingresa los 8 dígitos del código.'
+                        );
+
+                        OtpAnim.error();
+
+                        return;
+                    }
 
                     const btn =
                         document
@@ -1040,6 +1051,8 @@
 
                     if (resultado.error) {
 
+                        OtpAnim.error();
+
                         mostrarMensaje(
                             resultado.error
                         );
@@ -1054,6 +1067,8 @@
                         return;
                     }
 
+
+                    OtpAnim.ok();
 
                     if (
                         resultado.requiereCambioPassword

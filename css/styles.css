@@ -3475,3 +3475,176 @@ body > .container-fluid > *:nth-child(n+5) {
         print-color-adjust: exact;
     }
 }
+
+
+/* =========================================================
+   CÓDIGO DE VERIFICACIÓN (casillas animadas) — js/otp.js
+   ========================================================= */
+
+.otp {
+    --otp-size: 40px;
+    position: relative;
+    height: 10.5rem;
+    margin-bottom: 0.5rem;
+    container-type: inline-size;
+    cursor: text;
+    transition: height 0.8s var(--spring, cubic-bezier(0.34, 1.3, 0.64, 1));
+}
+
+/* En fila, el alto se reduce para no dejar un hueco */
+.otp[data-estado="fila"] {
+    height: 4.5rem;
+}
+
+.otp-pista {
+    position: absolute;
+    inset: 0;
+}
+
+/* Punto central (el "eje" de la órbita) */
+.otp-centro {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    margin: -2.5px 0 0 -2.5px;
+    border-radius: 50%;
+    background: var(--muted-foreground);
+    opacity: 0.55;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.otp[data-estado="fila"] .otp-centro {
+    opacity: 0;
+    transform: scale(0);
+}
+
+/* Anillo punteado: se lee como guía, no como cargando */
+.otp::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 7.5rem;
+    height: 7.5rem;
+    margin: -3.75rem 0 0 -3.75rem;
+    border-radius: 50%;
+    border: 1.5px dashed var(--border-strong);
+    opacity: 1;
+    transition: opacity 0.5s ease, transform 0.8s ease;
+    pointer-events: none;
+}
+
+.otp:not([data-estado="orbita"])::before {
+    opacity: 0;
+    transform: scale(0.6);
+}
+
+.otp-slot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--otp-size);
+    height: var(--otp-size);
+    margin: calc(var(--otp-size) / -2) 0 0 calc(var(--otp-size) / -2);
+    padding: 0;
+    text-align: center;
+    font: 800 1.25rem/1 var(--font-sans, inherit);
+    font-variant-numeric: tabular-nums;
+    color: var(--foreground);
+    caret-color: var(--primary);
+    background: var(--input);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--specular), 0 6px 14px -8px oklch(0 0 0 / 0.35);
+    outline: none;
+    will-change: transform;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+/* Mientras orbitan no se escriben (se enfocan y se acomodan solas) */
+.otp[data-estado="orbita"] .otp-slot {
+    cursor: pointer;
+    color: transparent;
+}
+
+.otp-slot:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--ring), var(--specular);
+}
+
+.otp-lleno {
+    border-color: var(--primary);
+    background: var(--card-solid);
+}
+
+.otp-pop {
+    animation: otp-pop 0.28s var(--spring, ease-out);
+}
+
+@keyframes otp-pop {
+    0%   { scale: 1; }
+    45%  { scale: 1.18; }
+    100% { scale: 1; }
+}
+
+/* Error: sacudida + borde rojo */
+.otp-error .otp-slot {
+    border-color: var(--destructive);
+    background: var(--destructive-soft);
+    animation: otp-sacudida 0.45s ease;
+}
+
+@keyframes otp-sacudida {
+    0%, 100% { translate: 0 0; }
+    20% { translate: -6px 0; }
+    40% { translate: 6px 0; }
+    60% { translate: -4px 0; }
+    80% { translate: 4px 0; }
+}
+
+/* Éxito: el verde es el único color reservado a un veredicto */
+.otp-ok .otp-slot {
+    border-color: var(--success);
+    background: var(--success-soft);
+    animation: otp-ok 0.5s ease both;
+}
+
+.otp-ok .otp-slot:nth-child(2) { animation-delay: 0.04s; }
+.otp-ok .otp-slot:nth-child(3) { animation-delay: 0.08s; }
+.otp-ok .otp-slot:nth-child(4) { animation-delay: 0.12s; }
+.otp-ok .otp-slot:nth-child(5) { animation-delay: 0.16s; }
+.otp-ok .otp-slot:nth-child(6) { animation-delay: 0.20s; }
+.otp-ok .otp-slot:nth-child(7) { animation-delay: 0.24s; }
+.otp-ok .otp-slot:nth-child(8) { animation-delay: 0.28s; }
+
+@keyframes otp-ok {
+    0%   { scale: 1; }
+    50%  { scale: 1.15; }
+    100% { scale: 1; }
+}
+
+.otp-ayuda {
+    margin: 0 0 1rem;
+    text-align: center;
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .otp,
+    .otp::before,
+    .otp-centro {
+        transition: none;
+    }
+
+    .otp-pop,
+    .otp-error .otp-slot,
+    .otp-ok .otp-slot {
+        animation: none;
+    }
+}
