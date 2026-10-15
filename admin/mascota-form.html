@@ -47,7 +47,7 @@
 
         <div class="card-body p-4">
 
-            <form id="formMascota">
+            <form id="formMascota" novalidate>
 
                 <input
                     type="hidden"
@@ -65,6 +65,8 @@
                         id="nombre"
                         class="form-control"
                         placeholder="Ej: Rocky"
+                        maxlength="40"
+                        autocomplete="off"
                         required>
 
                     <div
@@ -127,6 +129,8 @@
                             id="raza"
                             class="form-control"
                             placeholder="Ej: Mestizo, Labrador, Siamés..."
+                            maxlength="40"
+                            autocomplete="off"
                             required>
 
                         <div
@@ -148,12 +152,31 @@
                         Edad
                     </label>
 
-                    <input
-                        type="text"
-                        id="edad"
-                        class="form-control"
-                        placeholder="Ej: 1 año"
-                        required>
+                    <div class="input-group">
+
+                        <input
+                            type="number"
+                            id="edad"
+                            class="form-control"
+                            placeholder="Ej: 2"
+                            min="1"
+                            max="30"
+                            step="1"
+                            inputmode="numeric"
+                            required>
+
+                        <select
+                            id="edadUnidad"
+                            class="form-select"
+                            style="max-width: 8rem;"
+                            aria-label="Unidad de la edad">
+
+                            <option value="años">Años</option>
+                            <option value="meses">Meses</option>
+
+                        </select>
+
+                    </div>
 
                     <div
                         class="text-danger small d-none"
@@ -363,6 +386,7 @@
 <script src="../js/storage.js"></script>
 <script src="../js/auth.js"></script>
 <script src="../js/ui.js"></script>
+<script src="../js/validaciones.js"></script>
 
 
 <script>
@@ -379,6 +403,49 @@
 
     }
 
+
+    /* La edad se guarda como texto ("2 años", "1 mes") para no cambiar
+       la base de datos; en el formulario se captura como número + unidad. */
+    function cargarEdad(texto) {
+
+        const m =
+            String(texto || '')
+                .match(
+                    /(\d+)\s*(a[nñ]os?|mes(?:es)?)?/i
+                );
+
+        if (!m) return;
+
+        document.getElementById(
+            'edad'
+        ).value =
+            m[1];
+
+        document.getElementById(
+            'edadUnidad'
+        ).value =
+            /^mes/i.test(m[2] || '')
+                ? 'meses'
+                : 'años';
+    }
+
+
+    function textoEdad(numero, unidad) {
+
+        const n = Number(numero);
+
+        if (unidad === 'meses') {
+            return n + (n === 1 ? ' mes' : ' meses');
+        }
+
+        return n + (n === 1 ? ' año' : ' años');
+    }
+
+
+    /* Solo letras en nombre y raza; solo dígitos en la edad */
+    Validar.soloLetras('nombre');
+    Validar.soloLetras('raza');
+    Validar.soloDigitos('edad');
 
     async function cargarSiEsEdicion() {
 
@@ -446,10 +513,9 @@
             mascota.raza || '';
 
 
-        document.getElementById(
-            'edad'
-        ).value =
-            mascota.edad;
+        cargarEdad(
+            mascota.edad
+        );
 
 
         document.getElementById(
@@ -738,11 +804,16 @@
                         .trim();
 
 
-                const edad =
+                const edadNumero =
                     document
                         .getElementById('edad')
                         .value
                         .trim();
+
+                const edadUnidad =
+                    document
+                        .getElementById('edadUnidad')
+                        .value;
 
 
                 const sexo =
@@ -783,9 +854,33 @@
                     };
 
 
-                validarCampo(
+                const validarTexto =
+                    (
+                        idError,
+                        mensaje
+                    ) => {
+                        const elemento =
+                            document.getElementById(
+                                idError
+                            );
+                        if (mensaje) {
+                            elemento.textContent =
+                                mensaje;
+                        }
+                        validarCampo(
+                            idError,
+                            !!mensaje
+                        );
+                    };
+
+                validarTexto(
                     'errNombre',
-                    nombre === ''
+                    Validar.textoLetras(
+                        nombre,
+                        'El nombre',
+                        2,
+                        40
+                    )
                 );
 
 
@@ -795,15 +890,25 @@
                 );
 
 
-                validarCampo(
+                validarTexto(
                     'errRaza',
-                    raza === ''
+                    Validar.textoLetras(
+                        raza,
+                        'La raza o tipo',
+                        2,
+                        40
+                    )
                 );
 
 
-                validarCampo(
+                validarTexto(
                     'errEdad',
-                    edad === ''
+                    Validar.entero(
+                        edadNumero,
+                        'La edad',
+                        1,
+                        edadUnidad === 'meses' ? 11 : 30
+                    )
                 );
 
 
@@ -815,6 +920,11 @@
 
                 if (!valido) return;
 
+                const edad =
+                    textoEdad(
+                        edadNumero,
+                        edadUnidad
+                    );
 
                 const boton =
                     document.getElementById(

@@ -313,11 +313,15 @@
 <script src="../js/supabaseClient.js"></script>
 <script src="../js/auth.js"></script>
 <script src="../js/ui.js"></script>
+<script src="../js/validaciones.js"></script>
 
 
 <script>
 
 const usuario = Auth.usuarioActual();
+
+/* El nombre de contacto solo admite letras (también al pegar) */
+Validar.soloLetras('cNombre');
 
 if (!usuario) {
     location.replace('../login.html');
@@ -1334,6 +1338,15 @@ function iniciar() {
 
                 const contacto =
                     document.getElementById('cNombre').value.trim();
+
+                const errContacto =
+                    Validar.textoLetras(contacto, 'Tu nombre', 2, 100);
+
+                if (errContacto) {
+                    UI.marcarInvalido('cNombre', true);
+                    err(errContacto);
+                    return;
+                }
 
                 const telefono =
                     document.getElementById('cTel').value.trim();

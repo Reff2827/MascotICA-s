@@ -75,7 +75,7 @@
                 ========================== -->
                 <section id="panelLogin">
 
-                    <form id="formLogin">
+                    <form id="formLogin" novalidate>
 
                         <div class="mb-3">
 
@@ -91,6 +91,7 @@
                                 class="form-control"
                                 id="correo"
                                 autocomplete="email"
+                                maxlength="254"
                                 required
                             >
 
@@ -255,7 +256,7 @@
                     </div>
 
 
-                    <form id="formRegistro">
+                    <form id="formRegistro" novalidate>
 
                         <div class="mb-3">
 
@@ -271,6 +272,7 @@
                                 class="form-control"
                                 id="regNombre"
                                 autocomplete="name"
+                                maxlength="60"
                                 required
                             >
 
@@ -291,6 +293,7 @@
                                 class="form-control"
                                 id="regCorreo"
                                 autocomplete="email"
+                                maxlength="254"
                                 required
                             >
 
@@ -532,8 +535,18 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="js/supabaseClient.js"></script>
+<script src="js/validaciones.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/otp.js"></script>
+<script>
+    /* Validación de formularios: restricciones al escribir/pegar
+       y avisos claros debajo de cada campo. */
+    Validar.soloLetras('regNombre');
+
+    ['correo', 'password', 'regNombre', 'regCorreo'].forEach(
+        id => Validar.limpiarAlEscribir(id)
+    );
+</script>
 
     <script>
         /* =========================
@@ -928,6 +941,26 @@
                             .getElementById('password')
                             .value;
 
+                    const errCorreo = Validar.correo(correo);
+                    const errPassword =
+                        password === ''
+                            ? 'Ingresa tu contraseña.'
+                            : null;
+
+                    Validar.error('correo', errCorreo);
+                    Validar.error('password', errPassword);
+
+                    if (errCorreo || errPassword) {
+
+                        document
+                            .getElementById(
+                                errCorreo ? 'correo' : 'password'
+                            )
+                            .focus();
+
+                        return;
+                    }
+
                     const btn =
                         document
                             .getElementById('btnIngresar');
@@ -1234,6 +1267,25 @@
                             .getElementById('regCorreo')
                             .value
                             .trim();
+
+                    const errNombre =
+                        Validar.textoLetras(nombre, 'El nombre');
+                    const errCorreoReg =
+                        Validar.correo(correo);
+
+                    Validar.error('regNombre', errNombre);
+                    Validar.error('regCorreo', errCorreoReg);
+
+                    if (errNombre || errCorreoReg) {
+
+                        document
+                            .getElementById(
+                                errNombre ? 'regNombre' : 'regCorreo'
+                            )
+                            .focus();
+
+                        return;
+                    }
 
                     const password =
                         document
