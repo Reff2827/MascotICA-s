@@ -1145,6 +1145,36 @@
                 });
 
             });
+            
+            const parametrosURL = new URLSearchParams(window.location.search);
+            const idMascotaAdopcion = parametrosURL.get('adoptar');
+            
+            if (idMascotaAdopcion) {
+                const botonAdopcion = Array.from(
+                    cont.querySelectorAll('[data-action="adoptar"]')
+                ).find(btn => btn.dataset.id === idMascotaAdopcion);
+                
+                if (botonAdopcion) {
+                    botonAdopcion.click();
+                    
+                    parametrosURL.delete('adoptar');
+                    
+                    const nuevaURL =
+                    window.location.pathname +
+                    (parametrosURL.toString()
+                      ? '?' + parametrosURL.toString()
+                      : '') +
+                      window.location.hash;
+                      
+                      window.history.replaceState({}, '', nuevaURL);
+                    
+                    } else {
+                        console.warn(
+                            'No se encontró la mascota solicitada desde Match:',
+                            idMascotaAdopcion
+                        );
+                    }
+                }
 
     }
 

@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MascotICA's Match | Encuentra tu compañero ideal</title>
+    <meta name="description" content="Descubre qué mascotas de MascotICA's se adaptan mejor a tu estilo de vida y conoce a tu futuro compañero.">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <style>
+
+        :root {
+            --match-orange: #f47721;
+            --match-orange-dark: #d85d10;
+            --match-orange-light: #fff1e5;
+            --match-cream: #fffaf5;
+            --match-ink: #332a25;
+            --match-muted: #766b64;
+            --match-border: #f0e3d8;
+        }
+
+        body {
+            background: var(--match-cream);
+            color: var(--match-ink);
+        }
+
+        .match-page {
+            min-height: 100vh;
+            padding-bottom: 4rem;
+        }
+
+        .match-brand {
+            background: linear-gradient(120deg, #f47721, #ff9b45);
+            color: #fff;
+            padding: 2.6rem 1rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .match-brand::before,
+        .match-brand::after {
+            content: "";
+            position: absolute;
+            border: 2px solid rgb(255 255 255 / 20%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .match-brand::before {
+            width: 220px;
+            height: 220px;
+            top: -115px;
+            right: 8%;
+        }
+
+        .match-brand::after {
+            width: 150px;
+            height: 150px;
+            bottom: -100px;
+            left: 7%;
+        }
+
+        .match-brand-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .match-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: .7rem;
+            font-size: clamp(1.65rem, 4vw, 2.5rem);
+            font-weight: 850;
+            letter-spacing: -.7px;
+            line-height: 1.15;
+        }
+
+        .match-logo-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 52px;
+            height: 52px;
+            border-radius: 17px;
+            background: #fff;
+            color: var(--match-orange);
+            font-size: 1.75rem;
+            box-shadow: 0 6px 18px rgb(111 49 8 / 15%);
+        }
+
+        .match-brand p {
+            max-width: 660px;
+            margin: 1rem auto 0;
+            color: rgb(255 255 255 / 95%);
+            font-size: 1.05rem;
+        }
+
+        .match-back {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            margin-bottom: 1.4rem;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .match-back:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        .match-container {
+            max-width: 900px;
+            margin: -1.25rem auto 0;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .match-intro,
+        .match-question,
+        .match-results-panel {
+            background: #fff;
+            border: 1px solid var(--match-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 28px rgb(83 48 22 / 5%);
+        }
+
+        .match-intro {
+            padding: 1.35rem 1.5rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .match-intro-icon {
+            display: grid;
+            place-items: center;
+            flex: 0 0 48px;
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+            background: var(--match-orange-light);
+            color: var(--match-orange-dark);
+            font-size: 1.45rem;
+        }
+
+        .match-section-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin: 0 0 .35rem;
+        }
+
+        .match-section-subtitle {
+            color: var(--match-muted);
+            margin: 0;
+            font-size: .95rem;
+        }
+
+        .match-progress-wrap {
+            margin: 1.5rem 0;
+        }
+
+        .match-progress-label {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            color: var(--match-muted);
+            font-size: .88rem;
+            font-weight: 650;
+            margin-bottom: .55rem;
+        }
+
+        .match-progress {
+            height: 8px;
+            border-radius: 20px;
+            background: #f2e7de;
+            overflow: hidden;
+        }
+
+        .match-progress .progress-bar {
+            background: var(--match-orange);
+            border-radius: 20px;
+            transition: width .2s ease;
+        }
+
+        .match-question {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            scroll-margin-top: 1rem;
+        }
+
+        .match-question-heading {
+            display: flex;
+            gap: .85rem;
+            align-items: flex-start;
+            margin-bottom: 1.1rem;
+        }
+
+        .match-question-number {
+            display: grid;
+            place-items: center;
+            flex: 0 0 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: var(--match-orange-light);
+            color: var(--match-orange-dark);
+            font-weight: 800;
+        }
+
+        .match-question h3 {
+            font-size: 1.08rem;
+            line-height: 1.45;
+            font-weight: 750;
+            margin: .2rem 0 0;
+        }
+
+        .match-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: .7rem;
+        }
+
+        .match-option {
+            display: flex;
+            position: relative;
+            cursor: pointer;
+            min-width: 0;
+        }
+
+        .match-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .match-option-content {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            width: 100%;
+            min-height: 62px;
+            padding: .85rem 1rem;
+            border: 1.5px solid #eadfd6;
+            border-radius: 13px;
+            background: #fff;
+            color: var(--match-ink);
+            transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+        }
+
+        .match-option-icon {
+            display: grid;
+            place-items: center;
+            flex: 0 0 34px;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: #faf4ef;
+            color: #a96537;
+            font-size: 1.05rem;
+        }
+
+        .match-option-label {
+            font-size: .94rem;
+            line-height: 1.4;
+            font-weight: 550;
+        }
+
+        .match-option input:checked + .match-option-content {
+            border-color: var(--match-orange);
+            background: #fff7f0;
+            box-shadow: 0 0 0 2px rgb(244 119 33 / 9%);
+        }
+
+        .match-option input:checked + .match-option-content .match-option-icon {
+            background: var(--match-orange);
+            color: #fff;
+        }
+
+        .match-option input:focus-visible + .match-option-content {
+            outline: 3px solid rgb(244 119 33 / 35%);
+            outline-offset: 2px;
+        }
+
+        .match-option:hover .match-option-content {
+            border-color: #f2a36e;
+        }
+
+        .match-error {
+            display: none;
+            color: #b42318;
+            font-size: .88rem;
+            margin-top: .8rem;
+        }
+
+        .match-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .8rem;
+            justify-content: space-between;
+            align-items: center;
+            padding: .5rem 0 1.8rem;
+        }
+
+        .btn-match-primary {
+            background: var(--match-orange);
+            color: #fff;
+            border: 1px solid var(--match-orange);
+            border-radius: 12px;
+            padding: .85rem 1.25rem;
+            font-weight: 750;
+            transition: background .15s ease, transform .15s ease;
+        }
+
+        .btn-match-primary:hover,
+        .btn-match-primary:focus {
+            background: var(--match-orange-dark);
+            border-color: var(--match-orange-dark);
+            color: #fff;
+        }
+
+        .btn-match-secondary {
+            background: #fff;
+            color: var(--match-ink);
+            border: 1px solid #e7d9ce;
+            border-radius: 12px;
+            padding: .85rem 1.1rem;
+            font-weight: 650;
+            text-decoration: none;
+        }
+
+        .btn-match-secondary:hover {
+            background: #fff4e9;
+            color: var(--match-ink);
+        }
+
+        .match-note {
+            display: flex;
+            gap: .7rem;
+            padding: 1rem 1.1rem;
+            border-radius: 14px;
+            background: #fff3e7;
+            color: #75451f;
+            font-size: .9rem;
+            line-height: 1.5;
+            margin-bottom: 1.3rem;
+        }
+
+        .match-results-panel {
+            padding: clamp(1.2rem, 4vw, 2rem);
+            margin-top: 1.5rem;
+        }
+
+        .match-results-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .match-results-header .match-intro-icon {
+            margin: 0 auto .8rem;
+        }
+
+        .match-pet-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            border: 1px solid var(--match-border);
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 6px 20px rgb(83 48 22 / 5%);
+        }
+
+        .match-pet-image-wrap {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+            background: #fff0e3;
+        }
+
+        .match-pet-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .match-pet-placeholder {
+            display: grid;
+            place-items: center;
+            height: 100%;
+            color: #d97b3e;
+            font-size: 4rem;
+        }
+
+        .match-pet-rank {
+            position: absolute;
+            top: .8rem;
+            left: .8rem;
+            background: #fff;
+            color: var(--match-orange-dark);
+            padding: .4rem .7rem;
+            border-radius: 30px;
+            font-size: .8rem;
+            font-weight: 800;
+            box-shadow: 0 3px 10px rgb(0 0 0 / 8%);
+        }
+
+        .match-pet-body {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            padding: 1.2rem;
+        }
+
+        .match-pet-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin: 0 0 .35rem;
+        }
+
+        .match-pet-description {
+            color: var(--match-muted);
+            font-size: .9rem;
+            margin-bottom: .9rem;
+        }
+
+        .match-score-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .6rem;
+            margin-bottom: .5rem;
+        }
+
+        .match-score {
+            color: var(--match-orange-dark);
+            font-size: 1.45rem;
+            font-weight: 850;
+        }
+
+        .match-score-label {
+            font-size: .8rem;
+            color: var(--match-muted);
+        }
+
+        .match-score-track {
+            height: 8px;
+            border-radius: 20px;
+            background: #f3e7dd;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .match-score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f47721, #ffad64);
+            border-radius: 20px;
+        }
+
+        .match-reasons-title {
+            font-size: .9rem;
+            font-weight: 800;
+            margin-bottom: .45rem;
+        }
+
+        .match-reasons {
+            padding-left: 1.15rem;
+            color: #51463e;
+            font-size: .88rem;
+            line-height: 1.55;
+            margin-bottom: 1.2rem;
+        }
+
+        .match-reasons li {
+            margin-bottom: .25rem;
+        }
+
+        .match-pet-body .btn {
+            margin-top: auto;
+        }
+
+        .match-empty {
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .match-empty-icon {
+            font-size: 3.2rem;
+            color: var(--match-orange);
+            margin-bottom: .6rem;
+        }
+
+        .match-results-bottom {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: .8rem;
+            margin-top: 1.5rem;
+        }
+
+        .match-footer {
+            text-align: center;
+            padding: 1.5rem 1rem 0;
+            color: var(--match-muted);
+            font-size: .85rem;
+        }
+
+        @media (max-width: 575.98px) {
+            .match-brand {
+                padding: 2rem 1rem 2.6rem;
+            }
+
+            .match-logo {
+                font-size: 1.7rem;
+            }
+
+            .match-logo-icon {
+                width: 45px;
+                height: 45px;
+            }
+
+            .match-intro,
+            .match-question {
+                padding: 1.1rem;
+                border-radius: 16px;
+            }
+
+            .match-options {
+                grid-template-columns: 1fr;
+            }
+
+            .match-option-content {
+                min-height: 56px;
+            }
+
+            .match-actions {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .match-actions .btn {
+                width: 100%;
+            }
+
+            .match-pet-image-wrap {
+                height: 210px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar"></div>
+    <div id="alertas" class="container mt-3"></div>
+
+    <main class="match-page">
+        <header class="match-brand text-center">
+            <div class="container match-brand-content">
+                <a class="match-back" href="index.html">
+                    <i class="bi bi-arrow-left"></i>
+                    Volver al catálogo
+                </a>
+
+                <div>
+                    <span class="match-logo">
+                        <span class="match-logo-icon">
+                            <i class="bi bi-heart-fill"></i>
+                        </span>
+                        MascotICA's Match
+                    </span>
+                </div>
+
+                <p>
+                    Cada mascota tiene una personalidad única.
+                    Responde unas preguntas y descubre quién podría encajar mejor contigo.
+                </p>
+            </div>
+        </header>
+
+        <div class="match-container">
+            <section class="match-intro" aria-label="Información del test">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="match-intro-icon">
+                        <i class="bi bi-stars"></i>
+                    </div>
+                    <div>
+                        <h2 class="match-section-title">Encuentra a tu compañero ideal</h2>
+                        <p class="match-section-subtitle">
+                            Son 8 preguntas. No hay respuestas correctas o incorrectas:
+                            lo importante es conocer tu estilo de vida.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <form id="formMatch" novalidate>
+                <div class="match-progress-wrap">
+                    <div class="match-progress-label">
+                        <span>Tu perfil de adopción</span>
+                        <span id="matchProgressText">0 de 8 respondidas</span>
+                    </div>
+                    <div
+                        class="progress match-progress"
+                        role="progressbar"
+                        aria-label="Preguntas respondidas"
+                        aria-valuemin="0"
+                        aria-valuemax="8"
+                        aria-valuenow="0"
+                        id="matchProgressContainer">
+                        <div
+                            class="progress-bar"
+                            id="matchProgressBar"
+                            style="width: 0%">
+                        </div>
+                    </div>
+                </div>
+
+                <section class="match-question" data-question="vivienda">
+                    <div class="match-question-heading">
+                        <span class="match-question-number">1</span>
+                        <h3>¿Cómo es el lugar donde vives?</h3>
+                    </div>
+                    <div class="match-options">
+                        <label class="match-option">
+                            <input type="radio" name="vivienda" value="pequeno" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-building"></i></span>
+                                <span class="match-option-label">Departamento o espacio pequeño</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="vivienda" value="casa" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-house"></i></span>
+                                <span class="match-option-label">Casa con espacios interiores</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="vivienda" value="patio" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-flower1"></i></span>
+                                <span class="match-option-label">Casa con patio o jardín</span>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="match-question" data-question="tiempoFuera">
+                    <div class="match-question-heading">
+                        <span class="match-question-number">2</span>
+                        <h3>¿Cuánto tiempo pasas fuera de casa normalmente?</h3>
+                    </div>
+                    <div class="match-options">
+                        <label class="match-option">
+                            <input type="radio" name="tiempoFuera" value="poco" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-house-heart"></i></span>
+                                <span class="match-option-label">Casi nunca o pocas horas</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="tiempoFuera" value="medio" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-clock"></i></span>
+                                <span class="match-option-label">Entre 4 y 8 horas</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="tiempoFuera" value="mucho" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-briefcase"></i></span>
+                                <span class="match-option-label">Más de 8 horas</span>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="match-question" data-question="rutina">
+                    <div class="match-question-heading">
+                        <span class="match-question-number">3</span>
+                        <h3>¿Cómo es un día normal para ti?</h3>
+                    </div>
+                    <div class="match-options">
+                        <label class="match-option">
+                            <input type="radio" name="rutina" value="tranquila" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-cup-hot"></i></span>
+                                <span class="match-option-label">Tranquilo, prefiero descansar</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="rutina" value="equilibrada" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-sun"></i></span>
+                                <span class="match-option-label">Equilibrado, un poco de todo</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="rutina" value="activa" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-lightning-charge"></i></span>
+                                <span class="match-option-label">Muy activo, siempre en movimiento</span>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="match-question" data-question="cuidados">
+                    <div class="match-question-heading">
+                        <span class="match-question-number">4</span>
+                        <h3>¿Cuánto tiempo podrías dedicar diariamente a sus cuidados?</h3>
+                    </div>
+                    <div class="match-options">
+                        <label class="match-option">
+                            <input type="radio" name="cuidados" value="poco" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-hourglass"></i></span>
+                                <span class="match-option-label">Menos de 1 hora</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="cuidados" value="medio" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-clock-history"></i></span>
+                                <span class="match-option-label">Entre 1 y 2 horas</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="cuidados" value="mucho" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-heart"></i></span>
+                                <span class="match-option-label">Más de 2 horas</span>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="match-question" data-question="hogar">
+                    <div class="match-question-heading">
+                        <span class="match-question-number">5</span>
+                        <h3>¿Quiénes vivirán contigo y compartirán el espacio con la mascota?</h3>
+                    </div>
+                    <div class="match-options">
+                        <label class="match-option">
+                            <input type="radio" name="hogar" value="solo" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-person"></i></span>
+                                <span class="match-option-label">Vivo solo/a</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="hogar" value="adultos" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-people"></i></span>
+                                <span class="match-option-label">Con pareja u otros adultos</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="hogar" value="ninos" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-balloon"></i></span>
+                                <span class="match-option-label">Con niños</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="hogar" value="familia" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-house-heart"></i></span>
+                                <span class="match-option-label">Con niños y adultos</span>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="match-question" data-question="otrosAnimales">
+                    <div class="match-question-heading">
+                        <span class="match-question-number">6</span>
+                        <h3>¿Hay otros animales en casa?</h3>
+                    </div>
+                    <div class="match-options">
+                        <label class="match-option">
+                            <input type="radio" name="otrosAnimales" value="ninguno" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-house"></i></span>
+                                <span class="match-option-label">No, sería la primera mascota</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="otrosAnimales" value="perros" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-emoji-smile"></i></span>
+                                <span class="match-option-label">Sí, tengo perros</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="otrosAnimales" value="gatos" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-emoji-smile-upside-down"></i></span>
+                                <span class="match-option-label">Sí, tengo gatos</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="otrosAnimales" value="ambos" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-heart"></i></span>
+                                <span class="match-option-label">Tengo perros y gatos</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="otrosAnimales" value="otros" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-three-dots"></i></span>
+                                <span class="match-option-label">Tengo otros animales</span>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="match-question" data-question="preferencia">
+                    <div class="match-question-heading">
+                        <span class="match-question-number">7</span>
+                        <h3>¿Qué te gustaría compartir con tu futura mascota?</h3>
+                    </div>
+                    <div class="match-options">
+                        <label class="match-option">
+                            <input type="radio" name="preferencia" value="tranquila" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-cup-hot"></i></span>
+                                <span class="match-option-label">Compañía y momentos tranquilos</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="preferencia" value="juegos" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-controller"></i></span>
+                                <span class="match-option-label">Juegos y actividades</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="preferencia" value="aventuras" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-compass"></i></span>
+                                <span class="match-option-label">Paseos y aventuras</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="preferencia" value="familia" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-people"></i></span>
+                                <span class="match-option-label">Cariño y compañía familiar</span>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="match-question" data-question="preparacion">
+                    <div class="match-question-heading">
+                        <span class="match-question-number">8</span>
+                        <h3>¿Qué tan preparado/a te sientes para asumir una adopción a largo plazo?</h3>
+                    </div>
+                    <div class="match-options">
+                        <label class="match-option">
+                            <input type="radio" name="preparacion" value="informandome" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-book"></i></span>
+                                <span class="match-option-label">Estoy empezando a informarme</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="preparacion" value="organizado" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-journal-check"></i></span>
+                                <span class="match-option-label">Conozco las responsabilidades y me organizo</span>
+                            </span>
+                        </label>
+                        <label class="match-option">
+                            <input type="radio" name="preparacion" value="preparado" required>
+                            <span class="match-option-content">
+                                <span class="match-option-icon"><i class="bi bi-check-circle"></i></span>
+                                <span class="match-option-label">Estoy preparado/a para cuidados y gastos</span>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <div class="match-note">
+                    <i class="bi bi-info-circle-fill mt-1"></i>
+                    <div>
+                        <strong>Una recomendación responsable.</strong>
+                        El resultado es orientativo: no garantiza la convivencia.
+                        Antes de adoptar, también hay que considerar la salud, las necesidades
+                        particulares y la adaptación de cada mascota.
+                    </div>
+                </div>
+
+                <div class="match-actions">
+                    <a href="index.html" class="btn-match-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Volver al catálogo
+                    </a>
+
+                    <button type="submit" class="btn btn-match-primary">
+                        Encontrar mi Match
+                        <i class="bi bi-heart-fill ms-2"></i>
+                    </button>
+                </div>
+
+                <p id="matchFormError" class="match-error" role="alert">
+                    Responde las 8 preguntas para encontrar tus coincidencias.
+                </p>
+            </form>
+
+            <section id="matchResults" class="match-results-panel" hidden aria-live="polite">
+                <div id="matchResultsContent"></div>
+            </section>
+
+            <footer class="match-footer">
+                <i class="bi bi-heart-fill me-1"></i>
+                Una adopción responsable comienza con conocerse mutuamente.
+                <div class="mt-1">MascotICA's</div>
+            </footer>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/ui.js"></script>
+
+    <script>
+        (() => {
+            'use strict';
+
+            const usuario = Auth.requireCliente();
+
+            if (!usuario) return;
+
+            UI.navbarCliente(usuario);
+            UI.mostrarFlash();
+
+            const form = document.getElementById('formMatch');
+            const progressBar = document.getElementById('matchProgressBar');
+            const progressText = document.getElementById('matchProgressText');
+            const progressContainer = document.getElementById('matchProgressContainer');
+            const formError = document.getElementById('matchFormError');
+            const resultsSection = document.getElementById('matchResults');
+            const resultsContent = document.getElementById('matchResultsContent');
+
+            const TOTAL_PREGUNTAS = 8;
+
+            function escapeHTML(value) {
+                return String(value ?? '').replace(/[&<>"']/g, character => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                })[character]);
+            }
+
+            function normalizar(value) {
+                return String(value ?? '')
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .toLowerCase()
+                    .trim();
+            }
+
+            function obtenerRespuestas() {
+                const respuestas = {};
+
+                for (const pregunta of form.querySelectorAll('[data-question]')) {
+                    const nombre = pregunta.dataset.question;
+                    const seleccion = form.querySelector(
+                        `input[name="${nombre}"]:checked`
+                    );
+
+                    respuestas[nombre] = seleccion ? seleccion.value : '';
+                }
+
+                return respuestas;
+            }
+
+            function actualizarProgreso() {
+                const respondidas = Object.values(obtenerRespuestas())
+                    .filter(Boolean).length;
+
+                const porcentaje = (respondidas / TOTAL_PREGUNTAS) * 100;
+
+                progressBar.style.width = `${porcentaje}%`;
+                progressText.textContent =
+                    `${respondidas} de ${TOTAL_PREGUNTAS} respondidas`;
+
+                progressContainer.setAttribute('aria-valuenow', respondidas);
+            }
+
+            form.addEventListener('change', () => {
+                actualizarProgreso();
+                formError.style.display = 'none';
+
+                form.querySelectorAll('.match-question').forEach(section => {
+                    section.querySelector('.match-error')?.remove();
+                });
+            });
+
+            function obtenerTamano(mascota) {
+                const tamano = normalizar(mascota.tamano);
+
+                if (!tamano || tamano.includes('desconocido')) return null;
+                if (tamano.includes('pequ')) return 'pequeno';
+                if (tamano.includes('med')) return 'mediano';
+                if (tamano.includes('grand') || tamano.includes('gigante')) {
+                    return 'grande';
+                }
+
+                return null;
+            }
+
+            function obtenerActividad(mascota) {
+                const actividad = normalizar(mascota.nivelActividad);
+
+                if (!actividad || actividad.includes('desconocido')) return null;
+
+                if (
+                    actividad.includes('bajo') ||
+                    actividad.includes('tranquil') ||
+                    actividad.includes('poco activo') ||
+                    actividad.includes('poco_activo')
+                ) {
+                    return 'tranquila';
+                }
+
+                if (
+                    actividad.includes('moder') ||
+                    actividad.includes('medio')
+                ) {
+                    return 'equilibrada';
+                }
+
+                if (
+                    actividad.includes('alto') ||
+                    actividad.includes('activ') ||
+                    actividad.includes('energet')
+                ) {
+                    return 'activa';
+                }
+
+                return null;
+            }
+
+            function interpretarSiNo(valor) {
+                const texto = normalizar(valor);
+
+                if (['si', 'true', '1', 'yes'].includes(texto)) return true;
+                if (['no', 'false', '0'].includes(texto)) return false;
+
+                return null;
+            }
+
+            function obtenerPersonalidades(mascota) {
+                let valores = mascota.personalidad;
+
+                if (typeof valores === 'string') {
+                    try {
+                        valores = JSON.parse(valores);
+                    } catch {
+                        valores = valores.split(',');
+                    }
+                }
+
+                if (!Array.isArray(valores)) return [];
+
+                return valores.map(normalizar).filter(Boolean);
+            }
+
+            function calcularEspacio(vivienda, tamano) {
+                if (!tamano) return null;
+
+                const tabla = {
+                    pequeno: {
+                        pequeno: 100,
+                        mediano: 75,
+                        grande: 55
+                    },
+                    casa: {
+                        pequeno: 80,
+                        mediano: 100,
+                        grande: 80
+                    },
+                    patio: {
+                        pequeno: 80,
+                        mediano: 95,
+                        grande: 100
+                    }
+                };
+
+                return tabla[vivienda]?.[tamano] ?? null;
+            }
+
+            function calcularActividad(rutina, actividadMascota) {
+                if (!actividadMascota) return null;
+
+                const tabla = {
+                    tranquila: {
+                        tranquila: 100,
+                        equilibrada: 65,
+                        activa: 30
+                    },
+                    equilibrada: {
+                        tranquila: 75,
+                        equilibrada: 100,
+                        activa: 75
+                    },
+                    activa: {
+                        tranquila: 40,
+                        equilibrada: 75,
+                        activa: 100
+                    }
+                };
+
+                return tabla[rutina]?.[actividadMascota] ?? null;
+            }
+
+            function calcularPersonalidad(preferencia, personalidades) {
+                if (!personalidades.length) return null;
+
+                const afinidades = {
+                    tranquila: [
+                        'tranquila',
+                        'carinosa',
+                        'independiente',
+                        'poco activa'
+                    ],
+                    juegos: [
+                        'juguetona',
+                        'energica',
+                        'curiosa',
+                        'inteligente'
+                    ],
+                    aventuras: [
+                        'energica',
+                        'sociable',
+                        'curiosa',
+                        'juguetona'
+                    ],
+                    familia: [
+                        'carinosa',
+                        'sociable',
+                        'tranquila'
+                    ]
+                };
+
+                const buscadas = afinidades[preferencia] || [];
+
+                if (!buscadas.length) return null;
+
+                const coincidencias = buscadas.filter(caracteristica =>
+                    personalidades.some(personalidad =>
+                        personalidad.includes(caracteristica)
+                    )
+                ).length;
+
+                return Math.round((coincidencias / buscadas.length) * 100);
+            }
+
+            function calcularCompatibilidad(mascota, respuestas) {
+                const componentes = [];
+
+                function agregar(nombre, peso, puntaje) {
+                    if (puntaje === null || !Number.isFinite(puntaje)) return;
+
+                    componentes.push({
+                        nombre,
+                        peso,
+                        puntaje: Math.max(0, Math.min(100, puntaje))
+                    });
+                }
+
+                // El tamaño solo es una orientación general, no una regla
+                // que determine si una mascota puede vivir en una vivienda.
+                agregar(
+                    'espacio',
+                    15,
+                    calcularEspacio(respuestas.vivienda, obtenerTamano(mascota))
+                );
+
+                // Solo se compara la rutina si existe un nivel de actividad
+                // reconocido en los datos de la mascota.
+                agregar(
+                    'actividad',
+                    25,
+                    calcularActividad(
+                        respuestas.rutina,
+                        obtenerActividad(mascota)
+                    )
+                );
+
+                const hayNinos = ['ninos', 'familia'].includes(respuestas.hogar);
+
+                if (hayNinos) {
+                    const conviveNinos = interpretarSiNo(mascota.conviveNinos);
+
+                    if (conviveNinos === true) {
+                        agregar('convivencia con niños', 25, 100);
+                    } else if (conviveNinos === false) {
+                        agregar('convivencia con niños', 25, 0);
+                    }
+                    // Si se desconoce, no asumimos que sea compatible.
+                    // Tampoco lo penalizamos como si se supiera que no convive.
+                }
+
+                const hayOtrosAnimales = respuestas.otrosAnimales !== 'ninguno';
+
+                if (hayOtrosAnimales) {
+                    const conviveMascotas =
+                        interpretarSiNo(mascota.conviveMascotas);
+
+                    if (conviveMascotas === true) {
+                        agregar('convivencia con otros animales', 25, 100);
+                    } else if (conviveMascotas === false) {
+                        agregar('convivencia con otros animales', 25, 0);
+                    }
+                    // El dato disponible es general: no confirma
+                    // compatibilidad específica con perros, gatos u otras especies.
+                }
+
+                agregar(
+                    'personalidad',
+                    25,
+                    calcularPersonalidad(
+                        respuestas.preferencia,
+                        obtenerPersonalidades(mascota)
+                    )
+                );
+
+                const pesoTotal = componentes.reduce(
+                    (total, componente) => total + componente.peso,
+                    0
+                );
+
+                if (!pesoTotal) {
+                    return {
+                        puntuacion: null,
+                        componentes: [],
+                        razones: [
+                            'Aún no hay suficientes características registradas para calcular una coincidencia fiable.'
+                        ]
+                    };
+                }
+
+                const puntuacion = Math.round(
+                    componentes.reduce(
+                        (total, componente) =>
+                            total + componente.puntaje * componente.peso,
+                        0
+                    ) / pesoTotal
+                );
+
+                const razones = [];
+
+                const espacio = componentes.find(c => c.nombre === 'espacio');
+                if (espacio && espacio.puntaje >= 80) {
+                    razones.push(
+                        'El tamaño registrado parece encajar con el espacio que describes.'
+                    );
+                }
+
+                const actividad = componentes.find(c => c.nombre === 'actividad');
+                if (actividad && actividad.puntaje >= 75) {
+                    razones.push(
+                        'Su nivel de actividad registrado se acerca a tu rutina.'
+                    );
+                }
+
+                const personalidad = componentes.find(c => c.nombre === 'personalidad');
+                if (personalidad && personalidad.puntaje >= 50) {
+                    razones.push(
+                        'Su personalidad registrada comparte rasgos con lo que buscas.'
+                    );
+                }
+
+                const convivenciaNinos =
+                    componentes.find(c => c.nombre === 'convivencia con niños');
+
+                if (convivenciaNinos?.puntaje === 100) {
+                    razones.push(
+                        'La ficha indica que puede convivir con niños.'
+                    );
+                }
+
+                const convivenciaAnimales =
+                    componentes.find(c =>
+                        c.nombre === 'convivencia con otros animales'
+                    );
+
+                if (convivenciaAnimales?.puntaje === 100) {
+                    razones.push(
+                        'La ficha indica que puede convivir con otras mascotas; la presentación debe evaluarse individualmente.'
+                    );
+                }
+
+                if (!razones.length) {
+                    razones.push(
+                        'Esta mascota puede ser una opción para conocer mejor. Revisa sus características y necesidades antes de decidir.'
+                    );
+                }
+
+                return { puntuacion, componentes, razones };
+            }
+
+            function crearDescripcion(mascota) {
+                const detalles = [
+                    mascota.especie,
+                    mascota.raza,
+                    mascota.edad ? `${mascota.edad}` : null,
+                    mascota.sexo
+                ].filter(Boolean);
+
+                return detalles.length
+                    ? detalles.join(' · ')
+                    : 'Conoce su ficha para descubrir más sobre ella.';
+            }
+
+            function crearTarjeta(mascota, indice, resultado) {
+                const id = Number(mascota.idMascota);
+
+                if (!Number.isFinite(id) || id <= 0) return '';
+
+                const nombre = escapeHTML(mascota.nombre || 'Mascota');
+                const descripcion = escapeHTML(crearDescripcion(mascota));
+                const puntuacion = resultado.puntuacion;
+                const imagen = typeof mascota.imagenUrl === 'string'
+                    ? mascota.imagenUrl.trim()
+                    : '';
+
+                // Aceptamos solamente URL web seguras para imágenes.
+                const imagenSegura = /^https?:\/\//i.test(imagen)
+                    ? escapeHTML(imagen)
+                    : '';
+
+                const foto = imagenSegura
+                    ? `<img class="match-pet-image"
+                            src="${imagenSegura}"
+                            alt="Foto de ${nombre}"
+                            loading="lazy"
+                            onerror="this.style.display='none';this.nextElementSibling.hidden=false;">
+                       <div class="match-pet-placeholder" hidden>
+                           <i class="bi bi-heart-fill" aria-hidden="true"></i>
+                       </div>`
+                    : `<div class="match-pet-placeholder">
+                           <i class="bi bi-heart-fill" aria-hidden="true"></i>
+                       </div>`;
+
+                const razones = resultado.razones
+                    .map(razon => `<li>${escapeHTML(razon)}</li>`)
+                    .join('');
+
+                return `
+                    <div class="col-12 col-md-6">
+                        <article class="match-pet-card">
+                            <div class="match-pet-image-wrap">
+                                ${foto}
+                                <span class="match-pet-rank">
+                                    ${indice === 0 ? 'Tu primera coincidencia' : 'Otra gran opción'}
+                                </span>
+                            </div>
+
+                            <div class="match-pet-body">
+                                <h3 class="match-pet-name">${nombre}</h3>
+                                <p class="match-pet-description">${descripcion}</p>
+
+                                <div class="match-score-row">
+                                    <span class="match-score-label">
+                                        Coincidencia orientativa
+                                    </span>
+                                    <span class="match-score">
+                                        ${puntuacion === null ? '—' : `${puntuacion}%`}
+                                    </span>
+                                </div>
+
+                                <div class="match-score-track"
+                                     role="progressbar"
+                                     aria-label="Porcentaje orientativo de coincidencia"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"
+                                     aria-valuenow="${puntuacion ?? 0}">
+                                    <div class="match-score-fill"
+                                         style="width:${puntuacion ?? 0}%"></div>
+                                </div>
+
+                                <h4 class="match-reasons-title">
+                                    ¿Por qué aparece aquí?
+                                </h4>
+
+                                <ul class="match-reasons">${razones}</ul>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-match-primary w-100"
+                                    data-adoptar-id="${id}">
+                                    <i class="bi bi-heart-fill me-2"></i>
+                                    Solicitar adopción
+                                </button>
+                            </div>
+                        </article>
+                    </div>`;
+            }
+
+            function mostrarResultados(mascotas, respuestas) {
+                const evaluadas = mascotas
+                    .filter(mascota =>
+                        normalizar(mascota.estado) === 'disponible'
+                    )
+                    .map(mascota => ({
+                        mascota,
+                        ...calcularCompatibilidad(mascota, respuestas)
+                    }));
+
+                // Ordenamos por puntuación conocida. Si faltan datos para
+                // una mascota, no inventamos un porcentaje para ella.
+                evaluadas.sort((a, b) => {
+                    if (a.puntuacion === null && b.puntuacion !== null) return 1;
+                    if (b.puntuacion === null && a.puntuacion !== null) return -1;
+                    return (b.puntuacion ?? -1) - (a.puntuacion ?? -1);
+                });
+
+                const mejores = evaluadas
+                    .filter(resultado => resultado.puntuacion !== null)
+                    .slice(0, 2);
+
+                const preparacion = respuestas.preparacion;
+                let notaResponsable = '';
+
+                if (preparacion === 'informandome') {
+                    notaResponsable = `
+                        <div class="match-note mt-3 mb-0">
+                            <i class="bi bi-book-half mt-1"></i>
+                            <div>
+                                <strong>Un buen siguiente paso:</strong>
+                                infórmate sobre alimentación, atención veterinaria,
+                                tiempo, gastos y adaptación antes de decidir.
+                            </div>
+                        </div>`;
+                } else if (preparacion === 'organizado') {
+                    notaResponsable = `
+                        <div class="match-note mt-3 mb-0">
+                            <i class="bi bi-list-check mt-1"></i>
+                            <div>
+                                <strong>Vas por buen camino.</strong>
+                                Conversa con quienes compartirán el hogar y prepara
+                                un plan de cuidados y gastos.
+                            </div>
+                        </div>`;
+                } else {
+                    notaResponsable = `
+                        <div class="match-note mt-3 mb-0">
+                            <i class="bi bi-heart-fill mt-1"></i>
+                            <div>
+                                <strong>La preparación también importa.</strong>
+                                Confirma que tienes tiempo, apoyo y presupuesto
+                                para acompañar a tu mascota a largo plazo.
+                            </div>
+                        </div>`;
+                }
+
+                let contenido = `
+                    <div class="match-results-header">
+                        <div class="match-intro-icon">
+                            <i class="bi bi-stars"></i>
+                        </div>
+                        <h2 class="match-section-title">¡Aquí están tus coincidencias!</h2>
+                        <p class="match-section-subtitle">
+                            Estas recomendaciones se basan en las características
+                            disponibles en las fichas de nuestras mascotas.
+                        </p>
+                    </div>`;
+
+                if (mejores.length) {
+                    contenido += `
+                        <div class="row g-3">
+                            ${mejores.map((resultado, indice) =>
+                                crearTarjeta(
+                                    resultado.mascota,
+                                    indice,
+                                    resultado
+                                )
+                            ).join('')}
+                        </div>`;
+                } else {
+                    contenido += `
+                        <div class="match-empty">
+                            <div class="match-empty-icon">
+                                <i class="bi bi-search-heart"></i>
+                            </div>
+                            <h3 class="h5 fw-bold">Todavía no encontramos una coincidencia calculable</h3>
+                            <p class="text-secondary">
+                                Puede que falten características en las fichas
+                                de las mascotas disponibles. Puedes revisar el
+                                catálogo completo y conocerlas por tu cuenta.
+                            </p>
+                        </div>`;
+                }
+
+                contenido += `
+                    ${notaResponsable}
+                    <div class="match-note mt-3">
+                        <i class="bi bi-info-circle-fill mt-1"></i>
+                        <div>
+                            <strong>Recuerda:</strong>
+                            el porcentaje es orientativo, no una garantía de
+                            compatibilidad ni una aprobación de adopción.
+                            El equipo deberá evaluar cada caso.
+                        </div>
+                    </div>
+                    <div class="match-results-bottom">
+                        <a href="index.html" class="btn btn-match-primary">
+                            <i class="bi bi-search me-2"></i>
+                            Prefiero buscar por mi cuenta
+                        </a>
+                        <button type="button" id="matchVolverPreguntas"
+                                class="btn-match-secondary">
+                            <i class="bi bi-arrow-repeat me-1"></i>
+                            Cambiar mis respuestas
+                        </button>
+                    </div>`;
+
+                resultsContent.innerHTML = contenido;
+                resultsSection.hidden = false;
+
+                document.getElementById('matchVolverPreguntas')
+                    ?.addEventListener('click', () => {
+                        resultsSection.hidden = true;
+                        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+
+                // Este botón conecta con el flujo de adopción que ya existe
+                // en cliente/index.html. El ajuste de ese archivo lo haremos
+                // en el siguiente paso.
+                resultsContent.querySelectorAll('[data-adoptar-id]')
+                    .forEach(boton => {
+                        boton.addEventListener('click', () => {
+                            const id = boton.dataset.adoptarId;
+                            window.location.href =
+                                `index.html?adoptar=${encodeURIComponent(id)}`;
+                        });
+                    });
+
+                resultsSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+
+                const respuestas = obtenerRespuestas();
+                const preguntasFaltantes = [];
+
+                form.querySelectorAll('[data-question]').forEach(section => {
+                    const nombre = section.dataset.question;
+
+                    if (!respuestas[nombre]) {
+                        preguntasFaltantes.push(section);
+                    }
+                });
+
+                if (preguntasFaltantes.length) {
+                    formError.style.display = 'block';
+                    preguntasFaltantes[0].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    preguntasFaltantes[0].querySelector('input')?.focus({
+                        preventScroll: true
+                    });
+                    return;
+                }
+
+                const botonEnviar = form.querySelector('button[type="submit"]');
+                const textoOriginal = botonEnviar.innerHTML;
+
+                botonEnviar.disabled = true;
+                botonEnviar.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Buscando coincidencias...';
+
+                formError.style.display = 'none';
+                resultsSection.hidden = true;
+
+                try {
+                    const mascotas = await Mascotas.listarPorEstado('DISPONIBLE');
+
+                    if (!Array.isArray(mascotas)) {
+                        throw new Error('No se pudo obtener la lista de mascotas.');
+                    }
+
+                    mostrarResultados(mascotas, respuestas);
+                } catch (error) {
+                    console.error('Error al calcular MascotICA\'s Match:', error);
+
+                    resultsSection.hidden = false;
+                    resultsContent.innerHTML = `
+                        <div class="match-empty">
+                            <div class="match-empty-icon">
+                                <i class="bi bi-exclamation-circle"></i>
+                            </div>
+                            <h2 class="h5 fw-bold">No pudimos cargar las mascotas</h2>
+                            <p class="text-secondary">
+                                Inténtalo de nuevo en unos momentos o consulta
+                                el catálogo completo.
+                            </p>
+                            <div class="match-results-bottom">
+                                <button type="button" id="matchReintentar"
+                                        class="btn btn-match-primary">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>
+                                    Intentar de nuevo
+                                </button>
+                                <a href="index.html" class="btn-match-secondary">
+                                    Ver catálogo
+                                </a>
+                            </div>
+                        </div>`;
+
+                    document.getElementById('matchReintentar')
+                        ?.addEventListener('click', () => form.requestSubmit());
+
+                    resultsSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                } finally {
+                    botonEnviar.disabled = false;
+                    botonEnviar.innerHTML = textoOriginal;
+                }
+            });
+
+            actualizarProgreso();
+        })();
+    </script>
+</body>
+</html>
