@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -15,6 +16,51 @@
 
 <div id="navbar"></div>
 <div id="alertas"></div>
+
+<!-- Invitación a MascotICA's Match -->
+<div class="modal fade" id="modalInvitacionMatch" tabindex="-1"
+     aria-labelledby="tituloInvitacionMatch" aria-hidden="true"
+     data-bs-backdrop="static" data-bs-keyboard="false">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloInvitacionMatch">
+                    <i class="bi bi-stars"></i>
+                    ¡Encuentra a tu compañero ideal!
+                </h5>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    ¿Quieres descubrir qué mascota de nuestro albergue
+                    podría ser más compatible contigo?
+                </p>
+
+                <p class="text-muted mb-0">
+                    Responde unas sencillas preguntas sobre tu estilo
+                    de vida y conoce las mascotas que podrían encajar
+                    mejor contigo.
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                        id="btnMatchDespues">
+                    No por ahora
+                </button>
+
+                <button type="button" class="btn btn-primary-ps"
+                        id="btnMatchProbar">
+                    <i class="bi bi-heart"></i>
+                    Probar Match
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <button type="button" class="btn-carrito-flotante" id="btnAbrirCarrito" aria-label="Ver carrito">
     <i class="bi bi-cart3"></i>
@@ -397,6 +443,10 @@
     let modalPago = null;
     let modalCompraExitosa = null;
 
+    // Invitación de MascotICA's Match.
+    let modalInvitacionMatch = null;
+    let procesandoDecisionMatch = false;
+
     // Datos devueltos por la consulta de DNI/RUC.
     // Se invalidan si el usuario cambia el tipo o número de documento.
     let documentoConsultadoPago = null;
@@ -408,6 +458,134 @@
         new bootstrap.Modal(
             document.getElementById('modalEvaluacion')
         );
+
+
+    /*
+     * INVITACIÓN MASCOTICA'S MATCH
+     *
+     * Consulta si el cliente ya respondió la invitación.
+     * La respuesta se guarda en Supabase para que no se repita
+     * al volver a iniciar sesión.
+     */
+    async function iniciarInvitacionMatch() {
+
+        if (!usuario || usuario.rol !== 'CLIENTE') {
+            return;
+        }
+
+        const modalElemento =
+            document.getElementById('modalInvitacionMatch');
+
+        const botonProbar =
+            document.getElementById('btnMatchProbar');
+
+        const botonDespues =
+            document.getElementById('btnMatchDespues');
+
+        if (!modalElemento || !botonProbar || !botonDespues) {
+            return;
+        }
+
+        modalInvitacionMatch =
+            new bootstrap.Modal(modalElemento);
+
+        const { data, error } = await db
+            .from('match_invitaciones')
+            .select('decision')
+            .eq('usuario_id', usuario.idUsuario)
+            .maybeSingle();
+
+        if (error) {
+
+            console.error(
+                'No se pudo consultar la invitación Match:',
+                error
+            );
+
+            return;
+
+        }
+
+        // Si ya respondió, no volver a mostrar la invitación.
+        if (data) {
+            return;
+        }
+
+        modalInvitacionMatch.show();
+
+
+        async function guardarDecision(decision) {
+
+            if (procesandoDecisionMatch) {
+                return false;
+            }
+
+            procesandoDecisionMatch = true;
+
+            botonProbar.disabled = true;
+            botonDespues.disabled = true;
+
+            const { error: errorGuardar } = await db
+                .from('match_invitaciones')
+                .insert({
+                    usuario_id: usuario.idUsuario,
+                    decision: decision
+                });
+
+            if (errorGuardar) {
+
+                console.error(
+                    'No se pudo guardar la decisión de Match:',
+                    errorGuardar
+                );
+
+                UI.setFlash(
+                    'error',
+                    'No pudimos guardar tu respuesta. Inténtalo nuevamente.'
+                );
+
+                UI.mostrarFlash();
+
+                procesandoDecisionMatch = false;
+
+                botonProbar.disabled = false;
+                botonDespues.disabled = false;
+
+                return false;
+
+            }
+
+            modalInvitacionMatch.hide();
+
+            if (decision === 'probar') {
+
+                window.location.href = 'match.html';
+
+                return true;
+
+            }
+
+            UI.setFlash(
+                'exito',
+                "¡No hay problema! Puedes probar MascotICA's Match en cualquier momento desde el botón de la barra de navegación."
+            );
+
+            UI.mostrarFlash();
+
+            return true;
+
+        }
+
+
+        botonProbar.addEventListener('click', () => {
+            guardarDecision('probar');
+        });
+
+        botonDespues.addEventListener('click', () => {
+            guardarDecision('no_por_ahora');
+        });
+
+    }
 
 
     if (usuario) {
@@ -429,6 +607,9 @@
             new bootstrap.Modal(
                 document.getElementById('modalCompraExitosa')
             );
+
+        // Se comprueba la invitación al cargar el catálogo.
+        iniciarInvitacionMatch();
 
     }
 
@@ -1145,36 +1326,41 @@
                 });
 
             });
-            
-            const parametrosURL = new URLSearchParams(window.location.search);
-            const idMascotaAdopcion = parametrosURL.get('adoptar');
-            
-            if (idMascotaAdopcion) {
-                const botonAdopcion = Array.from(
-                    cont.querySelectorAll('[data-action="adoptar"]')
-                ).find(btn => btn.dataset.id === idMascotaAdopcion);
-                
-                if (botonAdopcion) {
-                    botonAdopcion.click();
-                    
-                    parametrosURL.delete('adoptar');
-                    
-                    const nuevaURL =
+
+        const parametrosURL = new URLSearchParams(window.location.search);
+        const idMascotaAdopcion = parametrosURL.get('adoptar');
+
+        if (idMascotaAdopcion) {
+
+            const botonAdopcion = Array.from(
+                cont.querySelectorAll('[data-action="adoptar"]')
+            ).find(btn => btn.dataset.id === idMascotaAdopcion);
+
+            if (botonAdopcion) {
+
+                botonAdopcion.click();
+
+                parametrosURL.delete('adoptar');
+
+                const nuevaURL =
                     window.location.pathname +
                     (parametrosURL.toString()
-                      ? '?' + parametrosURL.toString()
-                      : '') +
-                      window.location.hash;
-                      
-                      window.history.replaceState({}, '', nuevaURL);
-                    
-                    } else {
-                        console.warn(
-                            'No se encontró la mascota solicitada desde Match:',
-                            idMascotaAdopcion
-                        );
-                    }
-                }
+                        ? '?' + parametrosURL.toString()
+                        : '') +
+                    window.location.hash;
+
+                window.history.replaceState({}, '', nuevaURL);
+
+            } else {
+
+                console.warn(
+                    'No se encontró la mascota solicitada desde Match:',
+                    idMascotaAdopcion
+                );
+
+            }
+
+        }
 
     }
 

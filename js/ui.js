@@ -53,6 +53,11 @@ const UI = {
             href: 'perdidas.html',
             icono: 'bi-geo-alt-fill',
             texto: 'Reportar mascota'
+        },
+        {
+        href: 'match.html',
+        icono: 'bi-stars',
+        texto: "MascotICA's Match"
         }
     ],
 
