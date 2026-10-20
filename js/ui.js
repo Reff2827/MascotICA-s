@@ -1,3 +1,4 @@
+
 const UI = {
 
     /* ----------------------------------------------------------------------
@@ -55,19 +56,25 @@ const UI = {
             texto: 'Reportar mascota'
         },
         {
-        href: 'match.html',
-        icono: 'bi-stars',
-        texto: "MascotICA's Match"
+            href: 'match.html',
+            icono: 'bi-stars',
+            texto: "MascotICA's Match"
         }
     ],
 
 
     navbarAdmin(usuario) {
+        const raiz = Auth.raiz();
+
+        const enlaces = UI.ENLACES_ADMIN.map(e => ({
+            ...e,
+            href: raiz + 'admin/' + e.href
+        }));
 
         UI._montarNavbar(
             usuario,
-            UI.ENLACES_ADMIN,
-            'dashboard.html',
+            enlaces,
+            raiz + 'admin/dashboard.html',
             'Admin'
         );
 
@@ -75,11 +82,17 @@ const UI = {
 
 
     navbarCliente(usuario) {
+        const raiz = Auth.raiz();
+
+        const enlaces = UI.ENLACES_CLIENTE.map(e => ({
+            ...e,
+            href: raiz + 'cliente/' + e.href
+        }));
 
         UI._montarNavbar(
             usuario,
-            UI.ENLACES_CLIENTE,
-            'index.html',
+            enlaces,
+            raiz + 'cliente/index.html',
             ''
         );
 
@@ -201,8 +214,14 @@ const UI = {
             enlaces
                 .map(e => {
 
+                    const archivoEnlace =
+                        e.href
+                            .split('/')
+                            .pop()
+                            .split('?')[0];
+
                     const activo =
-                        e.href === actual
+                        archivoEnlace === actual
                             ? ' is-active'
                             : '';
 
