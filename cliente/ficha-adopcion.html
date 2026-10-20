@@ -60,8 +60,6 @@
                 </div>
 
             </div>
-
-
             <!-- Contenido -->
             <div class="ficha-adopcion__contenido">
 
@@ -81,7 +79,6 @@
 
                 </div>
 
-
                 <!-- Ficha -->
                 <div
                     id="ficha"
@@ -100,7 +97,6 @@
 
                         </div>
 
-
                         <div>
 
                             <h2
@@ -111,7 +107,6 @@
                             <p class="ficha-adopcion__tipo">
                                 Mascota adoptada oficialmente
                             </p>
-
 
                             <div class="ficha-adopcion__datos">
 
@@ -126,7 +121,6 @@
 
                                 </div>
 
-
                                 <div class="ficha-adopcion__dato">
 
                                     <small>
@@ -138,7 +132,6 @@
 
                                 </div>
 
-
                                 <div class="ficha-adopcion__dato">
 
                                     <small>
@@ -149,7 +142,6 @@
                                     </strong>
 
                                 </div>
-
 
                                 <div class="ficha-adopcion__dato">
 
@@ -164,7 +156,6 @@
 
                             </div>
 
-
                             <!-- Datos de adopción -->
                             <div class="ficha-adopcion__seccion">
 
@@ -175,7 +166,6 @@
                                     Datos de adopción
 
                                 </div>
-
 
                                 <div class="ficha-adopcion__datos">
 
@@ -189,7 +179,6 @@
                                         </strong>
 
                                     </div>
-
 
                                     <div class="ficha-adopcion__dato">
 
@@ -210,7 +199,6 @@
 
                     </div>
 
-
                     <!-- Datos del adoptante -->
                     <div class="ficha-adopcion__seccion">
 
@@ -221,7 +209,6 @@
                             Datos del adoptante
 
                         </div>
-
 
                         <div class="ficha-adopcion__adoptante">
 
@@ -238,11 +225,10 @@
 
                                 </div>
 
-
                                 <div class="ficha-adopcion__dato">
 
                                     <small>
-                                        DNI
+                                        Documento de identidad
                                     </small>
 
                                     <strong id="dniAdoptante">
@@ -251,7 +237,6 @@
                                 </div>
 
                             </div>
-
 
                             <!-- QR -->
                             <div class="ficha-adopcion__qr">
@@ -275,8 +260,7 @@
 
                 </div>
 
-
-                <!-- Ficha no encontrada -->
+                <!-- Ficha no encontrada o acceso no autorizado -->
                 <div
                     id="sinFicha"
                     class="d-none text-center py-5">
@@ -286,17 +270,18 @@
                     </i>
 
                     <h5 class="fw-bold mt-3">
-                        Ficha no encontrada
+                        Ficha no disponible
                     </h5>
 
-                    <p class="text-muted mb-0">
+                    <p
+                        id="mensajeSinFicha"
+                        class="text-muted mb-0">
                         No se encontró una ficha de adopción para esta solicitud.
                     </p>
 
                 </div>
 
             </div>
-
 
             <!-- Pie -->
             <div class="ficha-adopcion__pie">
@@ -310,7 +295,6 @@
     </div>
 
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -327,214 +311,265 @@
 <script src="../js/ui.js"></script>
 
 <script>
+const usuarioSesion = Auth.usuarioActual();
 
-const usuario =
-    Auth.requireCliente();
-
-
-if (usuario) {
-
-    UI.navbarCliente(usuario);
-
-    cargarFicha();
-
-}
+iniciarFicha();
 
 
-async function cargarFicha() {
+async function iniciarFicha() {
 
     const idSolicitud =
         new URLSearchParams(
             window.location.search
         ).get('id');
 
-
     if (!idSolicitud) {
-
         mostrarSinFicha();
-
         return;
-
     }
 
+    try {
 
-    const ficha =
-        await FichasAdopcion.buscarPorSolicitud(
-            idSolicitud
-        );
+        // Verificar la sesión real de Supabase.
+        const {
+            data: { user },
+            error: errorUsuario
+        } = await db.auth.getUser();
 
+        if (errorUsuario || !user) {
 
-    if (!ficha) {
+            mostrarSinFicha(
+                'Debes iniciar sesión para consultar la ficha privada.'
+            );
 
-        mostrarSinFicha();
+            return;
+        }
 
-        return;
+        // Comprobar si el usuario tiene permisos de administrador.
+        const {
+            data: resultadoAdmin,
+            error: errorAdmin
+        } = await db.rpc('es_admin');
 
-    }
+        const esAdmin =
+            !errorAdmin &&
+            resultadoAdmin === true;
 
+        // Mantener la navegación correspondiente al rol.
+        if (esAdmin) {
 
-    const perfil =
-        await FichasAdopcion.buscarPerfil(
-            ficha.id_usuario
-        );
+            if (
+                usuarioSesion &&
+                usuarioSesion.rol === 'ADMIN'
+            ) {
+                UI.navbarAdmin(usuarioSesion);
+            }
 
+        } else if (
+            usuarioSesion &&
+            usuarioSesion.rol === 'CLIENTE'
+        ) {
 
-    document.getElementById(
-        'nombreMascota'
-    ).textContent =
-        ficha.nombre_mascota;
+            UI.navbarCliente(usuarioSesion);
 
+        }
 
-    document.getElementById(
-        'especieMascota'
-    ).textContent =
-        ficha.especie;
+        // Buscar la ficha. Supabase RLS debe permitir
+        // únicamente al administrador o al propietario.
+        const ficha =
+            await FichasAdopcion.buscarPorSolicitud(
+                idSolicitud
+            );
 
+        if (!ficha) {
 
-    document.getElementById(
-        'razaMascota'
-    ).textContent =
-        ficha.raza ||
-        'No especificado';
+            mostrarSinFicha(
+                'No se encontró una ficha de adopción para esta solicitud o no tienes permiso para consultarla.'
+            );
 
+            return;
+        }
 
-    document.getElementById(
-        'edadMascota'
-    ).textContent =
-        ficha.edad;
+        // Verificación adicional del propietario.
+        const esPropietario =
+            ficha.id_usuario === user.id;
 
+        if (!esAdmin && !esPropietario) {
 
-    document.getElementById(
-        'sexoMascota'
-    ).textContent =
-        ficha.sexo ||
-        'No registrado';
+            mostrarSinFicha(
+                'No tienes permiso para consultar esta ficha de adopción.'
+            );
 
+            return;
+        }
 
-    document.getElementById(
-        'codigoFicha'
-    ).textContent =
-        ficha.codigo;
+        // Obtener el perfil del adoptante.
+        const perfil =
+            await FichasAdopcion.buscarPerfil(
+                ficha.id_usuario
+            );
 
+        // Datos de la mascota.
+        document.getElementById(
+            'nombreMascota'
+        ).textContent =
+            ficha.nombre_mascota || 'Sin nombre';
 
-    const fecha =
-        new Date(
+        document.getElementById(
+            'especieMascota'
+        ).textContent =
+            ficha.especie || 'No especificada';
+
+        document.getElementById(
+            'razaMascota'
+        ).textContent =
+            ficha.raza || 'No especificado';
+
+        document.getElementById(
+            'edadMascota'
+        ).textContent =
+            ficha.edad || 'No registrada';
+
+        document.getElementById(
+            'sexoMascota'
+        ).textContent =
+            ficha.sexo || 'No registrado';
+
+        document.getElementById(
+            'codigoFicha'
+        ).textContent =
+            ficha.codigo || '—';
+
+        // Fecha y hora de adopción.
+        const fecha = new Date(
             ficha.fecha_adopcion
         );
 
+        document.getElementById(
+            'fechaAdopcion'
+        ).textContent =
+            Number.isNaN(fecha.getTime())
+                ? 'No registrada'
+                : fecha.toLocaleDateString('es-PE');
 
-    document.getElementById(
-        'fechaAdopcion'
-    ).textContent =
-        fecha.toLocaleDateString(
-            'es-PE'
-        );
+        document.getElementById(
+            'horaAdopcion'
+        ).textContent =
+            Number.isNaN(fecha.getTime())
+                ? 'No registrada'
+                : fecha.toLocaleTimeString(
+                    'es-PE',
+                    {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }
+                );
 
+        // Datos del adoptante.
+        document.getElementById(
+            'nombreAdoptante'
+        ).textContent =
+            perfil?.nombre ||
+            usuarioSesion?.nombre ||
+            'No registrado';
 
-    document.getElementById(
-        'horaAdopcion'
-    ).textContent =
-        fecha.toLocaleTimeString(
-            'es-PE',
-            {
-                hour: '2-digit',
-                minute: '2-digit'
-            }
-        );
+        const tipoDocumento =
+            ficha.tipo_documento || 'DNI';
 
+        const numeroDocumento =
+            ficha.numero_documento ||
+            ficha.dni ||
+            'No registrado';
 
-    document.getElementById(
-        'nombreAdoptante'
-    ).textContent =
-        perfil?.nombre ||
-        usuario.nombre ||
-        'No registrado';
+        document.getElementById(
+            'dniAdoptante'
+        ).textContent =
+            `${tipoDocumento}: ${numeroDocumento}`;
 
+        // Fotografía de la mascota.
+        document.getElementById(
+            'fotoMascota'
+        ).src =
+            UI.imagenOPlaceholder(
+                ficha.imagen_url,
+                ficha.nombre_mascota
+            );
 
-    document.getElementById(
-        'dniAdoptante'
-    ).textContent =
-        ficha.dni;
-
-
-    document.getElementById(
-        'fotoMascota'
-    ).src =
-        UI.imagenOPlaceholder(
-            ficha.imagen_url,
-            ficha.nombre_mascota
-        );
-
-
-    const urlPublica =
-        new URL(
+        // Generar el QR hacia la ficha pública.
+        const urlPublica = new URL(
             'ficha-publica.html',
             window.location.href
         );
 
+        urlPublica.searchParams.set(
+            'id',
+            ficha.codigo
+        );
 
-    urlPublica.searchParams.set(
-        'id',
-        ficha.codigo
-    );
+        const contenedorQR =
+            document.getElementById('codigoQR');
 
+        contenedorQR.replaceChildren();
 
-    new QRCode(
+        new QRCode(
+            contenedorQR,
+            {
+                text: urlPublica.href,
+                width: 180,
+                height: 180
+            }
+        );
+
         document.getElementById(
-            'codigoQR'
-        ),
-        {
-            text:
-                urlPublica.href,
+            'textoCodigo'
+        ).textContent =
+            ficha.codigo || '';
 
-            width:
-                180,
+        // Mostrar la ficha completa.
+        document.getElementById(
+            'cargando'
+        ).classList.add('d-none');
 
-            height:
-                180
-        }
-    );
+        document.getElementById(
+            'ficha'
+        ).classList.remove('d-none');
 
+    } catch (error) {
 
-    document.getElementById(
-        'textoCodigo'
-    ).textContent =
-        ficha.codigo;
+        console.error(
+            'Error al cargar la ficha de adopción:',
+            error
+        );
 
+        mostrarSinFicha(
+            'No se pudo cargar la ficha. Comprueba tu sesión e inténtalo nuevamente.'
+        );
+
+    }
+
+}
+
+function mostrarSinFicha(
+    mensaje = 'No se encontró una ficha de adopción para esta solicitud.'
+) {
 
     document.getElementById(
         'cargando'
-    ).classList.add(
-        'd-none'
-    );
-
+    ).classList.add('d-none');
 
     document.getElementById(
         'ficha'
-    ).classList.remove(
-        'd-none'
-    );
-
-}
-
-
-function mostrarSinFicha() {
+    ).classList.add('d-none');
 
     document.getElementById(
-        'cargando'
-    ).classList.add(
-        'd-none'
-    );
-
+        'mensajeSinFicha'
+    ).textContent = mensaje;
 
     document.getElementById(
         'sinFicha'
-    ).classList.remove(
-        'd-none'
-    );
+    ).classList.remove('d-none');
 
 }
-
 </script>
 
 </body>

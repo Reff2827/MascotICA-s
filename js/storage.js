@@ -653,7 +653,16 @@ function mapSolicitud(row) {
             row.dni || null,
 
         evaluacion:
-            row.evaluacion || null
+            row.evaluacion || null,
+
+        tipoDocumento: 
+            row.tipoDocumento || null,
+
+        numeroDocumento:
+            row.numeroDocumento || null,
+
+        fechaNacimiento:
+            row.fechaNacimiento || null
 
     };
 
@@ -677,6 +686,9 @@ const Solicitudes = {
                     estado,
                     dni,
                     evaluacion,
+                    tipoDocumento:tipo_documento,
+                    numeroDocumento:numero_documento,
+                    fechaNacimiento:fecha_nacimiento,
                     perfiles(nombre)
                 `)
                 .order(
@@ -733,6 +745,9 @@ const Solicitudes = {
                     estado,
                     dni,
                     evaluacion,
+                    tipoDocumento:tipo_documento,
+                    numeroDocumento:numero_documento,
+                    fechaNacimiento:fecha_nacimiento,
                     perfiles(nombre)
                 `)
                 .eq(
@@ -777,6 +792,9 @@ const Solicitudes = {
                     estado,
                     dni,
                     evaluacion,
+                    tipoDocumento:tipo_documento,
+                    numeroDocumento:numero_documento,
+                    fechaNacimiento:fecha_nacimiento,
                     perfiles(nombre)
                 `)
                 .eq(
@@ -1133,6 +1151,9 @@ const FichasAdopcion = {
                     id_mascota,
                     id_usuario,
                     dni,
+                    tipo_documento,
+                    numero_documento,
+                    fecha_nacimiento,
                     fecha_adopcion,
                     nombre_mascota,
                     especie,
@@ -1193,6 +1214,9 @@ const FichasAdopcion = {
                     id_mascota,
                     id_usuario,
                     dni,
+                    tipo_documento,
+                    numero_documento,
+                    fecha_nacimiento,
                     fecha_adopcion,
                     nombre_mascota,
                     especie,
