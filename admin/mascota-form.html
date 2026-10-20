@@ -225,6 +225,148 @@
                 </div>
 
 
+                <!-- NUEVO: TAMAÑO PARA MASCOTICA'S MATCH -->
+                <div class="mb-3">
+
+                    <label class="form-label" for="tamano">
+                        Tamaño de la mascota
+                    </label>
+
+                    <select
+                        id="tamano"
+                        class="form-select">
+
+                        <option value="">
+                            -- No especificado --
+                        </option>
+
+                        <option value="PEQUENO">
+                            Pequeño
+                        </option>
+
+                        <option value="MEDIANO">
+                            Mediano
+                        </option>
+
+                        <option value="GRANDE">
+                            Grande
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- NUEVO: NIVEL DE ACTIVIDAD -->
+                <div class="mb-3">
+
+                    <label class="form-label" for="nivelActividad">
+                        Nivel de actividad
+                    </label>
+
+                    <select
+                        id="nivelActividad"
+                        class="form-select">
+
+                        <option value="">
+                            -- No especificado --
+                        </option>
+
+                        <option value="TRANQUILO">
+                            Tranquilo
+                        </option>
+
+                        <option value="MODERADO">
+                            Moderado
+                        </option>
+
+                        <option value="ACTIVO">
+                            Muy activo
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- NUEVO: PERSONALIDAD -->
+                <div class="mb-3">
+
+                    <label class="form-label" for="personalidad">
+                        Personalidad
+                    </label>
+
+                    <input
+                        type="text"
+                        id="personalidad"
+                        class="form-control"
+                        maxlength="250"
+                        placeholder="Ej: Cariñoso, juguetón y sociable"
+                        autocomplete="off">
+
+                    <small class="text-muted">
+                        Describe cómo se comporta la mascota.
+                    </small>
+
+                </div>
+
+
+                <!-- NUEVO: CONVIVENCIA CON NIÑOS -->
+                <div class="mb-3">
+
+                    <label class="form-label" for="conviveNinos">
+                        ¿Convive bien con niños?
+                    </label>
+
+                    <select
+                        id="conviveNinos"
+                        class="form-select">
+
+                        <option value="DESCONOCIDO">
+                            No se sabe todavía
+                        </option>
+
+                        <option value="SI">
+                            Sí
+                        </option>
+
+                        <option value="NO">
+                            No
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- NUEVO: CONVIVENCIA CON OTRAS MASCOTAS -->
+                <div class="mb-3">
+
+                    <label class="form-label" for="conviveMascotas">
+                        ¿Convive bien con otras mascotas?
+                    </label>
+
+                    <select
+                        id="conviveMascotas"
+                        class="form-select">
+
+                        <option value="DESCONOCIDO">
+                            No se sabe todavía
+                        </option>
+
+                        <option value="SI">
+                            Sí
+                        </option>
+
+                        <option value="NO">
+                            No
+                        </option>
+
+                    </select>
+
+                </div>
+
+
                 <div class="mb-3">
 
                     <label class="form-label">
@@ -379,7 +521,6 @@
 
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabaseClient.js"></script>
@@ -528,6 +669,38 @@
             'estado'
         ).value =
             mascota.estado;
+
+
+        /* NUEVO: cargar los datos utilizados por Match */
+
+        document.getElementById(
+            'tamano'
+        ).value =
+            mascota.tamano || '';
+
+
+        document.getElementById(
+            'nivelActividad'
+        ).value =
+            mascota.nivelActividad || '';
+
+
+        document.getElementById(
+            'personalidad'
+        ).value =
+            mascota.personalidad || '';
+
+
+        document.getElementById(
+            'conviveNinos'
+        ).value =
+            mascota.conviveNinos || 'DESCONOCIDO';
+
+
+        document.getElementById(
+            'conviveMascotas'
+        ).value =
+            mascota.conviveMascotas || 'DESCONOCIDO';
 
 
         document.getElementById(
@@ -1038,6 +1211,45 @@
                     edad,
 
                     sexo,
+
+                    /* NUEVO: datos de MascotICA's Match */
+
+                    tamano:
+                        document
+                            .getElementById(
+                                'tamano'
+                            )
+                            .value || null,
+
+                    nivelActividad:
+                        document
+                            .getElementById(
+                                'nivelActividad'
+                            )
+                            .value || null,
+
+                    personalidad:
+                        document
+                            .getElementById(
+                                'personalidad'
+                            )
+                            .value
+                            .trim() || null,
+
+                    conviveNinos:
+                        document
+                            .getElementById(
+                                'conviveNinos'
+                            )
+                            .value || 'DESCONOCIDO',
+
+                    conviveMascotas:
+                        document
+                            .getElementById(
+                                'conviveMascotas'
+                            )
+                            .value || 'DESCONOCIDO',
+
 
                     estado:
                         document

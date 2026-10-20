@@ -1,3 +1,4 @@
+
 const Mascotas = {
 
     async listar() {
@@ -12,7 +13,12 @@ const Mascotas = {
                     edad,
                     sexo,
                     estado,
-                    imagenUrl:imagen_url
+                    imagenUrl:imagen_url,
+                    tamano,
+                    nivelActividad:nivel_actividad,
+                    personalidad,
+                    conviveNinos:convive_ninos,
+                    conviveMascotas:convive_mascotas
                 `)
                 .order('id_mascota');
 
@@ -38,7 +44,12 @@ const Mascotas = {
                     edad,
                     sexo,
                     estado,
-                    imagenUrl:imagen_url
+                    imagenUrl:imagen_url,
+                    tamano,
+                    nivelActividad:nivel_actividad,
+                    personalidad,
+                    conviveNinos:convive_ninos,
+                    conviveMascotas:convive_mascotas
                 `)
                 .eq('estado', estado)
                 .order('id_mascota');
@@ -65,7 +76,12 @@ const Mascotas = {
                     edad,
                     sexo,
                     estado,
-                    imagenUrl:imagen_url
+                    imagenUrl:imagen_url,
+                    tamano,
+                    nivelActividad:nivel_actividad,
+                    personalidad,
+                    conviveNinos:convive_ninos,
+                    conviveMascotas:convive_mascotas
                 `)
                 .eq('id_mascota', Number(id))
                 .maybeSingle();
@@ -107,7 +123,27 @@ const Mascotas = {
 
             imagen_url:
                 mascota.imagenUrl ||
-                null
+                null,
+
+            tamano:
+                mascota.tamano ||
+                null,
+
+            nivel_actividad:
+                mascota.nivelActividad ||
+                null,
+
+            personalidad:
+                mascota.personalidad ||
+                null,
+
+            convive_ninos:
+                mascota.conviveNinos ||
+                'DESCONOCIDO',
+
+            convive_mascotas:
+                mascota.conviveMascotas ||
+                'DESCONOCIDO'
 
         };
 
@@ -120,7 +156,12 @@ const Mascotas = {
             edad,
             sexo,
             estado,
-            imagenUrl:imagen_url
+            imagenUrl:imagen_url,
+            tamano,
+            nivelActividad:nivel_actividad,
+            personalidad,
+            conviveNinos:convive_ninos,
+            conviveMascotas:convive_mascotas
         `;
 
 
