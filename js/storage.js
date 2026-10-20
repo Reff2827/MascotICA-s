@@ -1,3 +1,115 @@
+const PERSONALIDADES_MASCOTA = [
+    'Tranquila',
+    'Juguetona',
+    'Cariñosa',
+    'Sociable',
+    'Independiente',
+    'Curiosa',
+    'Protectora',
+    'Tímida',
+    'Enérgica',
+    'Inteligente',
+    'Comunicativa',
+    'Poco activa'
+];
+
+
+function normalizarPersonalidadEntrada(personalidad) {
+
+    if (!personalidad) {
+        return [];
+    }
+
+    let caracteristicas = personalidad;
+
+    if (typeof personalidad === 'string') {
+
+        try {
+
+            const resultado = JSON.parse(personalidad);
+
+            if (Array.isArray(resultado)) {
+                caracteristicas = resultado;
+            } else {
+                caracteristicas = [personalidad];
+            }
+
+        } catch {
+
+            caracteristicas = [personalidad];
+
+        }
+
+    }
+
+    if (!Array.isArray(caracteristicas)) {
+        return [];
+    }
+
+    return [
+        ...new Set(
+            caracteristicas.filter(
+                caracteristica =>
+                    typeof caracteristica === 'string' &&
+                    PERSONALIDADES_MASCOTA.includes(
+                        caracteristica
+                    )
+            )
+        )
+    ];
+
+}
+
+
+function normalizarPersonalidadSalida(personalidad) {
+
+    if (!personalidad) {
+        return [];
+    }
+
+    if (Array.isArray(personalidad)) {
+        return normalizarPersonalidadEntrada(personalidad);
+    }
+
+    if (typeof personalidad !== 'string') {
+        return [];
+    }
+
+    try {
+
+        const resultado = JSON.parse(personalidad);
+
+        if (Array.isArray(resultado)) {
+            return normalizarPersonalidadEntrada(resultado);
+        }
+
+    } catch {
+
+        // Permite manejar registros antiguos que guardaban texto libre.
+
+    }
+
+    return [personalidad];
+
+}
+
+
+function mapMascota(row) {
+
+    if (!row) {
+        return row;
+    }
+
+    return {
+        ...row,
+        personalidad: normalizarPersonalidadSalida(
+            row.personalidad
+        )
+    };
+
+}
+
+
 
 const Mascotas = {
 
@@ -27,7 +139,7 @@ const Mascotas = {
             return [];
         }
 
-        return data;
+        return data.map(mapMascota);
 
     },
 
@@ -59,7 +171,7 @@ const Mascotas = {
             return [];
         }
 
-        return data;
+        return data.map(mapMascota);
 
     },
 
@@ -91,12 +203,17 @@ const Mascotas = {
             return null;
         }
 
-        return data;
+        return data ? mapMascota(data) : null;
 
     },
 
 
     async guardar(mascota) {
+
+        const personalidades =
+            normalizarPersonalidadEntrada(
+                mascota.personalidad
+            );
 
         const fila = {
 
@@ -134,8 +251,7 @@ const Mascotas = {
                 null,
 
             personalidad:
-                mascota.personalidad ||
-                null,
+                JSON.stringify(personalidades),
 
             convive_ninos:
                 mascota.conviveNinos ||
@@ -187,7 +303,7 @@ const Mascotas = {
             }
 
 
-            return data;
+            return mapMascota(data);
 
         }
 
@@ -208,7 +324,7 @@ const Mascotas = {
         }
 
 
-        return data;
+        return mapMascota(data);
 
     },
 

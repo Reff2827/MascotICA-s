@@ -292,21 +292,197 @@
                 <!-- NUEVO: PERSONALIDAD -->
                 <div class="mb-3">
 
-                    <label class="form-label" for="personalidad">
+                    <label class="form-label">
                         Personalidad
                     </label>
 
-                    <input
-                        type="text"
-                        id="personalidad"
-                        class="form-control"
-                        maxlength="250"
-                        placeholder="Ej: Cariñoso, juguetón y sociable"
-                        autocomplete="off">
-
-                    <small class="text-muted">
-                        Describe cómo se comporta la mascota.
+                    <small class="text-muted d-block mb-2">
+                        Selecciona todas las características que describan a la mascota.
                     </small>
+
+                    <div id="personalidad" class="row g-2">
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadTranquila"
+                                    class="form-check-input"
+                                    value="Tranquila">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadTranquila">
+                                    Tranquila
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadJuguetona"
+                                    class="form-check-input"
+                                    value="Juguetona">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadJuguetona">
+                                    Juguetona
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadCarinosa"
+                                    class="form-check-input"
+                                    value="Cariñosa">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadCarinosa">
+                                    Cariñosa
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadSociable"
+                                    class="form-check-input"
+                                    value="Sociable">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadSociable">
+                                    Sociable
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadIndependiente"
+                                    class="form-check-input"
+                                    value="Independiente">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadIndependiente">
+                                    Independiente
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadCuriosa"
+                                    class="form-check-input"
+                                    value="Curiosa">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadCuriosa">
+                                    Curiosa
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadProtectora"
+                                    class="form-check-input"
+                                    value="Protectora">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadProtectora">
+                                    Protectora
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadTimida"
+                                    class="form-check-input"
+                                    value="Tímida">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadTimida">
+                                    Tímida
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadEnergica"
+                                    class="form-check-input"
+                                    value="Enérgica">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadEnergica">
+                                    Enérgica
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadInteligente"
+                                    class="form-check-input"
+                                    value="Inteligente">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadInteligente">
+                                    Inteligente
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadComunicativa"
+                                    class="form-check-input"
+                                    value="Comunicativa">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadComunicativa">
+                                    Comunicativa
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    id="personalidadPocoActiva"
+                                    class="form-check-input"
+                                    value="Poco activa">
+                                <label
+                                    class="form-check-label"
+                                    for="personalidadPocoActiva">
+                                    Poco activa
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -583,6 +759,37 @@
     }
 
 
+    /* NUEVO: cargar las personalidades guardadas al editar */
+    function cargarPersonalidad(personalidad) {
+
+        const seleccionadas = Array.isArray(personalidad)
+            ? personalidad
+            : [];
+
+        document
+            .querySelectorAll('#personalidad input[type="checkbox"]')
+            .forEach(checkbox => {
+
+                checkbox.checked =
+                    seleccionadas.includes(checkbox.value);
+
+            });
+
+    }
+
+
+    /* NUEVO: obtener las personalidades seleccionadas */
+    function obtenerPersonalidad() {
+
+        return Array.from(
+            document.querySelectorAll(
+                '#personalidad input[type="checkbox"]:checked'
+            )
+        ).map(checkbox => checkbox.value);
+
+    }
+
+
     /* Solo letras en nombre y raza; solo dígitos en la edad */
     Validar.soloLetras('nombre');
     Validar.soloLetras('raza');
@@ -685,10 +892,9 @@
             mascota.nivelActividad || '';
 
 
-        document.getElementById(
-            'personalidad'
-        ).value =
-            mascota.personalidad || '';
+        cargarPersonalidad(
+            mascota.personalidad
+        );
 
 
         document.getElementById(
@@ -1229,12 +1435,7 @@
                             .value || null,
 
                     personalidad:
-                        document
-                            .getElementById(
-                                'personalidad'
-                            )
-                            .value
-                            .trim() || null,
+                        obtenerPersonalidad(),
 
                     conviveNinos:
                         document
