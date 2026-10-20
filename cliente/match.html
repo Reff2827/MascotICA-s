@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,20 +8,60 @@
     <title>MascotICA's Match | Encuentra tu compañero ideal</title>
     <meta name="description" content="Descubre qué mascotas de MascotICA's se adaptan mejor a tu estilo de vida y conoce a tu futuro compañero.">
 
+    <!-- Aplicar el tema antes de pintar la página -->
+    <script src="../js/theme.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
 
     <style>
-
         :root {
+            color-scheme: light;
+
             --match-orange: #f47721;
-            --match-orange-dark: #d85d10;
-            --match-orange-light: #fff1e5;
+            --match-orange-dark: #b94b08;
+            --match-orange-light: #fff0e3;
             --match-cream: #fffaf5;
             --match-ink: #332a25;
-            --match-muted: #766b64;
-            --match-border: #f0e3d8;
+            --match-muted: #62564f;
+            --match-border: #ead9cc;
+
+            --match-surface: #ffffff;
+            --match-surface-soft: #fff7f0;
+            --match-option-bg: #ffffff;
+            --match-option-border: #d9c9bd;
+            --match-icon-bg: #f8eee5;
+            --match-icon-color: #85461f;
+            --match-progress-bg: #eadfd5;
+            --match-note-bg: #fff0df;
+            --match-note-text: #663b1b;
+            --match-reasons: #51463e;
+            --match-shadow: 0 8px 28px rgb(83 48 22 / 7%);
+        }
+
+        :root[data-theme="dark"] {
+            color-scheme: dark;
+
+            --match-orange: #ff9b52;
+            --match-orange-dark: #ffb77e;
+            --match-orange-light: #3b291e;
+            --match-cream: #171513;
+            --match-ink: #f5eee8;
+            --match-muted: #c2b6ad;
+            --match-border: #44372f;
+
+            --match-surface: #24201d;
+            --match-surface-soft: #30251f;
+            --match-option-bg: #292420;
+            --match-option-border: #514238;
+            --match-icon-bg: #3b2d23;
+            --match-icon-color: #ffc08e;
+            --match-progress-bg: #493a30;
+            --match-note-bg: #35271e;
+            --match-note-text: #f5d3b5;
+            --match-reasons: #e2d7ce;
+            --match-shadow: 0 8px 28px rgb(0 0 0 / 20%);
         }
 
         body {
@@ -31,6 +72,7 @@
         .match-page {
             min-height: 100vh;
             padding-bottom: 4rem;
+            color: var(--match-ink);
         }
 
         .match-brand {
@@ -86,7 +128,7 @@
             height: 52px;
             border-radius: 17px;
             background: #fff;
-            color: var(--match-orange);
+            color: #f47721;
             font-size: 1.75rem;
             box-shadow: 0 6px 18px rgb(111 49 8 / 15%);
         }
@@ -124,10 +166,11 @@
         .match-intro,
         .match-question,
         .match-results-panel {
-            background: #fff;
+            background: var(--match-surface);
+            color: var(--match-ink);
             border: 1px solid var(--match-border);
             border-radius: 20px;
-            box-shadow: 0 8px 28px rgb(83 48 22 / 5%);
+            box-shadow: var(--match-shadow);
         }
 
         .match-intro {
@@ -148,6 +191,7 @@
         }
 
         .match-section-title {
+            color: var(--match-ink);
             font-size: 1.35rem;
             font-weight: 800;
             margin: 0 0 .35rem;
@@ -176,7 +220,7 @@
         .match-progress {
             height: 8px;
             border-radius: 20px;
-            background: #f2e7de;
+            background: var(--match-progress-bg);
             overflow: hidden;
         }
 
@@ -211,6 +255,7 @@
         }
 
         .match-question h3 {
+            color: var(--match-ink);
             font-size: 1.08rem;
             line-height: 1.45;
             font-weight: 750;
@@ -243,11 +288,14 @@
             width: 100%;
             min-height: 62px;
             padding: .85rem 1rem;
-            border: 1.5px solid #eadfd6;
+            border: 1.5px solid var(--match-option-border);
             border-radius: 13px;
-            background: #fff;
+            background: var(--match-option-bg);
             color: var(--match-ink);
-            transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+            transition:
+                border-color .15s ease,
+                background .15s ease,
+                box-shadow .15s ease;
         }
 
         .match-option-icon {
@@ -257,12 +305,13 @@
             width: 34px;
             height: 34px;
             border-radius: 10px;
-            background: #faf4ef;
-            color: #a96537;
+            background: var(--match-icon-bg);
+            color: var(--match-icon-color);
             font-size: 1.05rem;
         }
 
         .match-option-label {
+            color: var(--match-ink);
             font-size: .94rem;
             line-height: 1.4;
             font-weight: 550;
@@ -270,22 +319,22 @@
 
         .match-option input:checked + .match-option-content {
             border-color: var(--match-orange);
-            background: #fff7f0;
-            box-shadow: 0 0 0 2px rgb(244 119 33 / 9%);
+            background: var(--match-surface-soft);
+            box-shadow: 0 0 0 2px rgb(244 119 33 / 15%);
         }
 
         .match-option input:checked + .match-option-content .match-option-icon {
             background: var(--match-orange);
-            color: #fff;
+            color: #21150e;
         }
 
         .match-option input:focus-visible + .match-option-content {
-            outline: 3px solid rgb(244 119 33 / 35%);
-            outline-offset: 2px;
+            outline: 3px solid var(--match-orange);
+            outline-offset: 3px;
         }
 
         .match-option:hover .match-option-content {
-            border-color: #f2a36e;
+            border-color: var(--match-orange);
         }
 
         .match-error {
@@ -293,6 +342,10 @@
             color: #b42318;
             font-size: .88rem;
             margin-top: .8rem;
+        }
+
+        :root[data-theme="dark"] .match-error {
+            color: #ffaaa3;
         }
 
         .match-actions {
@@ -305,9 +358,9 @@
         }
 
         .btn-match-primary {
-            background: var(--match-orange);
+            background: #f47721;
             color: #fff;
-            border: 1px solid var(--match-orange);
+            border: 1px solid #f47721;
             border-radius: 12px;
             padding: .85rem 1.25rem;
             font-weight: 750;
@@ -316,23 +369,30 @@
 
         .btn-match-primary:hover,
         .btn-match-primary:focus {
-            background: var(--match-orange-dark);
-            border-color: var(--match-orange-dark);
+            background: #d85d10;
+            border-color: #d85d10;
             color: #fff;
         }
 
+        .btn-match-primary:disabled {
+            opacity: .7;
+            cursor: wait;
+        }
+
         .btn-match-secondary {
-            background: #fff;
+            display: inline-block;
+            background: var(--match-surface);
             color: var(--match-ink);
-            border: 1px solid #e7d9ce;
+            border: 1px solid var(--match-border);
             border-radius: 12px;
             padding: .85rem 1.1rem;
             font-weight: 650;
             text-decoration: none;
+            cursor: pointer;
         }
 
         .btn-match-secondary:hover {
-            background: #fff4e9;
+            background: var(--match-surface-soft);
             color: var(--match-ink);
         }
 
@@ -341,11 +401,15 @@
             gap: .7rem;
             padding: 1rem 1.1rem;
             border-radius: 14px;
-            background: #fff3e7;
-            color: #75451f;
+            background: var(--match-note-bg);
+            color: var(--match-note-text);
             font-size: .9rem;
             line-height: 1.5;
             margin-bottom: 1.3rem;
+        }
+
+        .match-note strong {
+            color: inherit;
         }
 
         .match-results-panel {
@@ -369,18 +433,20 @@
             overflow: hidden;
             border: 1px solid var(--match-border);
             border-radius: 18px;
-            background: #fff;
-            box-shadow: 0 6px 20px rgb(83 48 22 / 5%);
+            background: var(--match-surface);
+            color: var(--match-ink);
+            box-shadow: var(--match-shadow);
         }
 
         .match-pet-image-wrap {
             position: relative;
             height: 220px;
             overflow: hidden;
-            background: #fff0e3;
+            background: var(--match-surface-soft);
         }
 
         .match-pet-image {
+            display: block;
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -389,16 +455,22 @@
         .match-pet-placeholder {
             display: grid;
             place-items: center;
+            width: 100%;
             height: 100%;
-            color: #d97b3e;
+            color: var(--match-orange-dark);
             font-size: 4rem;
+        }
+
+        /* El marcador oculto no debe aparecer mientras carga una foto */
+        .match-pet-placeholder[hidden] {
+            display: none !important;
         }
 
         .match-pet-rank {
             position: absolute;
             top: .8rem;
             left: .8rem;
-            background: #fff;
+            background: var(--match-surface);
             color: var(--match-orange-dark);
             padding: .4rem .7rem;
             border-radius: 30px;
@@ -415,6 +487,7 @@
         }
 
         .match-pet-name {
+            color: var(--match-ink);
             font-size: 1.3rem;
             font-weight: 800;
             margin: 0 0 .35rem;
@@ -448,7 +521,7 @@
         .match-score-track {
             height: 8px;
             border-radius: 20px;
-            background: #f3e7dd;
+            background: var(--match-progress-bg);
             overflow: hidden;
             margin-bottom: 1rem;
         }
@@ -460,6 +533,7 @@
         }
 
         .match-reasons-title {
+            color: var(--match-ink);
             font-size: .9rem;
             font-weight: 800;
             margin-bottom: .45rem;
@@ -467,7 +541,7 @@
 
         .match-reasons {
             padding-left: 1.15rem;
-            color: #51463e;
+            color: var(--match-reasons);
             font-size: .88rem;
             line-height: 1.55;
             margin-bottom: 1.2rem;
@@ -484,12 +558,17 @@
         .match-empty {
             padding: 2rem 1rem;
             text-align: center;
+            color: var(--match-ink);
         }
 
         .match-empty-icon {
             font-size: 3.2rem;
             color: var(--match-orange);
             margin-bottom: .6rem;
+        }
+
+        .match-empty .text-secondary {
+            color: var(--match-muted) !important;
         }
 
         .match-results-bottom {
@@ -507,6 +586,7 @@
             font-size: .85rem;
         }
 
+        /* Ajustes para móviles */
         @media (max-width: 575.98px) {
             .match-brand {
                 padding: 2rem 1rem 2.6rem;
@@ -540,12 +620,27 @@
                 align-items: stretch;
             }
 
-            .match-actions .btn {
+            .match-actions .btn,
+            .match-actions .btn-match-secondary {
                 width: 100%;
+                text-align: center;
             }
 
             .match-pet-image-wrap {
                 height: 210px;
+            }
+
+            .match-results-bottom > * {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .match-option-content,
+            .match-progress .progress-bar,
+            .btn-match-primary {
+                transition: none;
             }
         }
     </style>
@@ -559,14 +654,14 @@
         <header class="match-brand text-center">
             <div class="container match-brand-content">
                 <a class="match-back" href="index.html">
-                    <i class="bi bi-arrow-left"></i>
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
                     Volver al catálogo
                 </a>
 
                 <div>
                     <span class="match-logo">
                         <span class="match-logo-icon">
-                            <i class="bi bi-heart-fill"></i>
+                            <i class="bi bi-heart-fill" aria-hidden="true"></i>
                         </span>
                         MascotICA's Match
                     </span>
@@ -582,7 +677,7 @@
         <div class="match-container">
             <section class="match-intro" aria-label="Información del test">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="match-intro-icon">
+                    <div class="match-intro-icon" aria-hidden="true">
                         <i class="bi bi-stars"></i>
                     </div>
                     <div>
@@ -601,6 +696,7 @@
                         <span>Tu perfil de adopción</span>
                         <span id="matchProgressText">0 de 8 respondidas</span>
                     </div>
+
                     <div
                         class="progress match-progress"
                         role="progressbar"
@@ -617,11 +713,13 @@
                     </div>
                 </div>
 
+                <!-- PREGUNTA 1 -->
                 <section class="match-question" data-question="vivienda">
                     <div class="match-question-heading">
                         <span class="match-question-number">1</span>
                         <h3>¿Cómo es el lugar donde vives?</h3>
                     </div>
+
                     <div class="match-options">
                         <label class="match-option">
                             <input type="radio" name="vivienda" value="pequeno" required>
@@ -630,6 +728,7 @@
                                 <span class="match-option-label">Departamento o espacio pequeño</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="vivienda" value="casa" required>
                             <span class="match-option-content">
@@ -637,6 +736,7 @@
                                 <span class="match-option-label">Casa con espacios interiores</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="vivienda" value="patio" required>
                             <span class="match-option-content">
@@ -647,11 +747,13 @@
                     </div>
                 </section>
 
+                <!-- PREGUNTA 2 -->
                 <section class="match-question" data-question="tiempoFuera">
                     <div class="match-question-heading">
                         <span class="match-question-number">2</span>
                         <h3>¿Cuánto tiempo pasas fuera de casa normalmente?</h3>
                     </div>
+
                     <div class="match-options">
                         <label class="match-option">
                             <input type="radio" name="tiempoFuera" value="poco" required>
@@ -660,6 +762,7 @@
                                 <span class="match-option-label">Casi nunca o pocas horas</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="tiempoFuera" value="medio" required>
                             <span class="match-option-content">
@@ -667,6 +770,7 @@
                                 <span class="match-option-label">Entre 4 y 8 horas</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="tiempoFuera" value="mucho" required>
                             <span class="match-option-content">
@@ -677,11 +781,13 @@
                     </div>
                 </section>
 
+                <!-- PREGUNTA 3 -->
                 <section class="match-question" data-question="rutina">
                     <div class="match-question-heading">
                         <span class="match-question-number">3</span>
                         <h3>¿Cómo es un día normal para ti?</h3>
                     </div>
+
                     <div class="match-options">
                         <label class="match-option">
                             <input type="radio" name="rutina" value="tranquila" required>
@@ -690,6 +796,7 @@
                                 <span class="match-option-label">Tranquilo, prefiero descansar</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="rutina" value="equilibrada" required>
                             <span class="match-option-content">
@@ -697,6 +804,7 @@
                                 <span class="match-option-label">Equilibrado, un poco de todo</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="rutina" value="activa" required>
                             <span class="match-option-content">
@@ -707,11 +815,13 @@
                     </div>
                 </section>
 
+                <!-- PREGUNTA 4 -->
                 <section class="match-question" data-question="cuidados">
                     <div class="match-question-heading">
                         <span class="match-question-number">4</span>
                         <h3>¿Cuánto tiempo podrías dedicar diariamente a sus cuidados?</h3>
                     </div>
+
                     <div class="match-options">
                         <label class="match-option">
                             <input type="radio" name="cuidados" value="poco" required>
@@ -720,6 +830,7 @@
                                 <span class="match-option-label">Menos de 1 hora</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="cuidados" value="medio" required>
                             <span class="match-option-content">
@@ -727,6 +838,7 @@
                                 <span class="match-option-label">Entre 1 y 2 horas</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="cuidados" value="mucho" required>
                             <span class="match-option-content">
@@ -737,11 +849,13 @@
                     </div>
                 </section>
 
+                <!-- PREGUNTA 5 -->
                 <section class="match-question" data-question="hogar">
                     <div class="match-question-heading">
                         <span class="match-question-number">5</span>
                         <h3>¿Quiénes vivirán contigo y compartirán el espacio con la mascota?</h3>
                     </div>
+
                     <div class="match-options">
                         <label class="match-option">
                             <input type="radio" name="hogar" value="solo" required>
@@ -750,6 +864,7 @@
                                 <span class="match-option-label">Vivo solo/a</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="hogar" value="adultos" required>
                             <span class="match-option-content">
@@ -757,6 +872,7 @@
                                 <span class="match-option-label">Con pareja u otros adultos</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="hogar" value="ninos" required>
                             <span class="match-option-content">
@@ -764,6 +880,7 @@
                                 <span class="match-option-label">Con niños</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="hogar" value="familia" required>
                             <span class="match-option-content">
@@ -774,11 +891,13 @@
                     </div>
                 </section>
 
+                <!-- PREGUNTA 6 -->
                 <section class="match-question" data-question="otrosAnimales">
                     <div class="match-question-heading">
                         <span class="match-question-number">6</span>
                         <h3>¿Hay otros animales en casa?</h3>
                     </div>
+
                     <div class="match-options">
                         <label class="match-option">
                             <input type="radio" name="otrosAnimales" value="ninguno" required>
@@ -787,6 +906,7 @@
                                 <span class="match-option-label">No, sería la primera mascota</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="otrosAnimales" value="perros" required>
                             <span class="match-option-content">
@@ -794,6 +914,7 @@
                                 <span class="match-option-label">Sí, tengo perros</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="otrosAnimales" value="gatos" required>
                             <span class="match-option-content">
@@ -801,6 +922,7 @@
                                 <span class="match-option-label">Sí, tengo gatos</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="otrosAnimales" value="ambos" required>
                             <span class="match-option-content">
@@ -808,6 +930,7 @@
                                 <span class="match-option-label">Tengo perros y gatos</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="otrosAnimales" value="otros" required>
                             <span class="match-option-content">
@@ -818,11 +941,13 @@
                     </div>
                 </section>
 
+                <!-- PREGUNTA 7 -->
                 <section class="match-question" data-question="preferencia">
                     <div class="match-question-heading">
                         <span class="match-question-number">7</span>
                         <h3>¿Qué te gustaría compartir con tu futura mascota?</h3>
                     </div>
+
                     <div class="match-options">
                         <label class="match-option">
                             <input type="radio" name="preferencia" value="tranquila" required>
@@ -831,6 +956,7 @@
                                 <span class="match-option-label">Compañía y momentos tranquilos</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="preferencia" value="juegos" required>
                             <span class="match-option-content">
@@ -838,6 +964,7 @@
                                 <span class="match-option-label">Juegos y actividades</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="preferencia" value="aventuras" required>
                             <span class="match-option-content">
@@ -845,6 +972,7 @@
                                 <span class="match-option-label">Paseos y aventuras</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="preferencia" value="familia" required>
                             <span class="match-option-content">
@@ -855,11 +983,13 @@
                     </div>
                 </section>
 
+                <!-- PREGUNTA 8 -->
                 <section class="match-question" data-question="preparacion">
                     <div class="match-question-heading">
                         <span class="match-question-number">8</span>
                         <h3>¿Qué tan preparado/a te sientes para asumir una adopción a largo plazo?</h3>
                     </div>
+
                     <div class="match-options">
                         <label class="match-option">
                             <input type="radio" name="preparacion" value="informandome" required>
@@ -868,6 +998,7 @@
                                 <span class="match-option-label">Estoy empezando a informarme</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="preparacion" value="organizado" required>
                             <span class="match-option-content">
@@ -875,6 +1006,7 @@
                                 <span class="match-option-label">Conozco las responsabilidades y me organizo</span>
                             </span>
                         </label>
+
                         <label class="match-option">
                             <input type="radio" name="preparacion" value="preparado" required>
                             <span class="match-option-content">
@@ -886,7 +1018,7 @@
                 </section>
 
                 <div class="match-note">
-                    <i class="bi bi-info-circle-fill mt-1"></i>
+                    <i class="bi bi-info-circle-fill mt-1" aria-hidden="true"></i>
                     <div>
                         <strong>Una recomendación responsable.</strong>
                         El resultado es orientativo: no garantiza la convivencia.
@@ -897,13 +1029,13 @@
 
                 <div class="match-actions">
                     <a href="index.html" class="btn-match-secondary">
-                        <i class="bi bi-arrow-left me-1"></i>
+                        <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>
                         Volver al catálogo
                     </a>
 
                     <button type="submit" class="btn btn-match-primary">
                         Encontrar mi Match
-                        <i class="bi bi-heart-fill ms-2"></i>
+                        <i class="bi bi-heart-fill ms-2" aria-hidden="true"></i>
                     </button>
                 </div>
 
@@ -912,12 +1044,16 @@
                 </p>
             </form>
 
-            <section id="matchResults" class="match-results-panel" hidden aria-live="polite">
+            <section
+                id="matchResults"
+                class="match-results-panel"
+                hidden
+                aria-live="polite">
                 <div id="matchResultsContent"></div>
             </section>
 
             <footer class="match-footer">
-                <i class="bi bi-heart-fill me-1"></i>
+                <i class="bi bi-heart-fill me-1" aria-hidden="true"></i>
                 Una adopción responsable comienza con conocerse mutuamente.
                 <div class="mt-1">MascotICA's</div>
             </footer>
@@ -1014,6 +1150,7 @@
                 if (!tamano || tamano.includes('desconocido')) return null;
                 if (tamano.includes('pequ')) return 'pequeno';
                 if (tamano.includes('med')) return 'mediano';
+
                 if (tamano.includes('grand') || tamano.includes('gigante')) {
                     return 'grande';
                 }
@@ -1264,6 +1401,7 @@
                 const razones = [];
 
                 const espacio = componentes.find(c => c.nombre === 'espacio');
+
                 if (espacio && espacio.puntaje >= 80) {
                     razones.push(
                         'El tamaño registrado parece encajar con el espacio que describes.'
@@ -1271,6 +1409,7 @@
                 }
 
                 const actividad = componentes.find(c => c.nombre === 'actividad');
+
                 if (actividad && actividad.puntaje >= 75) {
                     razones.push(
                         'Su nivel de actividad registrado se acerca a tu rutina.'
@@ -1278,6 +1417,7 @@
                 }
 
                 const personalidad = componentes.find(c => c.nombre === 'personalidad');
+
                 if (personalidad && personalidad.puntaje >= 50) {
                     razones.push(
                         'Su personalidad registrada comparte rasgos con lo que buscas.'
@@ -1334,17 +1474,42 @@
                 const nombre = escapeHTML(mascota.nombre || 'Mascota');
                 const descripcion = escapeHTML(crearDescripcion(mascota));
                 const puntuacion = resultado.puntuacion;
-                const imagen = typeof mascota.imagenUrl === 'string'
-                    ? mascota.imagenUrl.trim()
-                    : '';
 
-                // Aceptamos solamente URL web seguras para imágenes.
-                const imagenSegura = /^https?:\/\//i.test(imagen)
-                    ? escapeHTML(imagen)
-                    : '';
+                /*
+                 * storage.js normalmente devuelve imagenUrl.
+                 * También aceptamos otros nombres por compatibilidad.
+                 */
+                const posiblesImagenes = [
+                    mascota.imagenUrl,
+                    mascota.imagen_url,
+                    mascota.imageUrl,
+                    mascota.image_url
+                ];
+
+                const imagen = posiblesImagenes.find(
+                    valor =>
+                        typeof valor === 'string' &&
+                        valor.trim() !== ''
+                ) || '';
+
+                let imagenSegura = '';
+
+                try {
+                    const url = new URL(imagen.trim());
+
+                    if (
+                        ['https:', 'http:'].includes(url.protocol) &&
+                        url.hostname
+                    ) {
+                        imagenSegura = escapeHTML(url.href);
+                    }
+                } catch {
+                    imagenSegura = '';
+                }
 
                 const foto = imagenSegura
-                    ? `<img class="match-pet-image"
+                    ? `<img
+                            class="match-pet-image"
                             src="${imagenSegura}"
                             alt="Foto de ${nombre}"
                             loading="lazy"
@@ -1365,8 +1530,11 @@
                         <article class="match-pet-card">
                             <div class="match-pet-image-wrap">
                                 ${foto}
+
                                 <span class="match-pet-rank">
-                                    ${indice === 0 ? 'Tu primera coincidencia' : 'Otra gran opción'}
+                                    ${indice === 0
+                                        ? 'Tu primera coincidencia'
+                                        : 'Otra gran opción'}
                                 </span>
                             </div>
 
@@ -1378,19 +1546,26 @@
                                     <span class="match-score-label">
                                         Coincidencia orientativa
                                     </span>
+
                                     <span class="match-score">
-                                        ${puntuacion === null ? '—' : `${puntuacion}%`}
+                                        ${puntuacion === null
+                                            ? '—'
+                                            : `${puntuacion}%`}
                                     </span>
                                 </div>
 
-                                <div class="match-score-track"
-                                     role="progressbar"
-                                     aria-label="Porcentaje orientativo de coincidencia"
-                                     aria-valuemin="0"
-                                     aria-valuemax="100"
-                                     aria-valuenow="${puntuacion ?? 0}">
-                                    <div class="match-score-fill"
-                                         style="width:${puntuacion ?? 0}%"></div>
+                                <div
+                                    class="match-score-track"
+                                    role="progressbar"
+                                    aria-label="Porcentaje orientativo de coincidencia"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                    aria-valuenow="${puntuacion ?? 0}">
+
+                                    <div
+                                        class="match-score-fill"
+                                        style="width:${puntuacion ?? 0}%">
+                                    </div>
                                 </div>
 
                                 <h4 class="match-reasons-title">
@@ -1403,7 +1578,7 @@
                                     type="button"
                                     class="btn btn-match-primary w-100"
                                     data-adoptar-id="${id}">
-                                    <i class="bi bi-heart-fill me-2"></i>
+                                    <i class="bi bi-heart-fill me-2" aria-hidden="true"></i>
                                     Solicitar adopción
                                 </button>
                             </div>
@@ -1424,8 +1599,20 @@
                 // Ordenamos por puntuación conocida. Si faltan datos para
                 // una mascota, no inventamos un porcentaje para ella.
                 evaluadas.sort((a, b) => {
-                    if (a.puntuacion === null && b.puntuacion !== null) return 1;
-                    if (b.puntuacion === null && a.puntuacion !== null) return -1;
+                    if (
+                        a.puntuacion === null &&
+                        b.puntuacion !== null
+                    ) {
+                        return 1;
+                    }
+
+                    if (
+                        b.puntuacion === null &&
+                        a.puntuacion !== null
+                    ) {
+                        return -1;
+                    }
+
                     return (b.puntuacion ?? -1) - (a.puntuacion ?? -1);
                 });
 
@@ -1439,7 +1626,7 @@
                 if (preparacion === 'informandome') {
                     notaResponsable = `
                         <div class="match-note mt-3 mb-0">
-                            <i class="bi bi-book-half mt-1"></i>
+                            <i class="bi bi-book-half mt-1" aria-hidden="true"></i>
                             <div>
                                 <strong>Un buen siguiente paso:</strong>
                                 infórmate sobre alimentación, atención veterinaria,
@@ -1449,7 +1636,7 @@
                 } else if (preparacion === 'organizado') {
                     notaResponsable = `
                         <div class="match-note mt-3 mb-0">
-                            <i class="bi bi-list-check mt-1"></i>
+                            <i class="bi bi-list-check mt-1" aria-hidden="true"></i>
                             <div>
                                 <strong>Vas por buen camino.</strong>
                                 Conversa con quienes compartirán el hogar y prepara
@@ -1459,7 +1646,7 @@
                 } else {
                     notaResponsable = `
                         <div class="match-note mt-3 mb-0">
-                            <i class="bi bi-heart-fill mt-1"></i>
+                            <i class="bi bi-heart-fill mt-1" aria-hidden="true"></i>
                             <div>
                                 <strong>La preparación también importa.</strong>
                                 Confirma que tienes tiempo, apoyo y presupuesto
@@ -1470,10 +1657,14 @@
 
                 let contenido = `
                     <div class="match-results-header">
-                        <div class="match-intro-icon">
+                        <div class="match-intro-icon" aria-hidden="true">
                             <i class="bi bi-stars"></i>
                         </div>
-                        <h2 class="match-section-title">¡Aquí están tus coincidencias!</h2>
+
+                        <h2 class="match-section-title">
+                            ¡Aquí están tus coincidencias!
+                        </h2>
+
                         <p class="match-section-subtitle">
                             Estas recomendaciones se basan en las características
                             disponibles en las fichas de nuestras mascotas.
@@ -1494,10 +1685,14 @@
                 } else {
                     contenido += `
                         <div class="match-empty">
-                            <div class="match-empty-icon">
+                            <div class="match-empty-icon" aria-hidden="true">
                                 <i class="bi bi-search-heart"></i>
                             </div>
-                            <h3 class="h5 fw-bold">Todavía no encontramos una coincidencia calculable</h3>
+
+                            <h3 class="h5 fw-bold">
+                                Todavía no encontramos una coincidencia calculable
+                            </h3>
+
                             <p class="text-secondary">
                                 Puede que falten características en las fichas
                                 de las mascotas disponibles. Puedes revisar el
@@ -1508,8 +1703,9 @@
 
                 contenido += `
                     ${notaResponsable}
+
                     <div class="match-note mt-3">
-                        <i class="bi bi-info-circle-fill mt-1"></i>
+                        <i class="bi bi-info-circle-fill mt-1" aria-hidden="true"></i>
                         <div>
                             <strong>Recuerda:</strong>
                             el porcentaje es orientativo, no una garantía de
@@ -1517,14 +1713,18 @@
                             El equipo deberá evaluar cada caso.
                         </div>
                     </div>
+
                     <div class="match-results-bottom">
                         <a href="index.html" class="btn btn-match-primary">
-                            <i class="bi bi-search me-2"></i>
+                            <i class="bi bi-search me-2" aria-hidden="true"></i>
                             Prefiero buscar por mi cuenta
                         </a>
-                        <button type="button" id="matchVolverPreguntas"
-                                class="btn-match-secondary">
-                            <i class="bi bi-arrow-repeat me-1"></i>
+
+                        <button
+                            type="button"
+                            id="matchVolverPreguntas"
+                            class="btn-match-secondary">
+                            <i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>
                             Cambiar mis respuestas
                         </button>
                     </div>`;
@@ -1535,16 +1735,20 @@
                 document.getElementById('matchVolverPreguntas')
                     ?.addEventListener('click', () => {
                         resultsSection.hidden = true;
-                        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                        form.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
                     });
 
-                // Este botón conecta con el flujo de adopción que ya existe
-                // en cliente/index.html. El ajuste de ese archivo lo haremos
-                // en el siguiente paso.
+                // Conecta con el flujo de adopción que existe
+                // en cliente/index.html.
                 resultsContent.querySelectorAll('[data-adoptar-id]')
                     .forEach(boton => {
                         boton.addEventListener('click', () => {
                             const id = boton.dataset.adoptarId;
+
                             window.location.href =
                                 `index.html?adoptar=${encodeURIComponent(id)}`;
                         });
@@ -1572,13 +1776,16 @@
 
                 if (preguntasFaltantes.length) {
                     formError.style.display = 'block';
+
                     preguntasFaltantes[0].scrollIntoView({
                         behavior: 'smooth',
                         block: 'center'
                     });
+
                     preguntasFaltantes[0].querySelector('input')?.focus({
                         preventScroll: true
                     });
+
                     return;
                 }
 
@@ -1596,30 +1803,44 @@
                     const mascotas = await Mascotas.listarPorEstado('DISPONIBLE');
 
                     if (!Array.isArray(mascotas)) {
-                        throw new Error('No se pudo obtener la lista de mascotas.');
+                        throw new Error(
+                            'No se pudo obtener la lista de mascotas.'
+                        );
                     }
 
                     mostrarResultados(mascotas, respuestas);
                 } catch (error) {
-                    console.error('Error al calcular MascotICA\'s Match:', error);
+                    console.error(
+                        'Error al calcular MascotICA\'s Match:',
+                        error
+                    );
 
                     resultsSection.hidden = false;
+
                     resultsContent.innerHTML = `
                         <div class="match-empty">
-                            <div class="match-empty-icon">
+                            <div class="match-empty-icon" aria-hidden="true">
                                 <i class="bi bi-exclamation-circle"></i>
                             </div>
-                            <h2 class="h5 fw-bold">No pudimos cargar las mascotas</h2>
+
+                            <h2 class="h5 fw-bold">
+                                No pudimos cargar las mascotas
+                            </h2>
+
                             <p class="text-secondary">
                                 Inténtalo de nuevo en unos momentos o consulta
                                 el catálogo completo.
                             </p>
+
                             <div class="match-results-bottom">
-                                <button type="button" id="matchReintentar"
-                                        class="btn btn-match-primary">
-                                    <i class="bi bi-arrow-clockwise me-2"></i>
+                                <button
+                                    type="button"
+                                    id="matchReintentar"
+                                    class="btn btn-match-primary">
+                                    <i class="bi bi-arrow-clockwise me-2" aria-hidden="true"></i>
                                     Intentar de nuevo
                                 </button>
+
                                 <a href="index.html" class="btn-match-secondary">
                                     Ver catálogo
                                 </a>
@@ -1627,7 +1848,9 @@
                         </div>`;
 
                     document.getElementById('matchReintentar')
-                        ?.addEventListener('click', () => form.requestSubmit());
+                        ?.addEventListener('click', () => {
+                            form.requestSubmit();
+                        });
 
                     resultsSection.scrollIntoView({
                         behavior: 'smooth',
