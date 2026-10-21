@@ -14,7 +14,7 @@
     --radius-full: 999px;
 
     /* Superficies y texto */
-    --background: oklch(0.977 0.006 76);
+    --background: oklch(0.972 0.022 68);
     --foreground: oklch(0.235 0.018 266);
     --card: oklch(1 0 0 / 0.72);
     --card-solid: oklch(1 0 0);
@@ -263,12 +263,14 @@ body::before {
     z-index: -1;
     pointer-events: none;
     background:
-        radial-gradient(60rem 42rem at 4% -6%,
-            oklch(0.687 0.178 42 / 0.13), transparent 62%),
-        radial-gradient(52rem 40rem at 102% 8%,
-            oklch(0.645 0.135 236 / 0.10), transparent 60%),
-        radial-gradient(46rem 38rem at 78% 108%,
-            oklch(0.672 0.108 192 / 0.10), transparent 62%);
+        radial-gradient(64rem 46rem at 2% -8%,
+            oklch(0.74 0.17 52 / 0.34), transparent 64%),
+        radial-gradient(56rem 44rem at 104% 6%,
+            oklch(0.78 0.15 62 / 0.26), transparent 62%),
+        radial-gradient(52rem 42rem at 80% 110%,
+            oklch(0.70 0.17 42 / 0.22), transparent 64%),
+        radial-gradient(40rem 34rem at -6% 98%,
+            oklch(0.80 0.13 75 / 0.22), transparent 62%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -3646,5 +3648,132 @@ body > .container-fluid > *:nth-child(n+5) {
     .otp-error .otp-slot,
     .otp-ok .otp-slot {
         animation: none;
+    }
+}
+
+
+/* --------------------------------------------------------------------------
+   Mejoras visuales: más naranja, laterales rellenos y detalles elegantes
+   -------------------------------------------------------------------------- */
+
+:root {
+    --primary-soft: oklch(0.687 0.178 42 / 0.12);
+    --primary-soft-strong: oklch(0.687 0.178 42 / 0.2);
+    --glow: 0 10px 30px -10px oklch(0.687 0.178 42 / 0.45);
+    --paw: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='%23f97316'%3E%3Cellipse cx='60' cy='76' rx='15' ry='12'/%3E%3Cellipse cx='39' cy='58' rx='6.5' ry='8.5' transform='rotate(-22 39 58)'/%3E%3Cellipse cx='53' cy='46' rx='6.5' ry='9' transform='rotate(-6 53 46)'/%3E%3Cellipse cx='68' cy='46' rx='6.5' ry='9' transform='rotate(6 68 46)'/%3E%3Cellipse cx='82' cy='58' rx='6.5' ry='8.5' transform='rotate(22 82 58)'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Laterales: huellitas y banda naranja que se desvanecen hacia el centro,
+   así los costados ya no se ven vacíos en pantallas anchas */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg,
+            oklch(0.72 0.17 48 / 0.20), transparent 16%,
+            transparent 84%, oklch(0.72 0.17 48 / 0.20)),
+        var(--paw);
+    background-size: 100% 100%, 120px 120px;
+    opacity: 0.9;
+    -webkit-mask-image: linear-gradient(90deg,
+        #000 0, rgba(0, 0, 0, 0.55) 9%, transparent 20%,
+        transparent 80%, rgba(0, 0, 0, 0.55) 91%, #000 100%);
+    mask-image: linear-gradient(90deg,
+        #000 0, rgba(0, 0, 0, 0.55) 9%, transparent 20%,
+        transparent 80%, rgba(0, 0, 0, 0.55) 91%, #000 100%);
+}
+
+@media (max-width: 991.98px) {
+    body::after {
+        opacity: 0.45;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) body::after {
+        opacity: 0.35;
+    }
+}
+
+:root[data-theme="dark"] body::after {
+    opacity: 0.35;
+}
+
+/* Barra de navegación: borde cálido al hacer scroll */
+.app-header.is-scrolled .app-navbar {
+    border-color: oklch(0.687 0.178 42 / 0.28);
+    box-shadow: var(--specular-strong), var(--shadow-lg), 0 12px 32px -18px oklch(0.687 0.178 42 / 0.5);
+}
+
+/* Tarjetas: acento naranja arriba y brillo suave al pasar el cursor */
+.card {
+    border-top: 3px solid oklch(0.687 0.178 42 / 0.55);
+    transition:
+        transform var(--base) var(--spring),
+        box-shadow var(--base) var(--ease-out),
+        border-color var(--base) var(--ease-out);
+}
+
+.card:hover {
+    border-color: oklch(0.687 0.178 42 / 0.6);
+    box-shadow: var(--shadow-lg), var(--glow);
+}
+
+/* Tablas: encabezado teñido de naranja suave */
+.table > thead > tr > th,
+.table thead th {
+    background-color: var(--primary-soft) !important;
+    color: var(--foreground);
+    border-bottom: 2px solid oklch(0.687 0.178 42 / 0.4);
+}
+
+.table-hover > tbody > tr:hover > * {
+    --bs-table-hover-bg: var(--primary-soft);
+}
+
+/* Títulos de página con subrayado naranja */
+body > .container-fluid > .d-flex > h3 {
+    position: relative;
+    padding-bottom: 0.55rem;
+}
+
+body > .container-fluid > .d-flex > h3::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 3.2rem;
+    height: 4px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg, var(--primary), oklch(0.82 0.15 70));
+}
+
+/* Botón principal con un poco más de presencia */
+.btn-primary {
+    box-shadow: var(--glow);
+}
+
+/* Campos de formulario: foco naranja */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--ring);
+}
+
+/* Selección de texto y barra de desplazamiento */
+::selection {
+    background: oklch(0.687 0.178 42 / 0.3);
+}
+
+html {
+    scrollbar-color: oklch(0.687 0.178 42 / 0.55) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card {
+        transition: none;
     }
 }

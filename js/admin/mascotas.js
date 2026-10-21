@@ -1,0 +1,379 @@
+const usuario = Auth.requireAdmin();
+
+const ESTADOS = [
+    'DISPONIBLE',
+    'EN_PROCESO',
+    'ADOPTADO'
+];
+
+if (usuario) {
+    UI.navbarAdmin(usuario);
+    UI.mostrarFlash();
+    pintarFiltro();
+    pintarLista();
+}
+
+function filtroActivo() {
+    return new URLSearchParams(
+        window.location.search
+    ).get('estado');
+}
+
+function pintarFiltro() {
+    const activo = filtroActivo();
+
+    const botones = [
+        `
+            <a href="mascotas.html"
+               class="btn btn-sm ${!activo ? 'btn-dark' : 'btn-outline-dark'}">
+                Todas
+            </a>
+        `
+    ].concat(
+        ESTADOS.map(e => `
+            <a
+                href="mascotas.html?estado=${e}"
+                class="btn btn-sm ${
+                    activo === e
+                        ? 'btn-dark'
+                        : 'btn-outline-dark'
+                }">
+                ${e}
+            </a>
+        `)
+    );
+
+    document.getElementById('filtroEstado').innerHTML =
+        botones.join('');
+}
+
+function textoSeguro(valor, alternativa = 'No especificado') {
+    if (
+        valor === null ||
+        valor === undefined ||
+        String(valor).trim() === ''
+    ) {
+        return alternativa;
+    }
+
+    return UI.esc(String(valor));
+}
+
+function traducirTamano(tamano) {
+    const valores = {
+        PEQUENO: 'Pequeño',
+        MEDIANO: 'Mediano',
+        GRANDE: 'Grande'
+    };
+
+    return valores[tamano] || 'No registrado';
+}
+
+function traducirActividad(actividad) {
+    const valores = {
+        TRANQUILO: 'Tranquilo',
+        MODERADO: 'Moderado',
+        ACTIVO: 'Activo'
+    };
+
+    return valores[actividad] || 'No registrada';
+}
+
+function traducirConvivencia(valor) {
+    const valores = {
+        SI: 'Sí',
+        NO: 'No',
+        DESCONOCIDO: 'Sin información'
+    };
+
+    return valores[valor] || 'Sin información';
+}
+
+function etiquetasPersonalidad(personalidad) {
+    let caracteristicas = personalidad;
+
+    if (typeof caracteristicas === 'string') {
+        try {
+            const resultado = JSON.parse(caracteristicas);
+
+            caracteristicas = Array.isArray(resultado)
+                ? resultado
+                : [caracteristicas];
+        } catch {
+            caracteristicas = [caracteristicas];
+        }
+    }
+
+    if (!Array.isArray(caracteristicas)) {
+        caracteristicas = [];
+    }
+
+    caracteristicas = caracteristicas.filter(
+        valor => typeof valor === 'string' && valor.trim() !== ''
+    );
+
+    if (caracteristicas.length === 0) {
+        return '<span class="text-muted small">No registrada</span>';
+    }
+
+    return caracteristicas.map(caracteristica => `
+        <span class="badge rounded-pill bg-info-subtle text-dark border me-1 mb-1">
+            ${UI.esc(caracteristica)}
+        </span>
+    `).join('');
+}
+
+async function pintarLista() {
+    const activo = filtroActivo();
+
+    const cont = document.getElementById('listaMascotas');
+
+    cont.innerHTML = `
+        <div class="col-12 text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted mt-2 mb-0">Cargando mascotas...</p>
+        </div>
+    `;
+
+    try {
+        const mascotas = activo
+            ? await Mascotas.listarPorEstado(activo)
+            : await Mascotas.listar();
+
+        if (!Array.isArray(mascotas) || mascotas.length === 0) {
+            cont.innerHTML = `
+                <div class="col-12">
+                    <p class="text-muted">
+                        No hay mascotas registradas con ese filtro.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
+        cont.innerHTML = mascotas.map(m => `
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+
+                <div class="card card-mascota h-100">
+
+                    <img
+                        src="${UI.imagenOPlaceholder(m.imagenUrl, m.nombre)}"
+                        class="img-top"
+                        alt="Foto de ${UI.esc(m.nombre)}"
+                    >
+
+                    <div class="card-body d-flex flex-column">
+
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+
+                            <h5 class="card-title mb-0">
+                                ${UI.esc(m.nombre)}
+                            </h5>
+
+                            <span class="badge badge-estado-${m.estado}">
+                                ${UI.esc(m.estado)}
+                            </span>
+
+                        </div>
+
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-paw"></i>
+                            ${textoSeguro(m.especie)}
+                        </p>
+
+                        <div class="small mb-3">
+
+                            <div class="mb-1">
+                                <strong>Raza:</strong>
+                                ${textoSeguro(m.raza)}
+                            </div>
+
+                            <div class="mb-1">
+                                <strong>Edad:</strong>
+                                ${textoSeguro(m.edad)}
+                            </div>
+
+                            <div class="mb-1">
+                                <strong>Sexo:</strong>
+                                ${textoSeguro(m.sexo, 'No registrado')}
+                            </div>
+
+                            <div class="mb-1">
+                                <strong>Tamaño:</strong>
+                                ${traducirTamano(m.tamano)}
+                            </div>
+
+                            <div class="mb-1">
+                                <strong>Actividad:</strong>
+                                ${traducirActividad(m.nivelActividad)}
+                            </div>
+
+                            <div class="mb-1">
+                                <strong>Convive con niños:</strong>
+                                ${traducirConvivencia(m.conviveNinos)}
+                            </div>
+
+                            <div class="mb-2">
+                                <strong>Convive con otras mascotas:</strong>
+                                ${traducirConvivencia(m.conviveMascotas)}
+                            </div>
+
+                            <div>
+                                <strong>Personalidad:</strong>
+                                <div class="mt-1">
+                                    ${etiquetasPersonalidad(m.personalidad)}
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-auto">
+
+                            <div class="d-flex gap-1 mb-2">
+
+                                <select
+                                    class="form-select form-select-sm"
+                                    data-id="${m.idMascota}"
+                                    data-action="cambiar-estado"
+                                    aria-label="Cambiar estado de ${UI.esc(m.nombre)}">
+
+                                    ${ESTADOS.map(e => `
+                                        <option
+                                            value="${e}"
+                                            ${e === m.estado ? 'selected' : ''}>
+                                            ${e}
+                                        </option>
+                                    `).join('')}
+
+                                </select>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    data-id="${m.idMascota}"
+                                    data-action="aplicar-estado"
+                                    aria-label="Guardar estado">
+
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </button>
+
+                            </div>
+
+                            <div class="d-flex gap-2">
+
+                                <a
+                                    href="mascota-form.html?id=${m.idMascota}"
+                                    class="btn btn-sm btn-outline-primary flex-fill">
+
+                                    <i class="bi bi-pencil"></i>
+                                    Editar
+                                </a>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    data-id="${m.idMascota}"
+                                    data-nombre="${UI.esc(m.nombre)}"
+                                    data-action="eliminar"
+                                    aria-label="Eliminar ${UI.esc(m.nombre)}">
+
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        cont.querySelectorAll(
+            '[data-action="aplicar-estado"]'
+        ).forEach(btn => {
+
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+
+                const select = cont.querySelector(
+                    `select[data-id="${id}"]`
+                );
+
+                if (!select) {
+                    return;
+                }
+
+                btn.disabled = true;
+
+                try {
+                    await Mascotas.cambiarEstado(
+                        id,
+                        select.value
+                    );
+
+                    UI.setFlash('exito', 'Estado actualizado.');
+                    window.location.reload();
+
+                } catch (error) {
+                    console.error('Error al cambiar el estado:', error);
+
+                    UI.setFlash(
+                        'error',
+                        'No se pudo actualizar el estado de la mascota.'
+                    );
+
+                    UI.mostrarFlash();
+                    btn.disabled = false;
+                }
+            });
+
+        });
+
+        cont.querySelectorAll(
+            '[data-action="eliminar"]'
+        ).forEach(btn => {
+
+            btn.addEventListener('click', async () => {
+                const nombre = btn.dataset.nombre;
+
+                if (!confirm(`¿Eliminar a ${nombre}?`)) {
+                    return;
+                }
+
+                btn.disabled = true;
+
+                try {
+                    await Mascotas.eliminar(btn.dataset.id);
+
+                    UI.setFlash('exito', 'Mascota eliminada.');
+                    window.location.reload();
+
+                } catch (error) {
+                    console.error('Error al eliminar la mascota:', error);
+
+                    UI.setFlash(
+                        'error',
+                        'No se pudo eliminar la mascota.'
+                    );
+
+                    UI.mostrarFlash();
+                    btn.disabled = false;
+                }
+            });
+
+        });
+
+    } catch (error) {
+        console.error('Error al cargar las mascotas:', error);
+
+        cont.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    No se pudo cargar la lista de mascotas.
+                    Revisa la conexión e inténtalo nuevamente.
+                </div>
+            </div>
+        `;
+    }
+}

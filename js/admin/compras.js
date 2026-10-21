@@ -1,0 +1,859 @@
+const usuario = Auth.requireAdmin();
+
+let modalDetalleCompra = null;
+
+if (usuario) {
+
+    UI.navbarAdmin(usuario);
+    UI.mostrarFlash();
+
+    modalDetalleCompra =
+        new bootstrap.Modal(
+            document.getElementById('modalDetalleCompra')
+        );
+
+    cargarCompras();
+
+}
+
+async function cargarCompras() {
+
+    const cont =
+        document.getElementById('listaCompras');
+
+    const errCont =
+        document.getElementById('errCompras');
+
+    errCont.textContent = '';
+
+    cont.innerHTML = `
+        <tr>
+            <td colspan="9" class="text-center text-muted py-5">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Cargando compras...
+            </td>
+        </tr>`;
+
+    try {
+
+        const respuesta =
+            await db
+                .from('pedidos')
+                .select(`
+                    id_pedido,
+                    id_usuario,
+                    fecha,
+                    total,
+                    estado,
+                    numero_boleta,
+                    boleta_codigo,
+                    pago_referencia,
+                    perfiles (
+                        nombre
+                    )
+                `)
+                .order(
+                    'fecha',
+                    {
+                        ascending: false
+                    }
+                );
+
+        if (respuesta.error) {
+
+            throw respuesta.error;
+
+        }
+
+        const compras =
+            respuesta.data || [];
+
+        if (compras.length === 0) {
+
+            cont.innerHTML = `
+                <tr>
+                    <td
+                        colspan="9"
+                        class="text-center text-muted py-5">
+
+                        <i class="bi bi-bag-x fs-2 d-block mb-2"></i>
+
+                        No hay compras registradas.
+
+                    </td>
+                </tr>`;
+
+            return;
+
+        }
+
+        cont.innerHTML =
+            compras
+                .map(compra => {
+
+                    const fecha =
+                        new Date(compra.fecha);
+
+                    const fechaTexto =
+                        fecha.toLocaleDateString(
+                            'es-PE'
+                        );
+
+                    const horaTexto =
+                        fecha.toLocaleTimeString(
+                            'es-PE',
+                            {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }
+                        );
+
+                    const cliente =
+                        obtenerNombreCliente(
+                            compra
+                        );
+
+                    const estado =
+                        obtenerEstadoCompra(
+                            compra.estado
+                        );
+
+                    const boleta =
+                        compra.numero_boleta
+                            ? UI.esc(
+                                String(
+                                    compra.numero_boleta
+                                )
+                            )
+                            : 'Pendiente';
+
+                    return `
+
+                        <tr>
+
+                            <td class="fw-bold">
+                                #${UI.esc(
+                                    String(
+                                        compra.id_pedido
+                                    )
+                                )}
+                            </td>
+
+                            <td>
+                                ${UI.esc(
+                                    String(
+                                        compra.id_pedido
+                                    )
+                                )}
+                            </td>
+
+                            <td>
+                                ${UI.esc(cliente)}
+                            </td>
+
+                            <td>
+                                ${UI.esc(fechaTexto)}
+                            </td>
+
+                            <td>
+                                ${UI.esc(horaTexto)}
+                            </td>
+
+                            <td class="fw-bold text-nowrap">
+                                S/
+                                ${Number(
+                                    compra.total
+                                ).toFixed(2)}
+                            </td>
+
+                            <td>
+                                ${estado}
+                            </td>
+
+                            <td>
+                                ${boleta}
+                            </td>
+
+                            <td class="text-center">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    data-ver-compra="${UI.esc(
+                                        String(
+                                            compra.id_pedido
+                                        )
+                                    )}">
+
+                                    <i class="bi bi-eye"></i>
+                                    Ver
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                })
+                .join('');
+
+        cont
+            .querySelectorAll(
+                '[data-ver-compra]'
+            )
+            .forEach(btn => {
+
+                btn.addEventListener(
+                    'click',
+                    () => {
+
+                        verDetalleCompra(
+                            btn.dataset.verCompra
+                        );
+
+                    }
+                );
+
+            });
+
+    } catch (error) {
+
+        console.error(
+            'Error al cargar compras:',
+            error
+        );
+
+        cont.innerHTML = `
+            <tr>
+                <td
+                    colspan="9"
+                    class="text-center text-danger py-5">
+
+                    No se pudieron cargar las compras.
+
+                </td>
+            </tr>`;
+
+        errCont.textContent =
+            error.message ||
+            'No se pudieron cargar las compras.';
+
+    }
+
+}
+
+function obtenerNombreCliente(compra) {
+
+    const perfil =
+        Array.isArray(compra.perfiles)
+            ? compra.perfiles[0]
+            : compra.perfiles;
+
+    if (!perfil) {
+
+        return 'Cliente no disponible';
+
+    }
+
+    return (
+        perfil.nombre ||
+        'Cliente no disponible'
+    );
+
+}
+
+function obtenerEstadoCompra(estado) {
+
+    const valor =
+        String(
+            estado || ''
+        ).toUpperCase();
+
+    if (valor === 'PAGADO') {
+
+        return `
+            <span class="badge bg-success">
+                Pagado
+            </span>`;
+
+    }
+
+    if (valor === 'ENTREGADO') {
+
+        return `
+            <span class="badge bg-primary">
+                Entregado
+            </span>`;
+
+    }
+
+    if (valor === 'PENDIENTE_PAGO') {
+
+        return `
+            <span class="badge bg-warning text-dark">
+                Pendiente de pago
+            </span>`;
+
+    }
+
+    if (valor === 'RECHAZADO') {
+
+        return `
+            <span class="badge bg-danger">
+                Rechazado
+            </span>`;
+
+    }
+
+    if (valor === 'VENCIDO') {
+
+        return `
+            <span class="badge bg-secondary">
+                Vencido
+            </span>`;
+
+    }
+
+    return `
+        <span class="badge bg-secondary">
+            ${UI.esc(
+                estado || 'Sin estado'
+            )}
+        </span>`;
+
+}
+
+async function verDetalleCompra(idPedido) {
+
+    const errCont =
+        document.getElementById(
+            'errDetalleCompra'
+        );
+
+    const cont =
+        document.getElementById(
+            'contenidoDetalleCompra'
+        );
+
+    errCont.textContent = '';
+
+    cont.innerHTML = `
+        <div class="text-center text-muted py-5">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Cargando detalle...
+        </div>`;
+
+    modalDetalleCompra.show();
+
+    try {
+
+        const respuestaPedido =
+            await db
+                .from('pedidos')
+                .select(`
+                    id_pedido,
+                    id_usuario,
+                    fecha,
+                    total,
+                    estado,
+                    vence_en,
+                    pagado_en,
+                    numero_boleta,
+                    boleta_codigo,
+                    pago_referencia,
+                    motivo_rechazo,
+                    nombre_comprador, 
+                    tipo_documento, 
+                    numero_documento,
+                    perfiles (
+                        nombre
+                    )
+                `)
+                .eq(
+                    'id_pedido',
+                    Number(idPedido)
+                )
+                .maybeSingle();
+
+        if (respuestaPedido.error) {
+
+            throw respuestaPedido.error;
+
+        }
+
+        const pedido =
+            respuestaPedido.data;
+
+        if (!pedido) {
+
+            throw new Error(
+                'No se encontró la compra seleccionada.'
+            );
+
+        }
+
+        const respuestaItems =
+            await db
+                .from('pedido_items')
+                .select(`
+                    id_item,
+                    nombre_producto,
+                    cantidad,
+                    precio_unitario,
+                    subtotal
+                `)
+                .eq(
+                    'id_pedido',
+                    Number(idPedido)
+                )
+                .order(
+                    'id_item',
+                    {
+                        ascending: true
+                    }
+                );
+
+        if (respuestaItems.error) {
+
+            throw respuestaItems.error;
+
+        }
+
+        const items =
+            respuestaItems.data || [];
+
+        const fecha =
+            new Date(
+                pedido.fecha
+            );
+
+        const fechaTexto =
+            fecha.toLocaleDateString(
+                'es-PE'
+            );
+
+        const horaTexto =
+            fecha.toLocaleTimeString(
+                'es-PE',
+                {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }
+            );
+
+        const perfil =
+            Array.isArray(pedido.perfiles)
+                ? pedido.perfiles[0]
+                : pedido.perfiles;
+
+        const cliente =
+            perfil?.nombre ||
+            'Cliente no disponible';
+
+        const nombreComprador =
+            pedido.nombre_comprador ||
+            cliente;
+
+        const tipoDocumento =
+            pedido.tipo_documento || '';
+
+        const numeroDocumento =
+            pedido.numero_documento || '';
+
+        const documentoComprador =
+            [tipoDocumento, numeroDocumento]
+    .filter(Boolean)
+    .join(': ') || 'No registrado';    
+
+        cont.innerHTML = `
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-3">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="text-muted small">
+                            Número de pedido
+                        </div>
+
+                        <div class="fw-bold fs-5">
+                            #${UI.esc(
+                                String(
+                                    pedido.id_pedido
+                                )
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="text-muted small">
+                            ID de compra
+                        </div>
+
+                        <div class="fw-bold fs-5">
+                            ${UI.esc(
+                                String(
+                                    pedido.id_pedido
+                                )
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="text-muted small">
+                            Cliente
+                        </div>
+
+                        <div class="fw-bold">
+                            ${UI.esc(cliente)}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="text-muted small">
+                            Estado
+                        </div>
+
+                        <div class="mt-1">
+                            ${obtenerEstadoCompra(
+                                pedido.estado
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Datos del comprador -->
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-6">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="text-muted small">
+                            Nombre del comprador
+                        </div>
+
+                        <div class="fw-bold">
+                            ${UI.esc(
+                                nombreComprador
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="text-muted small">
+                            Documento de identidad
+                        </div>
+
+                        <div class="fw-bold">
+                            ${UI.esc(
+                                documentoComprador
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-4">
+
+                    <div class="border rounded p-3">
+
+                        <div class="text-muted small">
+                            Fecha
+                        </div>
+
+                        <div class="fw-bold">
+                            ${UI.esc(fechaTexto)}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="border rounded p-3">
+
+                        <div class="text-muted small">
+                            Hora
+                        </div>
+
+                        <div class="fw-bold">
+                            ${UI.esc(horaTexto)}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="border rounded p-3">
+
+                        <div class="text-muted small">
+                            Total
+                        </div>
+
+                        <div class="fw-bold fs-5">
+                            S/
+                            ${Number(
+                                pedido.total
+                            ).toFixed(2)}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="table-responsive mb-4">
+
+                <table class="table table-bordered align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>
+                                Producto
+                            </th>
+
+                            <th class="text-center">
+                                Cantidad
+                            </th>
+
+                            <th class="text-end">
+                                Precio unitario
+                            </th>
+
+                            <th class="text-end">
+                                Subtotal
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        ${
+                            items.length === 0
+                                ? `
+                                    <tr>
+                                        <td
+                                            colspan="4"
+                                            class="text-center text-muted py-4">
+
+                                            No hay productos registrados.
+
+                                        </td>
+                                    </tr>
+                                `
+                                :
+                                items
+                                    .map(item => {
+
+                                        return `
+
+                                            <tr>
+
+                                                <td>
+                                                    ${UI.esc(
+                                                        item.nombre_producto ||
+                                                        'Producto sin nombre'
+                                                    )}
+                                                </td>
+
+                                                <td class="text-center">
+                                                    ${UI.esc(
+                                                        String(
+                                                            item.cantidad
+                                                        )
+                                                    )}
+                                                </td>
+
+                                                <td class="text-end">
+                                                    S/
+                                                    ${Number(
+                                                        item.precio_unitario
+                                                    ).toFixed(2)}
+                                                </td>
+
+                                                <td class="text-end">
+                                                    S/
+                                                    ${Number(
+                                                        item.subtotal
+                                                    ).toFixed(2)}
+                                                </td>
+
+                                            </tr>
+
+                                        `;
+
+                                    })
+                                    .join('')
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="row justify-content-end">
+
+                <div class="col-md-5">
+
+                    <div class="border rounded p-3">
+
+                        <div class="d-flex justify-content-between">
+
+                            <span>
+                                Total
+                            </span>
+
+                            <strong>
+                                S/
+                                ${Number(
+                                    pedido.total
+                                ).toFixed(2)}
+                            </strong>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="small text-muted">
+
+                            <div class="mb-2">
+                                Boleta:
+                                ${
+                                    pedido.numero_boleta
+                                        ? UI.esc(
+                                            String(
+                                                pedido.numero_boleta
+                                            )
+                                        )
+                                        : 'Pendiente'
+                                }
+                            </div>
+
+                            <div class="mb-2">
+                                Referencia de pago:
+                                ${
+                                    pedido.pago_referencia
+                                        ? UI.esc(
+                                            String(
+                                                pedido.pago_referencia
+                                            )
+                                        )
+                                        : 'No registrada'
+                                }
+                            </div>
+
+                            ${
+                                pedido.motivo_rechazo
+                                    ? `
+                                        <div>
+                                            Motivo de rechazo:
+                                            ${UI.esc(
+                                                String(
+                                                    pedido.motivo_rechazo
+                                                )
+                                            )}
+                                        </div>
+                                    `
+                                    : ''
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            ${
+                ['PAGADO', 'ENTREGADO'].includes(
+                    String(pedido.estado || '').toUpperCase()
+                ) && pedido.boleta_codigo
+                    ? `
+                        <div class="d-flex justify-content-end mt-4">
+                            <a
+                                href="../cliente/boleta.html?pedido=${encodeURIComponent(String(pedido.id_pedido))}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn btn-primary">
+
+                                <i class="bi bi-receipt"></i>
+                                Ver boleta imprimible
+
+                            </a>
+                        </div>
+                    `
+                    : ''
+            }
+
+        `;
+
+    } catch (error) {
+
+        console.error(
+            'Error al cargar detalle de compra:',
+            error
+        );
+
+        cont.innerHTML = '';
+
+        errCont.textContent =
+            error.message ||
+            'No se pudo cargar el detalle de la compra.';
+
+    }
+
+}
+
+document
+    .getElementById('btnActualizarCompras')
+    .addEventListener(
+        'click',
+        cargarCompras
+    );

@@ -1,0 +1,2350 @@
+const usuario = Auth.requireCliente();
+
+let mascotaSeleccionada = null;
+
+const CARRITO_KEY = 'ps_carrito';
+let productosCache = [];
+let carrito = JSON.parse(localStorage.getItem(CARRITO_KEY) || '{}');
+let modalCarrito = null;
+let modalPago = null;
+let modalCompraExitosa = null;
+
+// Invitación de MascotICA's Match.
+let modalInvitacionMatch = null;
+let procesandoDecisionMatch = false;
+
+// Datos devueltos por la consulta de DNI/RUC.
+// Se invalidan si el usuario cambia el tipo o número de documento.
+let documentoConsultadoPago = null;
+let nombreCompradorPagoActual = null;
+let consultaDocumentoEnCurso = false;
+
+
+const modalEvaluacion =
+    new bootstrap.Modal(
+        document.getElementById('modalEvaluacion')
+    );
+
+
+/*
+ * INVITACIÓN MASCOTICA'S MATCH
+ *
+ * Consulta si el cliente ya respondió la invitación.
+ * La respuesta se guarda en Supabase para que no se repita
+ * al volver a iniciar sesión.
+ */
+async function iniciarInvitacionMatch() {
+
+    if (!usuario || usuario.rol !== 'CLIENTE') {
+        return;
+    }
+
+    const modalElemento =
+        document.getElementById('modalInvitacionMatch');
+
+    const botonProbar =
+        document.getElementById('btnMatchProbar');
+
+    const botonDespues =
+        document.getElementById('btnMatchDespues');
+
+    if (!modalElemento || !botonProbar || !botonDespues) {
+        return;
+    }
+
+    modalInvitacionMatch =
+        new bootstrap.Modal(modalElemento);
+
+    const { data, error } = await db
+        .from('match_invitaciones')
+        .select('decision')
+        .eq('usuario_id', usuario.idUsuario)
+        .maybeSingle();
+
+    if (error) {
+
+        console.error(
+            'No se pudo consultar la invitación Match:',
+            error
+        );
+
+        return;
+
+    }
+
+    // Si ya respondió, no volver a mostrar la invitación.
+    if (data) {
+        return;
+    }
+
+    modalInvitacionMatch.show();
+
+
+    async function guardarDecision(decision) {
+
+        if (procesandoDecisionMatch) {
+            return false;
+        }
+
+        procesandoDecisionMatch = true;
+
+        botonProbar.disabled = true;
+        botonDespues.disabled = true;
+
+        const { error: errorGuardar } = await db
+            .from('match_invitaciones')
+            .insert({
+                usuario_id: usuario.idUsuario,
+                decision: decision
+            });
+
+        if (errorGuardar) {
+
+            console.error(
+                'No se pudo guardar la decisión de Match:',
+                errorGuardar
+            );
+
+            UI.setFlash(
+                'error',
+                'No pudimos guardar tu respuesta. Inténtalo nuevamente.'
+            );
+
+            UI.mostrarFlash();
+
+            procesandoDecisionMatch = false;
+
+            botonProbar.disabled = false;
+            botonDespues.disabled = false;
+
+            return false;
+
+        }
+
+        modalInvitacionMatch.hide();
+
+        if (decision === 'probar') {
+
+            window.location.href = 'match.html';
+
+            return true;
+
+        }
+
+        UI.setFlash(
+            'exito',
+            "¡No hay problema! Puedes probar MascotICA's Match en cualquier momento desde el botón de la barra de navegación."
+        );
+
+        UI.mostrarFlash();
+
+        return true;
+
+    }
+
+
+    botonProbar.addEventListener('click', () => {
+        guardarDecision('probar');
+    });
+
+    botonDespues.addEventListener('click', () => {
+        guardarDecision('no_por_ahora');
+    });
+
+}
+
+
+if (usuario) {
+
+    UI.navbarCliente(usuario);
+    UI.mostrarFlash();
+    UI.limpiarAlEscribir('#formEvaluacion');
+
+    pintarMascotas();
+    pintarProductos();
+    iniciarCarrito();
+
+    modalPago =
+        new bootstrap.Modal(
+            document.getElementById('modalPago')
+        );
+
+    modalCompraExitosa =
+        new bootstrap.Modal(
+            document.getElementById('modalCompraExitosa')
+        );
+
+    // Se comprueba la invitación al cargar el catálogo.
+    iniciarInvitacionMatch();
+
+}
+
+
+/* ================================================================
+   DOCUMENTO DE EVALUACIÓN DE ADOPCIÓN
+   Se conserva separado del documento de compra.
+   ================================================================ */
+
+/* Solo dígitos al escribir, pegar o arrastrar (limpia antes de insertar) */
+Validar.soloDigitos('evalNumeroDocumento');
+Validar.soloDigitos('numeroDocumentoPago');
+
+document
+    .getElementById('evalTipoDocumento')
+    .addEventListener('change', function () {
+
+        const esDni = this.value === 'DNI';
+        const campo = document.getElementById('evalNumeroDocumento');
+
+        campo.maxLength = esDni ? 8 : 11;
+        campo.value = '';
+        campo.classList.remove('is-invalid');
+
+        document.getElementById('evalDocAyuda').textContent = esDni
+            ? 'Ingresa los 8 dígitos de tu DNI.'
+            : 'Ingresa los 11 dígitos de tu Carnet de Extranjería.';
+
+    });
+
+
+/* ================================================================
+   DOCUMENTO DE COMPRA
+   DNI: 8 dígitos.
+   RUC: 11 dígitos.
+   CE: entre 9 y 11 dígitos, sin consulta externa.
+   ================================================================ */
+
+function limpiarConsultaDocumento() {
+
+    documentoConsultadoPago = null;
+
+    const resultado =
+        document.getElementById('resultadoDocumento');
+
+    const nombre =
+        document.getElementById('nombreDocumentoConsultado');
+
+    const estado =
+        document.getElementById('estadoConsultaDocumento');
+
+    resultado.classList.add('d-none');
+    nombre.textContent = '';
+    estado.textContent = '';
+    estado.className = 'small mt-2';
+
+    actualizarBotonConfirmarCompra();
+
+}
+
+
+function actualizarInterfazDocumentoPago() {
+
+    const tipo =
+        document.getElementById('tipoDocumentoPago').value;
+
+    const campo =
+        document.getElementById('numeroDocumentoPago');
+
+    const ayuda =
+        document.getElementById('ayudaDocumentoPago');
+
+    const boton =
+        document.getElementById('btnConsultarDocumento');
+
+    const ayudaConsulta =
+        document.getElementById('ayudaConsultaDocumento');
+
+    campo.value = '';
+    campo.classList.remove('is-invalid');
+
+    limpiarConsultaDocumento();
+
+    if (tipo === 'DNI') {
+
+        campo.maxLength = 8;
+        campo.inputMode = 'numeric';
+        campo.placeholder = 'Ej: 12345678';
+
+        ayuda.textContent =
+            'Ingresa los 8 dígitos de tu DNI.';
+
+        boton.classList.remove('d-none');
+        boton.innerHTML =
+            '<i class="bi bi-search"></i> Consultar DNI';
+
+        ayudaConsulta.textContent =
+            'Consulta tu DNI para completar automáticamente tu primer nombre y apellido paterno.';
+
+    } else if (tipo === 'RUC') {
+
+        campo.maxLength = 11;
+        campo.inputMode = 'numeric';
+        campo.placeholder = 'Ej: 20123456789';
+
+        ayuda.textContent =
+            'Ingresa los 11 dígitos de tu RUC.';
+
+        boton.classList.remove('d-none');
+        boton.innerHTML =
+            '<i class="bi bi-search"></i> Consultar RUC';
+
+        ayudaConsulta.textContent =
+            'Consulta tu RUC para obtener la razón social registrada.';
+
+    } else {
+
+        campo.maxLength = 11;
+        campo.inputMode = 'numeric';
+        campo.placeholder = 'Ingresa tu número de CE';
+
+        ayuda.textContent =
+            'Ingresa entre 9 y 11 dígitos de tu Carnet de Extranjería.';
+
+        boton.classList.add('d-none');
+
+        ayudaConsulta.textContent =
+            'Para el CE no se realiza consulta externa. Se utilizará el nombre de tu cuenta.';
+
+    }
+
+    actualizarBotonConfirmarCompra();
+
+}
+
+
+document
+    .getElementById('tipoDocumentoPago')
+    .addEventListener('change', actualizarInterfazDocumentoPago);
+
+
+document
+    .getElementById('numeroDocumentoPago')
+    .addEventListener('input', function () {
+
+        const tipo =
+            document.getElementById('tipoDocumentoPago').value;
+
+        // Los tres documentos admitidos en compra son numéricos.
+        this.value = this.value.replace(/\D/g, '');
+
+        if (tipo === 'DNI' && this.value.length > 8) {
+            this.value = this.value.slice(0, 8);
+        }
+
+        if (tipo === 'RUC' && this.value.length > 11) {
+            this.value = this.value.slice(0, 11);
+        }
+
+        if (tipo === 'CE' && this.value.length > 11) {
+            this.value = this.value.slice(0, 11);
+        }
+
+        this.classList.remove('is-invalid');
+
+        limpiarConsultaDocumento();
+
+    });
+
+
+function documentoPagoEsValido(tipo, numero) {
+
+    if (tipo === 'DNI') {
+        return /^\d{8}$/.test(numero);
+    }
+
+    if (tipo === 'RUC') {
+        return /^\d{11}$/.test(numero);
+    }
+
+    if (tipo === 'CE') {
+        return /^\d{9,11}$/.test(numero);
+    }
+
+    return false;
+
+}
+
+
+function actualizarBotonConfirmarCompra() {
+
+    const boton =
+        document.getElementById('btnConfirmarCompra');
+
+    const tipo =
+        document.getElementById('tipoDocumentoPago').value;
+
+    const numero =
+        document.getElementById('numeroDocumentoPago').value.trim();
+
+    const documentoValido =
+        documentoPagoEsValido(tipo, numero);
+
+    const consultaRequerida =
+        tipo === 'DNI' || tipo === 'RUC';
+
+    const consultaCorrecta =
+        documentoConsultadoPago &&
+        documentoConsultadoPago.tipoDocumento === tipo &&
+        documentoConsultadoPago.numeroDocumento === numero;
+
+    const carritoTieneProductos =
+        Object.entries(carrito).some(([id, cantidad]) =>
+            productoPorId(id) && Number(cantidad) > 0
+        );
+
+    boton.disabled =
+        consultaDocumentoEnCurso ||
+        !documentoValido ||
+        !carritoTieneProductos ||
+        (consultaRequerida && !consultaCorrecta);
+
+}
+
+
+document
+    .getElementById('btnConsultarDocumento')
+    .addEventListener('click', consultarDocumentoPago);
+
+
+async function consultarDocumentoPago() {
+
+    const tipo =
+        document.getElementById('tipoDocumentoPago').value;
+
+    const campo =
+        document.getElementById('numeroDocumentoPago');
+
+    const numero =
+        campo.value.trim();
+
+    const boton =
+        document.getElementById('btnConsultarDocumento');
+
+    const estado =
+        document.getElementById('estadoConsultaDocumento');
+
+    const resultado =
+        document.getElementById('resultadoDocumento');
+
+    const etiquetaNombre =
+        document.getElementById('etiquetaNombreDocumento');
+
+    const nombreMostrado =
+        document.getElementById('nombreDocumentoConsultado');
+
+    const errCont =
+        document.getElementById('errCarrito');
+
+    errCont.textContent = '';
+    limpiarConsultaDocumento();
+
+    if (tipo !== 'DNI' && tipo !== 'RUC') {
+        return;
+    }
+
+    if (!documentoPagoEsValido(tipo, numero)) {
+
+        campo.classList.add('is-invalid');
+
+        estado.className = 'small mt-2 text-danger';
+        estado.textContent =
+            tipo === 'DNI'
+                ? 'El DNI debe tener exactamente 8 dígitos.'
+                : 'El RUC debe tener exactamente 11 dígitos.';
+
+        return;
+
+    }
+
+    if (typeof db === 'undefined' || !db.functions) {
+
+        estado.className = 'small mt-2 text-danger';
+        estado.textContent =
+            'No está disponible la conexión con el servicio de consulta.';
+
+        return;
+
+    }
+
+    consultaDocumentoEnCurso = true;
+
+    boton.disabled = true;
+    boton.innerHTML =
+        '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Consultando...';
+
+    estado.className = 'small mt-2 text-muted';
+    estado.textContent = 'Consultando el documento. Espera un momento.';
+
+    actualizarBotonConfirmarCompra();
+
+    try {
+
+        const respuesta =
+            await db.functions.invoke(
+                'intifact-consultar-documento',
+                {
+                    body: {
+                        tipoDocumento: tipo,
+                        numeroDocumento: numero
+                    }
+                }
+            );
+
+        if (respuesta.error) {
+            const errorFuncion = respuesta.error;
+            const estadoHTTP = errorFuncion.context?.status;
+
+            let mensajeServidor = '';
+
+            // Intenta recuperar el mensaje enviado por la Edge Function.
+            try {
+                if (errorFuncion.context instanceof Response) {
+                    const cuerpo = await errorFuncion.context.clone().json();
+                    mensajeServidor = String(cuerpo?.error || '').trim();
+                }
+            } catch {
+                // Si no hay respuesta JSON, se utilizará un mensaje general.
+            }
+
+            if (estadoHTTP === 404) {
+
+                throw new Error(
+                    'No se encontraron datos para ese documento. Verifica el número e inténtalo nuevamente.'
+                );
+
+            }
+
+            if (estadoHTTP === 400) {
+
+                throw new Error(
+                    mensajeServidor ||
+                    'El número o tipo de documento no es válido.'
+                );
+
+            }
+
+            if (estadoHTTP === 429) {
+
+                throw new Error(
+                    'Se alcanzó el límite de consultas. Inténtalo más tarde.'
+                );
+
+            }
+
+            throw new Error(
+                mensajeServidor ||
+                'No se pudo consultar el documento en este momento. Inténtalo nuevamente más tarde.'
+            );
+
+        }
+
+
+        const datos = respuesta.data;
+
+        if (!datos || datos.error) {
+            throw new Error(
+                datos?.error ||
+                'El servicio no devolvió los datos esperados.'
+            );
+        }
+
+        // Evita utilizar el resultado si el usuario cambió
+        // el tipo o número mientras la consulta estaba en curso.
+        const tipoActual =
+            document.getElementById('tipoDocumentoPago').value;
+
+        const numeroActual =
+            document.getElementById('numeroDocumentoPago').value.trim();
+
+        if (tipoActual !== tipo || numeroActual !== numero) {
+            return;
+        }
+
+        let nombreComprador = '';
+
+        if (tipo === 'DNI') {
+
+            const primerNombre =
+                String(datos.primerNombre || '').trim();
+
+            const apellidoPaterno =
+                String(datos.apellidoPaterno || '').trim();
+
+            nombreComprador =
+                `${primerNombre} ${apellidoPaterno}`.trim();
+
+            etiquetaNombre.textContent =
+                'Nombre y apellido paterno consultados';
+
+        } else {
+
+            nombreComprador =
+                String(datos.razonSocial || '').trim();
+
+            etiquetaNombre.textContent =
+                'Razón social consultada';
+
+        }
+
+        if (!nombreComprador) {
+            throw new Error(
+                'La consulta no devolvió un nombre válido para este documento.'
+            );
+        }
+
+        documentoConsultadoPago = {
+            tipoDocumento: tipo,
+            numeroDocumento: numero,
+            nombre: nombreComprador
+        };
+
+        nombreMostrado.textContent = nombreComprador;
+        resultado.classList.remove('d-none');
+
+        estado.className = 'small mt-2 text-success';
+        estado.textContent =
+            'Documento consultado correctamente. Puedes continuar con la compra.';
+
+    } catch (error) {
+
+        console.error(
+            'Error al consultar el documento:',
+            error
+        );
+
+        documentoConsultadoPago = null;
+
+        resultado.classList.add('d-none');
+
+        estado.className = 'small mt-2 text-danger';
+        estado.textContent =
+            error.message ||
+            'No se pudo consultar el documento. Inténtalo nuevamente.';
+
+    } finally {
+
+        consultaDocumentoEnCurso = false;
+
+        // CAMBIO 1: reactivar el botón al terminar la consulta.
+        // Esto permite volver a consultar después de cambiar de documento.
+        boton.disabled = false;
+
+        if (tipo === 'DNI') {
+            boton.innerHTML =
+                '<i class="bi bi-search"></i> Consultar DNI';
+        } else {
+            boton.innerHTML =
+                '<i class="bi bi-search"></i> Consultar RUC';
+        }
+
+        actualizarBotonConfirmarCompra();
+
+    }
+
+}
+
+
+/* ================================================================
+   CARACTERÍSTICAS DE LAS MASCOTAS
+   Traduce los valores guardados en Supabase para mostrarlos
+   de forma legible en el catálogo del cliente.
+   ================================================================ */
+
+function traducirTamano(tamano) {
+
+    const valores = {
+        PEQUENO: 'Pequeño',
+        MEDIANO: 'Mediano',
+        GRANDE: 'Grande'
+    };
+
+    return valores[String(tamano || '').trim().toUpperCase()]
+        || 'No registrado';
+
+}
+
+
+function traducirActividad(actividad) {
+
+    const valores = {
+        TRANQUILO: 'Tranquilo',
+        MODERADO: 'Moderado',
+        ACTIVO: 'Muy activo'
+    };
+
+    return valores[String(actividad || '').trim().toUpperCase()]
+        || 'No registrada';
+
+}
+
+
+function traducirConvivencia(valor) {
+
+    const valores = {
+        SI: 'Sí',
+        NO: 'No',
+        DESCONOCIDO: 'Desconocido'
+    };
+
+    const normalizado =
+        String(valor || 'DESCONOCIDO').trim().toUpperCase();
+
+    return valores[normalizado] || 'Desconocido';
+
+}
+
+
+function obtenerPersonalidadesMascota(personalidad) {
+
+    if (Array.isArray(personalidad)) {
+
+        return personalidad
+            .filter(item => typeof item === 'string' && item.trim())
+            .map(item => item.trim());
+
+    }
+
+    if (typeof personalidad === 'string' && personalidad.trim()) {
+
+        try {
+
+            const resultado = JSON.parse(personalidad);
+
+            if (Array.isArray(resultado)) {
+
+                return resultado
+                    .filter(item => typeof item === 'string' && item.trim())
+                    .map(item => item.trim());
+
+            }
+
+        } catch {
+            // Admite registros anteriores que guardaban texto en vez de JSON.
+        }
+
+        return [personalidad.trim()];
+
+    }
+
+    return [];
+
+}
+
+
+async function pintarMascotas() {
+
+    const mascotas =
+        await Mascotas.listarPorEstado('DISPONIBLE');
+
+    const cont =
+        document.getElementById('listaMascotas');
+
+    if (mascotas.length === 0) {
+
+        cont.innerHTML = `
+            <div class="col-12">
+                <p class="text-muted">
+                    No hay mascotas disponibles por el momento.
+                </p>
+            </div>`;
+
+        return;
+
+    }
+
+    cont.innerHTML = mascotas.map(m => {
+
+        const personalidades =
+            obtenerPersonalidadesMascota(m.personalidad);
+
+        const etiquetasPersonalidad =
+            personalidades.length > 0
+                ? personalidades.map(personalidad => `
+                    <span class="badge rounded-pill bg-info-subtle text-dark border me-1 mb-1">
+                        ${UI.esc(personalidad)}
+                    </span>
+                `).join('')
+                : '<span class="text-muted small">No registrada</span>';
+
+        return `
+
+            <div class="col-md-3 col-sm-6">
+
+                <div class="card card-mascota h-100">
+
+                    <img
+                        src="${UI.imagenOPlaceholder(m.imagenUrl, m.nombre)}"
+                        class="img-top"
+                        alt="Foto de ${UI.esc(m.nombre)}">
+
+                    <div class="card-body d-flex flex-column">
+
+                        <h5 class="card-title mb-1">
+                            ${UI.esc(m.nombre)}
+                        </h5>
+
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-paw"></i>
+                            ${UI.esc(m.especie)}
+                        </p>
+
+                        <p class="text-muted mb-3">
+                            <strong>Raza / tipo:</strong>
+                            ${UI.esc(m.raza || 'No especificado')}
+                            <br>
+                            <strong>Edad:</strong>
+                            ${UI.esc(m.edad)}
+                            <br>
+                            <strong>Sexo:</strong>
+                            ${UI.esc(m.sexo || 'No registrado')}
+                        </p>
+
+                        <hr class="my-2">
+
+                        <h6 class="fw-bold mb-2">
+                            <i class="bi bi-card-list"></i>
+                            Características
+                        </h6>
+
+                        <div class="small mb-2">
+                            <div class="mb-2">
+                                <i class="bi bi-rulers text-primary"></i>
+                                <strong>Tamaño:</strong>
+                                ${UI.esc(traducirTamano(m.tamano))}
+                            </div>
+
+                            <div class="mb-2">
+                                <i class="bi bi-lightning-charge text-primary"></i>
+                                <strong>Actividad:</strong>
+                                ${UI.esc(traducirActividad(m.nivelActividad))}
+                            </div>
+
+                            <div class="mb-2">
+                                <i class="bi bi-people text-primary"></i>
+                                <strong>Convive con niños:</strong>
+                                ${UI.esc(traducirConvivencia(m.conviveNinos))}
+                            </div>
+
+                            <div class="mb-2">
+                                <i class="bi bi-heart text-primary"></i>
+                                <strong>Convive con otras mascotas:</strong>
+                                ${UI.esc(traducirConvivencia(m.conviveMascotas))}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="small fw-bold mb-2">
+                                <i class="bi bi-stars text-primary"></i>
+                                Personalidad
+                            </div>
+
+                            <div>
+                                ${etiquetasPersonalidad}
+                            </div>
+                        </div>
+
+                        <button
+                            class="btn btn-primary-ps btn-sm w-100 mt-auto"
+                            data-id="${m.idMascota}"
+                            data-nombre="${UI.esc(m.nombre)}"
+                            data-action="adoptar">
+
+                            <i class="bi bi-heart-fill"></i>
+                            Solicitar adopcion
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+        `;
+
+    }).join('');
+
+
+    cont
+        .querySelectorAll('[data-action="adoptar"]')
+        .forEach(btn => {
+
+            btn.addEventListener('click', () => {
+
+                mascotaSeleccionada = btn.dataset.id;
+
+                document
+                    .getElementById('evalNombreMascota')
+                    .textContent = btn.dataset.nombre;
+
+                document
+                    .getElementById('formEvaluacion')
+                    .reset();
+
+                document
+                    .querySelectorAll('#formEvaluacion .is-invalid')
+                    .forEach(el => el.classList.remove('is-invalid'));
+
+                document.getElementById('evalNumeroDocumento').maxLength = 8;
+
+                document.getElementById('evalDocAyuda').textContent =
+                    'Ingresa los 8 dígitos de tu DNI.';
+
+                modalEvaluacion.show();
+
+            });
+
+        });
+
+    const parametrosURL = new URLSearchParams(window.location.search);
+    const idMascotaAdopcion = parametrosURL.get('adoptar');
+
+    if (idMascotaAdopcion) {
+
+        const botonAdopcion = Array.from(
+            cont.querySelectorAll('[data-action="adoptar"]')
+        ).find(btn => btn.dataset.id === idMascotaAdopcion);
+
+        if (botonAdopcion) {
+
+            botonAdopcion.click();
+
+            parametrosURL.delete('adoptar');
+
+            const nuevaURL =
+                window.location.pathname +
+                (parametrosURL.toString()
+                    ? '?' + parametrosURL.toString()
+                    : '') +
+                window.location.hash;
+
+            window.history.replaceState({}, '', nuevaURL);
+
+        } else {
+
+            console.warn(
+                'No se encontró la mascota solicitada desde Match:',
+                idMascotaAdopcion
+            );
+
+        }
+
+    }
+
+}
+
+
+document
+    .getElementById('btnEnviarEvaluacion')
+    .addEventListener('click', async () => {
+
+        const mensaje = UI.validarCampos([
+            { id: 'evalTipoDocumento', etiqueta: 'Tipo de documento' },
+            { id: 'evalNumeroDocumento', etiqueta: 'Número de documento' },
+            { id: 'evalFechaNacimiento', etiqueta: 'Fecha de nacimiento' },
+            { id: 'evalVivienda', etiqueta: 'Tipo de vivienda' },
+            { id: 'evalEspacio', etiqueta: 'Espacio adecuado' },
+            { id: 'evalTiempo', etiqueta: 'Horas disponibles' },
+            { id: 'evalExperiencia', etiqueta: 'Experiencia previa' },
+            { id: 'evalAcuerdo', etiqueta: 'Acuerdo del hogar' },
+            { id: 'evalMotivo', etiqueta: 'Motivo de la adopción' }
+        ]);
+
+        if (mensaje) {
+            UI.setFlash('error', mensaje);
+            return;
+        }
+
+        const tipoDocumento =
+            document.getElementById('evalTipoDocumento').value;
+
+        const numeroDocumento =
+            document.getElementById('evalNumeroDocumento').value.trim();
+
+        const patronDocumento =
+            tipoDocumento === 'DNI' ? /^\d{8}$/ : /^\d{11}$/;
+
+        if (!patronDocumento.test(numeroDocumento)) {
+
+            UI.marcarInvalido('evalNumeroDocumento', true);
+
+            UI.setFlash(
+                'error',
+                tipoDocumento === 'DNI'
+                    ? 'El DNI debe tener exactamente 8 números.'
+                    : 'El Carnet de Extranjería debe tener exactamente 11 números.'
+            );
+
+            return;
+
+        }
+
+        const fechaNacimientoValor =
+            document.getElementById('evalFechaNacimiento').value;
+
+        const fechaNacimiento =
+            new Date(fechaNacimientoValor + 'T00:00:00');
+
+        const hoy = new Date();
+
+        if (isNaN(fechaNacimiento.getTime()) || fechaNacimiento > hoy) {
+
+            UI.marcarInvalido('evalFechaNacimiento', true);
+            UI.setFlash('error', 'La fecha de nacimiento no es válida.');
+            return;
+
+        }
+
+        if (UI.edadCumplida(fechaNacimiento, hoy) < 18) {
+
+            UI.marcarInvalido('evalFechaNacimiento', true);
+            UI.setFlash('error', 'Debes ser mayor de 18 años para adoptar.');
+            return;
+
+        }
+
+        const evaluacion = {
+
+            vivienda:
+                document.getElementById('evalVivienda').value,
+
+            espacioAdecuado:
+                document.getElementById('evalEspacio').value,
+
+            horasDisponibles:
+                document.getElementById('evalTiempo').value,
+
+            experienciaPrevia:
+                document.getElementById('evalExperiencia').value,
+
+            acuerdoHogar:
+                document.getElementById('evalAcuerdo').value,
+
+            motivo:
+                document.getElementById('evalMotivo').value.trim()
+
+        };
+
+        const error =
+            await Solicitudes.crearSolicitudAdopcion(
+                usuario,
+                mascotaSeleccionada,
+                evaluacion,
+                tipoDocumento,
+                numeroDocumento,
+                fechaNacimientoValor
+            );
+
+        if (error) {
+
+            UI.setFlash('error', error);
+            return;
+
+        }
+
+        modalEvaluacion.hide();
+
+        UI.setFlash(
+            'exito',
+            'Tu solicitud de adopcion fue enviada. Un administrador la revisara pronto.'
+        );
+
+        window.location.reload();
+
+    });
+
+
+async function pintarProductos() {
+
+    const productos =
+        await Productos.listarConStock();
+
+    const cont =
+        document.getElementById('listaProductos');
+
+    if (productos.length === 0) {
+
+        cont.innerHTML = `
+            <div class="col-12">
+                <p class="text-muted">
+                    No hay productos con stock disponible.
+                </p>
+            </div>`;
+
+        return;
+
+    }
+
+    cont.innerHTML = productos.map(p => `
+
+        <div class="col-md-3 col-sm-6">
+
+            <div class="card card-producto h-100">
+
+                <img
+                    src="${UI.imagenOPlaceholder(p.imagenUrl, p.nombre)}"
+                    class="img-top"
+                    alt="Foto de ${UI.esc(p.nombre)}">
+
+                <div class="card-body">
+
+                    <span class="badge bg-secondary mb-2">
+                        ${p.categoria}
+                    </span>
+
+                    <h5 class="card-title mb-1">
+                        ${UI.esc(p.nombre)}
+                    </h5>
+
+                    <p class="mb-1 fw-bold">
+                        S/ ${Number(p.precio).toFixed(2)}
+                    </p>
+
+                    <p class="text-muted small mb-2">
+                        Stock: ${p.stock}
+                    </p>
+
+                    <div class="input-group mb-2">
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            data-restar-producto="${p.idProducto}">
+
+                            <i class="bi bi-dash"></i>
+                        </button>
+
+                        <input
+                            type="text"
+                            class="form-control text-center"
+                            id="cantidadProducto_${p.idProducto}"
+                            value="1"
+                            inputmode="numeric"
+                            autocomplete="off"
+                            aria-label="Cantidad de ${UI.esc(p.nombre)}">
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            data-sumar-producto="${p.idProducto}">
+
+                            <i class="bi bi-plus"></i>
+                        </button>
+
+                    </div>
+
+                    <button
+                        class="btn btn-sm btn-primary w-100"
+                        data-id="${p.idProducto}"
+                        data-action="agregar-carrito">
+
+                        <i class="bi bi-cart-plus"></i>
+                        Agregar al carrito
+                    </button>
+
+                    <div
+                        id="mensajeProducto_${p.idProducto}"
+                        class="text-success small fw-semibold text-center mt-2"
+                        aria-live="polite">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    `).join('');
+
+
+    productosCache = productos;
+
+
+    cont
+        .querySelectorAll('[id^="cantidadProducto_"]')
+        .forEach(input => {
+
+            input.addEventListener('input', () => {
+
+                const id =
+                    input.id.replace('cantidadProducto_', '');
+
+                const producto = productoPorId(id);
+
+                const maximo =
+                    producto ? Number(producto.stock) : 1;
+
+                input.value = input.value.replace(/\D/g, '');
+
+                if (input.value === '') {
+                    return;
+                }
+
+                const cantidad = Number(input.value);
+
+                if (cantidad < 1) {
+                    input.value = '1';
+                } else if (cantidad > maximo) {
+                    input.value = String(maximo);
+                }
+
+            });
+
+        });
+
+
+    cont
+        .querySelectorAll('[data-restar-producto]')
+        .forEach(btn => {
+
+            btn.addEventListener('click', () => {
+
+                const id = btn.dataset.restarProducto;
+
+                const input =
+                    document.getElementById(`cantidadProducto_${id}`);
+
+                const actual = Number(input.value) || 1;
+
+                input.value = Math.max(1, actual - 1);
+
+            });
+
+        });
+
+
+    cont
+        .querySelectorAll('[data-sumar-producto]')
+        .forEach(btn => {
+
+            btn.addEventListener('click', () => {
+
+                const id = btn.dataset.sumarProducto;
+                const producto = productoPorId(id);
+
+                const input =
+                    document.getElementById(`cantidadProducto_${id}`);
+
+                const actual = Number(input.value) || 1;
+
+                const maximo =
+                    producto ? Number(producto.stock) : 1;
+
+                input.value = Math.min(maximo, actual + 1);
+
+            });
+
+        });
+
+
+    cont
+        .querySelectorAll('[data-action="agregar-carrito"]')
+        .forEach(btn => {
+
+            btn.addEventListener('click', () => {
+
+                const id = btn.dataset.id;
+
+                const input =
+                    document.getElementById(`cantidadProducto_${id}`);
+
+                const cantidad = Number(input.value) || 1;
+
+                const agregado = agregarAlCarrito(id, cantidad);
+
+                if (agregado) {
+
+                    const producto = productoPorId(id);
+
+                    const mensaje =
+                        document.getElementById(`mensajeProducto_${id}`);
+
+                    mensaje.textContent =
+                        `✓ ${producto.nombre} agregado al carrito.`;
+
+                    setTimeout(() => {
+
+                        if (mensaje) {
+                            mensaje.textContent = '';
+                        }
+
+                    }, 3000);
+
+                }
+
+            });
+
+        });
+
+}
+
+
+/* ================================================================
+   CARRITO DE COMPRAS
+   ================================================================ */
+
+function guardarCarrito() {
+    localStorage.setItem(CARRITO_KEY, JSON.stringify(carrito));
+    actualizarBadgeCarrito();
+}
+
+function totalItemsCarrito() {
+    return Object.values(carrito).reduce((a, b) => a + b, 0);
+}
+
+function actualizarBadgeCarrito() {
+    const total = totalItemsCarrito();
+    const badge = document.getElementById('badgeCarrito');
+    badge.textContent = total;
+    badge.classList.toggle('d-none', total === 0);
+}
+
+function productoPorId(id) {
+    return productosCache.find(p => String(p.idProducto) === String(id));
+}
+
+function agregarAlCarrito(idProducto, cantidad = 1) {
+
+    const producto = productoPorId(idProducto);
+
+    if (!producto) {
+        return false;
+    }
+
+    const cantidadSolicitada = Number(cantidad);
+
+    if (!Number.isInteger(cantidadSolicitada) || cantidadSolicitada < 1) {
+
+        UI.setFlash('error', 'La cantidad seleccionada no es válida.');
+        UI.mostrarFlash();
+
+        return false;
+
+    }
+
+    const actual = carrito[idProducto] || 0;
+
+    if (actual + cantidadSolicitada > producto.stock) {
+
+        const disponible = Math.max(0, producto.stock - actual);
+
+        UI.setFlash(
+            'error',
+            disponible === 0
+                ? `Ya tienes el máximo disponible de ${producto.nombre} en tu carrito.`
+                : `Solo puedes agregar ${disponible} unidad(es) más de ${producto.nombre}.`
+        );
+
+        UI.mostrarFlash();
+
+        return false;
+
+    }
+
+    carrito[idProducto] = actual + cantidadSolicitada;
+
+    guardarCarrito();
+
+    UI.setFlash('exito', `${producto.nombre} fue agregado al carrito.`);
+    UI.mostrarFlash();
+
+    return true;
+
+}
+
+function cambiarCantidadCarrito(idProducto, delta) {
+
+    const producto = productoPorId(idProducto);
+    const actual = carrito[idProducto] || 0;
+    let nueva = actual + delta;
+
+    if (producto) {
+        nueva = Math.min(nueva, producto.stock);
+    }
+
+    if (nueva <= 0) {
+        delete carrito[idProducto];
+    } else {
+        carrito[idProducto] = nueva;
+    }
+
+    guardarCarrito();
+    pintarCarrito();
+
+}
+
+function quitarDelCarrito(idProducto) {
+    delete carrito[idProducto];
+    guardarCarrito();
+    pintarCarrito();
+}
+
+function totalCarrito() {
+
+    return Object.entries(carrito).reduce((total, [id, cantidad]) => {
+
+        const producto = productoPorId(id);
+
+        return total + (
+            producto ? producto.precio * cantidad : 0
+        );
+
+    }, 0);
+
+}
+
+function pintarCarrito() {
+
+    const cont = document.getElementById('listaCarrito');
+
+    const entradas =
+        Object.entries(carrito)
+            .filter(([id]) => productoPorId(id));
+
+    if (entradas.length === 0) {
+
+        cont.innerHTML =
+            '<p class="text-muted text-center py-4 mb-0">Tu carrito está vacío.</p>';
+
+    } else {
+
+        cont.innerHTML = entradas.map(([id, cantidad]) => {
+
+            const p = productoPorId(id);
+
+            return `
+                <div class="fila-carrito">
+
+                    <div class="fila-carrito__info">
+                        <strong>${UI.esc(p.nombre)}</strong>
+                        <span class="text-muted small">S/ ${Number(p.precio).toFixed(2)} c/u</span>
+                    </div>
+
+                    <div class="fila-carrito__cant">
+
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-restar="${id}">
+                            <i class="bi bi-dash"></i>
+                        </button>
+
+                        <span>${cantidad}</span>
+
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-sumar="${id}">
+                            <i class="bi bi-plus"></i>
+                        </button>
+
+                    </div>
+
+                    <strong class="text-nowrap">
+                        S/ ${(p.precio * cantidad).toFixed(2)}
+                    </strong>
+
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-quitar="${id}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+                </div>`;
+
+        }).join('');
+
+    }
+
+    document.getElementById('totalCarrito').textContent =
+        'S/ ' + totalCarrito().toFixed(2);
+
+    cont.querySelectorAll('[data-sumar]').forEach(b =>
+        b.addEventListener('click', () =>
+            cambiarCantidadCarrito(b.dataset.sumar, 1)));
+
+    cont.querySelectorAll('[data-restar]').forEach(b =>
+        b.addEventListener('click', () =>
+            cambiarCantidadCarrito(b.dataset.restar, -1)));
+
+    cont.querySelectorAll('[data-quitar]').forEach(b =>
+        b.addEventListener('click', () =>
+            quitarDelCarrito(b.dataset.quitar)));
+
+    actualizarBotonConfirmarCompra();
+
+}
+
+function iniciarCarrito() {
+
+    modalCarrito =
+        new bootstrap.Modal(document.getElementById('modalCarrito'));
+
+    actualizarBadgeCarrito();
+
+    actualizarInterfazDocumentoPago();
+
+    document
+        .getElementById('btnAbrirCarrito')
+        .addEventListener('click', () => {
+
+            document.getElementById('errCarrito').textContent = '';
+
+            pintarCarrito();
+            modalCarrito.show();
+
+        });
+
+    document
+        .getElementById('btnConfirmarCompra')
+        .addEventListener('click', confirmarCompra);
+
+}
+
+
+async function confirmarCompra() {
+
+    const errCont = document.getElementById('errCarrito');
+
+    errCont.textContent = '';
+
+    const tipoDocumentoPago =
+        document.getElementById('tipoDocumentoPago').value;
+
+    const numeroDocumentoPago =
+        document.getElementById('numeroDocumentoPago').value.trim();
+
+    if (!numeroDocumentoPago) {
+
+        errCont.textContent =
+            'Ingresa tu número de documento para continuar.';
+
+        document
+            .getElementById('numeroDocumentoPago')
+            .classList.add('is-invalid');
+
+        return;
+
+    }
+
+    if (!documentoPagoEsValido(tipoDocumentoPago, numeroDocumentoPago)) {
+
+        errCont.textContent =
+            tipoDocumentoPago === 'DNI'
+                ? 'El DNI debe tener exactamente 8 números.'
+                : tipoDocumentoPago === 'RUC'
+                    ? 'El RUC debe tener exactamente 11 números.'
+                    : 'El CE debe tener entre 9 y 11 números.';
+
+        document
+            .getElementById('numeroDocumentoPago')
+            .classList.add('is-invalid');
+
+        return;
+
+    }
+
+    document
+        .getElementById('numeroDocumentoPago')
+        .classList.remove('is-invalid');
+
+    const requiereConsulta =
+        tipoDocumentoPago === 'DNI' ||
+        tipoDocumentoPago === 'RUC';
+
+    if (
+        requiereConsulta &&
+        (
+            !documentoConsultadoPago ||
+            documentoConsultadoPago.tipoDocumento !== tipoDocumentoPago ||
+            documentoConsultadoPago.numeroDocumento !== numeroDocumentoPago
+        )
+    ) {
+
+        errCont.textContent =
+            'Primero consulta el documento y verifica el nombre obtenido.';
+
+        return;
+
+    }
+
+    const items =
+        Object.entries(carrito)
+            .filter(([id, cantidad]) =>
+                productoPorId(id) && Number(cantidad) > 0
+            )
+            .map(([id, cantidad]) => ({
+                id_producto: Number(id),
+                cantidad
+            }));
+
+    if (items.length === 0) {
+        errCont.textContent = 'Tu carrito está vacío.';
+        return;
+    }
+
+    const total = Number(totalCarrito().toFixed(2));
+
+    if (!Number.isFinite(total) || total <= 0) {
+
+        errCont.textContent = 'El total del carrito no es válido.';
+        return;
+
+    }
+
+    // DNI/RUC: usar el nombre validado por la consulta.
+    // CE: conservar el nombre de la cuenta del cliente.
+    nombreCompradorPagoActual =
+        requiereConsulta
+            ? documentoConsultadoPago.nombre
+            : obtenerNombreCliente();
+
+    const boton = document.getElementById('btnConfirmarCompra');
+
+    boton.disabled = true;
+
+    boton.innerHTML =
+        '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+
+    let resultado;
+
+    try {
+
+        resultado = await Pedidos.crear(items, {
+            nombre: nombreCompradorPagoActual,
+            tipoDocumento: tipoDocumentoPago,
+            numeroDocumento: numeroDocumentoPago
+        });
+
+    } catch (error) {
+
+        console.error('Error al crear el pedido:', error);
+
+        boton.disabled = false;
+
+        boton.innerHTML =
+            '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
+
+        errCont.textContent =
+            error.message || 'No se pudo crear el pedido.';
+
+        return;
+
+    }
+
+    if (!resultado || resultado.error) {
+
+        boton.disabled = false;
+
+        boton.innerHTML =
+            '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
+
+        errCont.textContent =
+            resultado?.error || 'No se pudo crear el pedido.';
+
+        return;
+
+    }
+
+    try {
+
+        let email =
+            usuario?.email ||
+            usuario?.correo ||
+            usuario?.correoElectronico ||
+            '';
+
+        if (!email && typeof db !== 'undefined') {
+
+            const respuestaUsuario = await db.auth.getUser();
+
+            email =
+                respuestaUsuario?.data?.user?.email || '';
+
+        }
+
+        if (!email) {
+            throw new Error(
+                'No se pudo obtener el correo electrónico de tu cuenta.'
+            );
+        }
+
+        const respuestaPago =
+            await db.functions.invoke(
+                'izipay-crear-pago',
+                {
+                    body: {
+                        amount: total,
+                        currency: 'PEN',
+                        orderId: String(resultado.idPedido),
+                        email: email,
+                        identityType: tipoDocumentoPago,
+                        identityCode: numeroDocumentoPago
+                    }
+                }
+            );
+
+        if (respuestaPago.error) {
+
+            throw new Error(
+                respuestaPago.error.message ||
+                'No se pudo conectar con Izipay.'
+            );
+
+        }
+
+        const datosPago = respuestaPago.data;
+
+        if (
+            !datosPago ||
+            !datosPago.formToken ||
+            !datosPago.publicKey
+        ) {
+
+            throw new Error(
+                datosPago?.error ||
+                'Izipay no devolvió los datos necesarios para iniciar el pago.'
+            );
+
+        }
+
+        boton.disabled = false;
+
+        boton.innerHTML =
+            '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
+
+        modalCarrito.hide();
+
+        await mostrarCheckoutIzipay(
+            datosPago,
+            resultado.idPedido,
+            total
+        );
+
+    } catch (error) {
+
+        console.error('Error al iniciar el pago:', error);
+
+        boton.disabled = false;
+
+        boton.innerHTML =
+            '<i class="bi bi-bag-check-fill"></i> Confirmar compra';
+
+        errCont.textContent =
+            error.message || 'No se pudo iniciar el pago.';
+
+    }
+
+}
+
+
+async function mostrarCheckoutIzipay(datosPago, idPedido, total) {
+
+    const errPago = document.getElementById('errPago');
+    const contenedor = document.getElementById('contenedorPago');
+
+    errPago.textContent = '';
+    contenedor.innerHTML = '';
+
+    try {
+
+        await cargarFormularioIzipay(datosPago.publicKey);
+
+        if (typeof KR === 'undefined') {
+            throw new Error('La librería de pago de Izipay no está disponible.');
+        }
+
+        if (typeof KR.setFormConfig !== 'function') {
+            throw new Error('No se pudo configurar el formulario de pago de Izipay.');
+        }
+
+        if (typeof KR.renderElements !== 'function') {
+            throw new Error('No se pudo inicializar el formulario de pago de Izipay.');
+        }
+
+        await KR.setFormConfig({
+            formToken: datosPago.formToken,
+            'kr-language': 'es-ES'
+        });
+
+        const contenedorFormulario = document.createElement('div');
+        contenedorFormulario.id = 'contenedorFormularioIzipay';
+
+        const formulario = document.createElement('div');
+        formulario.className = 'kr-embedded';
+
+        formulario.setAttribute(
+            'kr-form-token',
+            datosPago.formToken
+        );
+
+        contenedorFormulario.appendChild(formulario);
+        contenedor.appendChild(contenedorFormulario);
+
+        modalPago.show();
+
+        await KR.renderElements('#contenedorFormularioIzipay');
+
+        esperarConfirmacionPago(idPedido, datosPago, total);
+
+    } catch (error) {
+
+        console.error('Error al cargar el formulario de Izipay:', error);
+
+        errPago.textContent =
+            error.message ||
+            'No se pudo cargar el formulario de pago de Izipay.';
+
+    }
+
+}
+
+
+function esperarConfirmacionPago(idPedido, datosPago, total) {
+
+    let intentos = 0;
+    const maximoIntentos = 180;
+
+    const intervalo = setInterval(async () => {
+
+        intentos++;
+
+        try {
+
+            const pedido = await Pedidos.buscarPorId(idPedido);
+
+            if (!pedido) {
+                return;
+            }
+
+            if (
+                pedido.estado === 'PAGADO' ||
+                pedido.estado === 'ENTREGADO'
+            ) {
+
+                clearInterval(intervalo);
+
+                await finalizarCompraExitosa(
+                    pedido,
+                    idPedido,
+                    total
+                );
+
+                return;
+
+            }
+
+            if (
+                pedido.estado === 'RECHAZADO' ||
+                pedido.estado === 'VENCIDO'
+            ) {
+
+                clearInterval(intervalo);
+
+                const errPago = document.getElementById('errPago');
+
+                errPago.textContent =
+                    pedido.estado === 'RECHAZADO'
+                        ? 'El pago fue rechazado. Puedes cerrar esta ventana e intentar nuevamente.'
+                        : 'El tiempo para completar el pago ha vencido.';
+
+                return;
+
+            }
+
+            if (intentos >= maximoIntentos) {
+
+                clearInterval(intervalo);
+
+                const errPago = document.getElementById('errPago');
+
+                errPago.textContent =
+                    'No pudimos confirmar automáticamente el resultado del pago. Si el cobro fue realizado, revisa tu historial de compras antes de volver a intentar el pago.';
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                'Error verificando el estado del pedido:',
+                error
+            );
+
+        }
+
+    }, 2000);
+
+}
+
+
+async function finalizarCompraExitosa(pedido, idPedido, total) {
+
+    if (modalPago) {
+        modalPago.hide();
+    }
+
+    const entradasCompra =
+        Object.entries(carrito)
+            .map(([id, cantidad]) => {
+
+                const producto = productoPorId(id);
+
+                if (!producto) {
+                    return null;
+                }
+
+                return {
+                    nombre: producto.nombre,
+                    cantidad: Number(cantidad),
+                    precio: Number(producto.precio),
+                    subtotal:
+                        Number(producto.precio) *
+                        Number(cantidad)
+                };
+
+            })
+            .filter(Boolean);
+
+    carrito = {};
+
+    guardarCarrito();
+
+    const contenido =
+        document.getElementById('contenidoCompraExitosa');
+
+    const nombreCliente =
+        nombreCompradorPagoActual ||
+        pedido.nombreComprador ||
+        obtenerNombreCliente();
+
+    const tipoDocumento =
+        document.getElementById('tipoDocumentoPago').value;
+
+    const numeroDocumento =
+        document.getElementById('numeroDocumentoPago').value.trim();
+
+    const fechaPedido =
+        pedido.fecha ? new Date(pedido.fecha) : new Date();
+
+    const fechaTexto =
+        fechaPedido.toLocaleDateString('es-PE', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+
+    const horaTexto =
+        fechaPedido.toLocaleTimeString('es-PE', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+
+    const numeroBoleta =
+        pedido.numeroBoleta || 'Pendiente de generación';
+
+    const filasProductos =
+        entradasCompra.length > 0
+            ? entradasCompra.map(item => `
+                <tr>
+                    <td>${UI.esc(item.nombre)}</td>
+                    <td class="text-center">${item.cantidad}</td>
+                    <td class="text-end">S/ ${item.precio.toFixed(2)}</td>
+                    <td class="text-end">S/ ${item.subtotal.toFixed(2)}</td>
+                </tr>
+            `).join('')
+            : `
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        No se pudo cargar el detalle local de los productos.
+                    </td>
+                </tr>
+            `;
+
+    contenido.innerHTML = `
+
+        <div class="text-center mb-4">
+
+            <div
+                class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center mb-3"
+                style="width: 70px; height: 70px;">
+
+                <i class="bi bi-check-lg text-success" style="font-size: 2rem;"></i>
+
+            </div>
+
+            <h4 class="fw-bold mb-2">¡Gracias por tu compra!</h4>
+
+            <p class="text-muted mb-0">
+                Tu pago fue confirmado correctamente.
+            </p>
+
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-body p-4">
+
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold mb-1">MascotICA's</h3>
+                    <div class="text-muted">Boleta electrónica</div>
+                </div>
+
+                <div class="row g-3 mb-4">
+
+                    <div class="col-md-6">
+                        <div class="small text-muted">ID de compra</div>
+                        <div class="fw-semibold">${UI.esc(String(idPedido))}</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="small text-muted">Fecha</div>
+                        <div class="fw-semibold">${UI.esc(fechaTexto)}</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="small text-muted">Hora</div>
+                        <div class="fw-semibold">${UI.esc(horaTexto)}</div>
+                    </div>
+
+                </div>
+
+                <div class="border rounded p-3 mb-4">
+
+                    <h6 class="fw-bold mb-3">Datos del cliente</h6>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-7">
+                            <div class="small text-muted">
+                                ${tipoDocumento === 'RUC' ? 'Razón social' : 'Nombre'}
+                            </div>
+
+                            <div class="fw-semibold">
+                                ${UI.esc(nombreCliente)}
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="small text-muted">Documento</div>
+
+                            <div class="fw-semibold">
+                                ${UI.esc(tipoDocumento)}:
+                                ${UI.esc(numeroDocumento)}
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle">
+
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-center">Cant.</th>
+                                <th class="text-end">Precio unitario</th>
+                                <th class="text-end">Importe</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            ${filasProductos}
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Total</th>
+                                <th class="text-end fs-5">
+                                    S/ ${Number(total).toFixed(2)}
+                                </th>
+                            </tr>
+                        </tfoot>
+
+                    </table>
+
+                </div>
+
+                <div class="border-top pt-4 mt-4">
+
+                    <div class="row align-items-center">
+
+                        <div class="col-md-7">
+
+                            <div class="small text-muted mb-1">
+                                Número de boleta
+                            </div>
+
+                            <div class="fw-bold">
+                                ${UI.esc(String(numeroBoleta))}
+                            </div>
+
+                            <div class="small text-muted mt-3">
+                                Esta boleta corresponde a la compra
+                                realizada en MascotICA's.
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-5 text-center mt-3 mt-md-0">
+
+                            <div id="qrBoleta" class="d-inline-block"></div>
+
+                            <div class="small text-muted mt-2">
+                                Escanea el código QR para consultar
+                                los datos de esta boleta.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="alert alert-success mb-0">
+            <i class="bi bi-info-circle-fill"></i>
+            Tu compra ha sido registrada correctamente.
+            Puedes conservar esta boleta como comprobante de tu compra.
+        </div>
+
+    `;
+
+    if (modalCompraExitosa) {
+        modalCompraExitosa.show();
+    }
+
+    setTimeout(() => {
+
+        const contenedorQr = document.getElementById('qrBoleta');
+
+        if (!contenedorQr) {
+            console.error('No se encontró el contenedor del QR.');
+            return;
+        }
+
+        if (typeof QRCode === 'undefined') {
+            console.error('La librería QRCode no está disponible.');
+            return;
+        }
+
+        if (!pedido.boletaCodigo) {
+            console.error('No se encontró el código público de la boleta.');
+            return;
+        }
+
+        const urlBoleta =
+            new URL('boleta.html', window.location.href);
+
+        urlBoleta.searchParams.set('codigo', pedido.boletaCodigo);
+
+        contenedorQr.innerHTML = '';
+
+        new QRCode(contenedorQr, {
+            text: urlBoleta.href,
+            width: 180,
+            height: 180,
+            correctLevel: QRCode.CorrectLevel.M
+        });
+
+        console.log(
+            'QR de la boleta generado correctamente:',
+            urlBoleta.href
+        );
+
+    }, 150);
+
+}
+
+
+function obtenerNombreCliente() {
+
+    return (
+        usuario?.nombre ||
+        usuario?.nombreCompleto ||
+        usuario?.nombre_completo ||
+        usuario?.full_name ||
+        usuario?.user_metadata?.nombre ||
+        usuario?.user_metadata?.nombre_completo ||
+        usuario?.user_metadata?.full_name ||
+        usuario?.email ||
+        'Cliente'
+    );
+
+}
+
+
+function cargarFormularioIzipay(publicKey) {
+
+    return new Promise((resolve, reject) => {
+
+        const libreriaExistente =
+            document.querySelector('script[data-izipay-krypton="true"]');
+
+        if (libreriaExistente) {
+
+            cargarTemaIzipay()
+                .then(resolve)
+                .catch(reject);
+
+            return;
+
+        }
+
+        const script = document.createElement('script');
+
+        script.type = 'text/javascript';
+
+        script.src =
+            'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js';
+
+        script.setAttribute('kr-public-key', publicKey);
+        script.setAttribute('kr-language', 'es-Es');
+        script.setAttribute('data-izipay-krypton', 'true');
+
+        script.onload = () => {
+
+            cargarTemaIzipay()
+                .then(resolve)
+                .catch(reject);
+
+        };
+
+        script.onerror = () => {
+
+            reject(
+                new Error(
+                    'No se pudo cargar la librería de pago de Izipay.'
+                )
+            );
+
+        };
+
+        document.head.appendChild(script);
+
+    });
+
+}
+
+
+function cargarTemaIzipay() {
+
+    return new Promise((resolve, reject) => {
+
+        const hojaExistente =
+            document.querySelector('link[data-izipay-neon="true"]');
+
+        const scriptExistente =
+            document.querySelector('script[data-izipay-neon="true"]');
+
+        let pendientes = 0;
+        let terminado = false;
+
+        const terminar = () => {
+
+            pendientes--;
+
+            if (pendientes <= 0 && !terminado) {
+                terminado = true;
+                resolve();
+            }
+
+        };
+
+        if (!hojaExistente) {
+
+            pendientes++;
+
+            const hoja = document.createElement('link');
+
+            hoja.rel = 'stylesheet';
+
+            hoja.href =
+                'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/neon-reset.min.css';
+
+            hoja.setAttribute('data-izipay-neon', 'true');
+
+            hoja.onload = terminar;
+
+            hoja.onerror = () => {
+
+                if (!terminado) {
+                    terminado = true;
+
+                    reject(
+                        new Error(
+                            'No se pudo cargar el estilo del formulario de pago.'
+                        )
+                    );
+                }
+
+            };
+
+            document.head.appendChild(hoja);
+
+        }
+
+        if (!scriptExistente) {
+
+            pendientes++;
+
+            const script = document.createElement('script');
+
+            script.type = 'text/javascript';
+
+            script.src =
+                'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/neon.js';
+
+            script.setAttribute('data-izipay-neon', 'true');
+
+            script.onload = terminar;
+
+            script.onerror = () => {
+
+                if (!terminado) {
+                    terminado = true;
+
+                    reject(
+                        new Error(
+                            'No se pudo cargar el tema del formulario de pago.'
+                        )
+                    );
+                }
+
+            };
+
+            document.head.appendChild(script);
+
+        }
+
+        if (pendientes === 0 && !terminado) {
+            terminado = true;
+            resolve();
+        }
+
+    });
+
+}
+
+
+function obtenerFechaTransaccion() {
+
+    const ahora = new Date();
+
+    const año = ahora.getFullYear();
+    const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+    const dia = String(ahora.getDate()).padStart(2, '0');
+    const hora = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    const segundos = String(ahora.getSeconds()).padStart(2, '0');
+
+    return (
+        año +
+        mes +
+        dia +
+        hora +
+        minutos +
+        segundos
+    );
+
+}
+
+
+function respuestaPagoIzipay(respuesta) {
+
+    console.log('Respuesta de Izipay:', respuesta);
+
+}
