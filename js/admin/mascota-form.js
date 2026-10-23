@@ -633,11 +633,11 @@ document
                     'Subiendo imagen...';
 
 
+                const extension =
+                archivo.name.split('.').pop().toLowerCase();
+                
                 const nombreArchivo =
-                    Date.now() +
-                    '-' +
-                    archivo.name;
-
+                `${Date.now()}-${crypto.randomUUID()}.${extension}`;
 
                 const {
                     error: errorSubida
