@@ -247,4 +247,3 @@ Mascoticas/
 
 - Recomendación de productos según la mascota adoptada.
 - Selector de aplicación de mapas (Google Maps, Waze o Apple Maps); hoy se abre OpenStreetMap.
-- Paso de Izipay del entorno de pruebas a producción.

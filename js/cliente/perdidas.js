@@ -1,3 +1,4 @@
+
 const usuario = Auth.usuarioActual();
 
 /* El nombre de contacto solo admite letras (también al pegar) */
@@ -37,7 +38,6 @@ function iniciar() {
     let pick = null;
     let pickMarker = null;
     let mapaPick = null;
-
 
     const marcadores = new Map();
 
@@ -144,6 +144,324 @@ function iniciar() {
 
 
     /* ============================================================
+       SELECTOR DE MAPAS
+       ============================================================ */
+
+    const modalSelectorMapaElemento =
+        document.getElementById('modalSelectorMapa');
+
+    const modalSelectorMapa =
+        new bootstrap.Modal(modalSelectorMapaElemento);
+
+    let reporteMapaActual = null;
+    let mapaInterno = null;
+    let marcadorInterno = null;
+
+
+    /*
+     * Comprueba que el reporte tenga coordenadas válidas.
+     */
+    function coordenadasValidas(r) {
+
+        if (
+            !r ||
+            r.lat === null ||
+            r.lat === undefined ||
+            r.lng === null ||
+            r.lng === undefined ||
+            String(r.lat).trim() === '' ||
+            String(r.lng).trim() === ''
+        ) {
+            return false;
+        }
+
+        const lat = Number(r.lat);
+        const lng = Number(r.lng);
+
+        return (
+            Number.isFinite(lat) &&
+            Number.isFinite(lng) &&
+            lat >= -90 &&
+            lat <= 90 &&
+            lng >= -180 &&
+            lng <= 180
+        );
+    }
+
+
+    /*
+     * Abre un enlace externo en otra pestaña.
+     */
+    function abrirEnlaceExterno(url) {
+
+        if (!url) {
+            return;
+        }
+
+        window.open(
+            url,
+            '_blank',
+            'noopener,noreferrer'
+        );
+    }
+
+
+    /*
+     * Abre el selector de mapas para el reporte seleccionado.
+     */
+    function abrirSelectorMapa(id) {
+
+        const r = reportes.find(
+            x => String(x.id) === String(id)
+        );
+
+        if (!r) {
+            alert('No se encontró el reporte seleccionado.');
+            return;
+        }
+
+        if (!coordenadasValidas(r)) {
+
+            alert(
+                'Este reporte no tiene coordenadas válidas para mostrar el mapa.'
+            );
+
+            return;
+        }
+
+        reporteMapaActual = r;
+
+        const lat = Number(r.lat);
+        const lng = Number(r.lng);
+
+        document.getElementById(
+            'selectorMapaDescripcion'
+        ).textContent =
+            `Ubicación del reporte de ${r.pet_name || 'la mascota'}: ` +
+            `${lat.toFixed(6)}, ${lng.toFixed(6)}.`;
+
+        /*
+         * Cada vez que se abre el selector, ocultamos el mapa interno.
+         * Se conserva la instancia para reutilizarla posteriormente.
+         */
+        document.getElementById(
+            'mapaInternoContenedor'
+        ).style.display = 'none';
+
+        modalSelectorMapa.show();
+    }
+
+
+    /*
+     * Google Maps.
+     */
+    document.getElementById(
+        'btnMapaGoogle'
+    ).addEventListener('click', () => {
+
+        if (!reporteMapaActual) {
+            return;
+        }
+
+        const lat = Number(reporteMapaActual.lat);
+        const lng = Number(reporteMapaActual.lng);
+
+        const url =
+            `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+
+        abrirEnlaceExterno(url);
+    });
+
+
+    /*
+     * Waze.
+     */
+    document.getElementById(
+        'btnMapaWaze'
+    ).addEventListener('click', () => {
+
+        if (!reporteMapaActual) {
+            return;
+        }
+
+        const lat = Number(reporteMapaActual.lat);
+        const lng = Number(reporteMapaActual.lng);
+
+        const url =
+            `https://www.waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+
+        abrirEnlaceExterno(url);
+    });
+
+
+    /*
+     * OpenStreetMap.
+     */
+    document.getElementById(
+        'btnMapaOSM'
+    ).addEventListener('click', () => {
+
+        if (!reporteMapaActual) {
+            return;
+        }
+
+        const lat = Number(reporteMapaActual.lat);
+        const lng = Number(reporteMapaActual.lng);
+
+        const url =
+            `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`;
+
+        abrirEnlaceExterno(url);
+    });
+
+
+    /*
+     * Mapa dentro de MascotICA's usando Leaflet.
+     */
+    document.getElementById(
+        'btnMapaInterno'
+    ).addEventListener('click', () => {
+
+        if (!reporteMapaActual) {
+            return;
+        }
+
+        const r = reporteMapaActual;
+
+        if (!coordenadasValidas(r)) {
+
+            alert(
+                'Las coordenadas del reporte no son válidas.'
+            );
+
+            return;
+        }
+
+        const lat = Number(r.lat);
+        const lng = Number(r.lng);
+
+        const contenedorMapa = document.getElementById(
+            'mapaInternoContenedor'
+        );
+
+        contenedorMapa.style.display = 'block';
+
+        if (!mapaInterno) {
+
+            mapaInterno = L.map(
+                'mapaInternoReporte'
+            ).setView(
+                [lat, lng],
+                16
+            );
+
+            L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                {
+                    maxZoom: 19,
+                    attribution:
+                        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+                }
+            ).addTo(mapaInterno);
+
+            marcadorInterno = L.marker(
+                [lat, lng]
+            ).addTo(mapaInterno);
+
+        } else {
+
+            mapaInterno.setView(
+                [lat, lng],
+                16
+            );
+
+            marcadorInterno.setLatLng(
+                [lat, lng]
+            );
+        }
+
+        marcadorInterno.bindPopup(
+            `<strong>${UI.esc(r.pet_name || 'Mascota reportada')}</strong><br>` +
+            `${UI.esc(r.zone || 'Zona no especificada')}`
+        ).openPopup();
+
+        /*
+         * Leaflet necesita recalcular sus dimensiones cuando el mapa
+         * se muestra dentro de un modal.
+         */
+        setTimeout(() => {
+
+            if (mapaInterno) {
+                mapaInterno.invalidateSize();
+            }
+
+        }, 150);
+    });
+
+
+    /*
+     * Ajusta el mapa interno cuando el modal termina de mostrarse.
+     */
+    modalSelectorMapaElemento.addEventListener(
+        'shown.bs.modal',
+        () => {
+
+            if (mapaInterno) {
+
+                setTimeout(() => {
+                    mapaInterno.invalidateSize();
+                }, 100);
+
+            }
+        }
+    );
+
+
+    /*
+     * Al cerrar el selector se limpia la referencia del reporte.
+     * La instancia del mapa se conserva para reutilizarla.
+     */
+    modalSelectorMapaElemento.addEventListener(
+        'hidden.bs.modal',
+        () => {
+
+            reporteMapaActual = null;
+
+            document.getElementById(
+                'mapaInternoContenedor'
+            ).style.display = 'none';
+
+        }
+    );
+
+
+    /*
+     * Permite abrir el selector desde el botón incluido en los popups
+     * de los marcadores del mapa principal.
+     */
+    document.addEventListener(
+        'click',
+        e => {
+
+            const boton = e.target.closest(
+                '[data-selector-mapa]'
+            );
+
+            if (!boton) {
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            abrirSelectorMapa(
+                boton.dataset.selectorMapa
+            );
+        }
+    );
+
+
+    /* ============================================================
        POPUP
        ============================================================ */
 
@@ -227,7 +545,7 @@ function iniciar() {
                             <a
                                 class="btn btn-sm btn-primary-ps mt-2 w-100"
                                 target="_blank"
-                                rel="noopener"
+                                rel="noopener noreferrer"
                                 href="https://wa.me/${telWhatsApp}">
 
                                 <i class="bi bi-whatsapp"></i>
@@ -239,6 +557,16 @@ function iniciar() {
                           `
                         : ''
                 }
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary mt-2 w-100"
+                    data-selector-mapa="${UI.esc(String(r.id))}">
+
+                    <i class="bi bi-map"></i>
+                    Ver ubicación en...
+
+                </button>
 
             </div>
         `;
@@ -292,8 +620,16 @@ function iniciar() {
 
         visiblesReportes.forEach(r => {
 
+            /*
+             * Evita intentar dibujar un marcador si un registro
+             * no tiene coordenadas utilizables.
+             */
+            if (!coordenadasValidas(r)) {
+                return;
+            }
+
             const marcador = L.marker(
-                [r.lat, r.lng],
+                [Number(r.lat), Number(r.lng)],
                 {
                     icon: icono(r)
                 }
@@ -331,8 +667,8 @@ function iniciar() {
                     return `
 
                         <div
-                            class="pp-item ${r.id === nuevoId ? 'is-new' : ''}"
-                            data-id="${r.id}">
+                            class="pp-item ${String(r.id) === String(nuevoId) ? 'is-new' : ''}"
+                            data-id="${UI.esc(String(r.id))}">
 
                             ${
                                 foto
@@ -424,7 +760,7 @@ function iniciar() {
     function agregar(r) {
 
         const existe = reportes.some(
-            x => x.id === r.id
+            x => String(x.id) === String(r.id)
         );
 
         if (existe) {
@@ -485,16 +821,25 @@ function iniciar() {
 
             const reporte =
                 reportes.find(
-                    x => x.id === item.dataset.id
+                    x => String(x.id) === String(item.dataset.id)
                 );
 
             if (!reporte) {
                 return;
             }
 
+            if (!coordenadasValidas(reporte)) {
+
+                alert(
+                    'Este reporte no tiene coordenadas válidas para mostrar el mapa.'
+                );
+
+                return;
+            }
+
 
             mapa.flyTo(
-                [reporte.lat, reporte.lng],
+                [Number(reporte.lat), Number(reporte.lng)],
                 16
             );
 
@@ -586,7 +931,7 @@ function iniciar() {
 
                 reportes =
                     reportes.map(r =>
-                        r.id === payload.new.id
+                        String(r.id) === String(payload.new.id)
                             ? payload.new
                             : r
                     );
@@ -607,7 +952,7 @@ function iniciar() {
 
                 reportes =
                     reportes.filter(
-                        r => r.id !== payload.old.id
+                        r => String(r.id) !== String(payload.old.id)
                     );
 
                 pintar();
@@ -619,7 +964,7 @@ function iniciar() {
 
 
     /* ============================================================
-       MODAL
+       MODAL PARA CREAR REPORTE
        ============================================================ */
 
     const modal =
@@ -914,7 +1259,7 @@ function iniciar() {
 
 
     /* ============================================================
-       TELEFONO
+       TELÉFONO
        ============================================================ */
 
     const campoTelefono =
