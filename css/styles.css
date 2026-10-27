@@ -4153,3 +4153,51 @@ html {
         opacity: 0.6;
     }
 }
+
+#formProducto .bg-light-subtle {
+    color: var(--foreground) !important;
+    background: var(--material-regular) !important;
+    border-color: var(--border-strong) !important;
+}
+
+#formProducto .bg-light-subtle legend,
+#formProducto .bg-light-subtle .form-label,
+#formProducto .bg-light-subtle .form-check-label {
+    color: var(--foreground);
+}
+
+#formProducto .bg-light-subtle .form-check {
+    color: var(--foreground);
+    background-color: var(--card-solid);
+    border-color: var(--border-strong) !important;
+    cursor: pointer;
+    transition:
+        background-color var(--fast) var(--ease-out),
+        border-color var(--fast) var(--ease-out),
+        box-shadow var(--fast) var(--ease-out);
+}
+
+#formProducto .bg-light-subtle .form-check:hover {
+    background-color: var(--primary-soft);
+    border-color: var(--primary) !important;
+}
+
+#formProducto .bg-light-subtle .form-check-input {
+    background-color: var(--input);
+    border-color: var(--border-strong);
+    cursor: pointer;
+}
+
+#formProducto .bg-light-subtle .form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+#formProducto .bg-light-subtle .form-check-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--ring);
+}
+
+#formProducto .bg-light-subtle .text-muted {
+    color: var(--muted-foreground) !important;
+}
