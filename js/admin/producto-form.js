@@ -28,10 +28,26 @@ async function cargarSiEsEdicion() {
     document.getElementById('precio').value = producto.precio;
     document.getElementById('stock').value = producto.stock;
     document.getElementById('imagenUrl').value = producto.imagenUrl || '';
+    seleccionarMultiples('especiesRecomendadas', producto.especiesRecomendadas);
+    seleccionarMultiples('edadesRecomendadas', producto.edadesRecomendadas);
+    seleccionarMultiples('tamanosRecomendados', producto.tamanosRecomendados);
+    seleccionarMultiples('actividadesRecomendadas', producto.actividadesRecomendadas);
+    document.getElementById('productoActivo').checked = producto.activo !== false;
 
     if (producto.imagenUrl) {
         mostrarPreview(producto.imagenUrl);
     }
+}
+
+function seleccionarMultiples(id, valores) {
+    const seleccionados = Array.isArray(valores) ? valores : [];
+    document.querySelectorAll(`#${id} option`).forEach(opcion => {
+        opcion.selected = seleccionados.includes(opcion.value);
+    });
+}
+
+function valoresSeleccionados(id) {
+    return Array.from(document.getElementById(id).selectedOptions).map(opcion => opcion.value);
 }
 
 function mostrarPreview(src) {
@@ -169,10 +185,21 @@ document.getElementById('formProducto').addEventListener('submit', async functio
         categoria,
         precio: Number(precio),
         stock: Number(stock),
-        imagenUrl
+        imagenUrl,
+        activo: document.getElementById('productoActivo').checked,
+        especiesRecomendadas: valoresSeleccionados('especiesRecomendadas'),
+        edadesRecomendadas: valoresSeleccionados('edadesRecomendadas'),
+        tamanosRecomendados: valoresSeleccionados('tamanosRecomendados'),
+        actividadesRecomendadas: valoresSeleccionados('actividadesRecomendadas')
     };
 
-    await Productos.guardar(producto);
+    const guardado = await Productos.guardar(producto);
+    if (!guardado) {
+        boton.disabled = false;
+        UI.setFlash('error', 'No se pudo guardar el producto. Verifica la conexión y los campos de compatibilidad.');
+        UI.mostrarFlash();
+        return;
+    }
 
     UI.setFlash('exito', 'Producto guardado correctamente.');
     window.location.href = 'productos.html';

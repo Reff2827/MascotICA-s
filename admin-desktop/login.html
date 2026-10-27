@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+
+    <title>Panel Administrativo | MascotICA's</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="login-page">
+
+    <main class="login-layout">
+
+        <section class="login-intro">
+            <div>
+                <div class="brand">
+                    <img
+                        src="../img/logo.png"
+                        alt="Logo de MascotICA's"
+                        class="brand-logo-img"
+                    >
+
+                    <div class="brand-copy">
+                        <div class="brand-name">MascotICA's</div>
+                        <div class="brand-caption">SISTEMA DE ADMINISTRACIÓN</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 55px;">
+                    <p style="color:#5ce0c8;font-weight:700;letter-spacing:.12em;font-size:11px;">
+                        CENTRO DE OPERACIONES
+                    </p>
+
+                    <h2 style="font-size:34px;line-height:1.25;margin:15px 0;">
+                        Panel Administrativo
+                    </h2>
+
+                    <p>
+                        Administra mascotas, productos, inventario,
+                        adopciones, compras y reportes justo aquí.
+                    </p>
+                </div>
+            </div>
+
+            <div>
+                <div style="font-size:12px;color:#5ce0c8;font-weight:700;">
+                    <span aria-hidden="true">●</span>
+                    ACCESO PRIVADO
+                </div>
+
+                <p style="font-size:12px;margin-bottom:0;">
+                    Herramientas de gestión para el equipo de administradores.
+                </p>
+            </div>
+        </section>
+
+        <section class="login-form-panel">
+
+            <div style="display:flex;justify-content:flex-end;margin-bottom:25px;">
+                <button
+                    class="theme-toggle"
+                    id="btnTema"
+                    type="button"
+                    aria-label="Cambiar tema"
+                    title="Cambiar tema"
+                >☾</button>
+            </div>
+
+            <div id="panelCredenciales">
+                <p class="text-muted-custom"
+                   style="font-weight:700;font-size:11px;letter-spacing:.12em;">
+                    BIENVENIDO DE NUEVO
+                </p>
+
+                <h1>Inicia sesión</h1>
+
+                <p class="text-muted-custom" style="line-height:1.7;">
+                    Ingresa tus credenciales administrativas para continuar.
+                </p>
+
+                <div
+                    id="mensajeLogin"
+                    class="login-message"
+                    role="alert"
+                    aria-live="polite"
+                ></div>
+
+                <form id="formLogin">
+                    <div style="margin-bottom:18px;">
+                        <label for="correo"
+                               style="display:block;margin-bottom:8px;font-weight:600;">
+                            Correo electrónico
+                        </label>
+
+                        <input
+                            class="form-control"
+                            type="email"
+                            id="correo"
+                            name="correo"
+                            placeholder="admin@tudominio.com"
+                            autocomplete="username"
+                            maxlength="254"
+                            autocapitalize="none"
+                            spellcheck="false"
+                            required
+                        >
+                    </div>
+
+                    <div style="margin-bottom:23px;">
+                        <label for="password"
+                               style="display:block;margin-bottom:8px;font-weight:600;">
+                            Contraseña
+                        </label>
+
+                        <div class="password-field">
+                            <input
+                                class="form-control"
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Tu contraseña"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                            <button
+                                class="password-toggle"
+                                id="btnMostrarPassword"
+                                type="button"
+                                aria-label="Mostrar contraseña"
+                                aria-pressed="false"
+                                title="Mostrar contraseña"
+                            >
+                                <span data-password-toggle-text>Mostrar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary"
+                            id="btnIngresar"
+                            type="submit"
+                            style="width:100%;min-height:47px;">
+                        Continuar →
+                    </button>
+                </form>
+            </div>
+
+            <div id="panelPin" hidden>
+                <p class="text-muted-custom"
+                   style="font-weight:700;font-size:11px;letter-spacing:.12em;">
+                    SEGUNDA CAPA DE SEGURIDAD
+                </p>
+
+                <h1>Verifica tu identidad</h1>
+
+                <p class="text-muted-custom" style="line-height:1.7;">
+                    Introduce el código de 8 dígitos enviado a tu correo.
+                </p>
+
+                <div
+                    id="mensajePin"
+                    class="login-message"
+                    role="alert"
+                    aria-live="polite"
+                ></div>
+
+                <form id="formPin">
+                    <div style="margin-bottom:22px;">
+                        <label for="codigoPin"
+                               style="display:block;margin-bottom:8px;font-weight:600;">
+                            Código de verificación
+                        </label>
+
+                        <input
+                            class="form-control"
+                            type="text"
+                            id="codigoPin"
+                            name="codigoPin"
+                            inputmode="numeric"
+                            autocomplete="one-time-code"
+                            pattern="[0-9]{8}"
+                            minlength="8"
+                            maxlength="8"
+                            placeholder="12345678"
+                            aria-describedby="mensajePin"
+                            required
+                        >
+                    </div>
+
+                    <button class="btn-primary"
+                            id="btnVerificar"
+                            type="submit"
+                            style="width:100%;min-height:47px;">
+                        Verificar y entrar →
+                    </button>
+
+                    <button class="btn-secondary"
+                            id="btnVolver"
+                            type="button"
+                            style="width:100%;margin-top:12px;">
+                        Volver al inicio de sesión
+                    </button>
+                </form>
+            </div>
+
+            <footer style="margin-top:35px;padding-top:18px;border-top:1px solid var(--border);">
+                <p class="text-muted-custom" style="font-size:11px;margin:0;">
+                    MascotICA's · Panel privado de administración
+                </p>
+            </footer>
+
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="login.js"></script>
+
+</body>
+</html>

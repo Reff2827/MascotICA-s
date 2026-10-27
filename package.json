@@ -1,5 +1,32 @@
 {
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
   "devDependencies": {
+    "electron": "^45.0.0",
+    "electron-builder": "^26.18.0",
     "supabase": "^2.120.0"
-  }
+  },
+  "build": {
+    "appId": "com.mascoticas.desktop",
+    "productName": "MascotICA Desktop",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "name": "mascotica-desktop",
+  "version": "1.0.0",
+  "description": "Aplicación de escritorio de MascotICA",
+  "author": "MascotICA"
 }

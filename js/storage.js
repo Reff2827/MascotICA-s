@@ -380,7 +380,7 @@ const Productos = {
         const { data, error } =
             await db.from('productos')
                 .select(
-                    'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url'
+                    'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url, activo, especiesRecomendadas:especies_recomendadas, edadesRecomendadas:edades_recomendadas, tamanosRecomendados:tamanos_recomendados, actividadesRecomendadas:actividades_recomendadas'
                 )
                 .order('id_producto');
 
@@ -403,7 +403,7 @@ const Productos = {
         const { data, error } =
             await db.from('productos')
                 .select(
-                    'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url'
+                    'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url, activo, especiesRecomendadas:especies_recomendadas, edadesRecomendadas:edades_recomendadas, tamanosRecomendados:tamanos_recomendados, actividadesRecomendadas:actividades_recomendadas'
                 )
                 .eq(
                     'categoria',
@@ -428,12 +428,13 @@ const Productos = {
         const { data, error } =
             await db.from('productos')
                 .select(
-                    'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url'
+                    'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url, activo, especiesRecomendadas:especies_recomendadas, edadesRecomendadas:edades_recomendadas, tamanosRecomendados:tamanos_recomendados, actividadesRecomendadas:actividades_recomendadas'
                 )
                 .gt(
                     'stock',
                     0
                 )
+                .eq('activo', true)
                 .order('id_producto');
 
 
@@ -455,7 +456,7 @@ const Productos = {
         const { data, error } =
             await db.from('productos')
                 .select(
-                    'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url'
+                    'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url, activo, especiesRecomendadas:especies_recomendadas, edadesRecomendadas:edades_recomendadas, tamanosRecomendados:tamanos_recomendados, actividadesRecomendadas:actividades_recomendadas'
                 )
                 .lte(
                     'stock',
@@ -480,7 +481,7 @@ const Productos = {
         const { data, error } =
             await db.from('productos')
                 .select(
-                    'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url'
+                    'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url, activo, especiesRecomendadas:especies_recomendadas, edadesRecomendadas:edades_recomendadas, tamanosRecomendados:tamanos_recomendados, actividadesRecomendadas:actividades_recomendadas'
                 )
                 .eq(
                     'id_producto',
@@ -518,13 +519,19 @@ const Productos = {
 
             imagen_url:
                 producto.imagenUrl ||
-                null
+                null,
+
+            activo: producto.activo !== false,
+            especies_recomendadas: Array.isArray(producto.especiesRecomendadas) ? producto.especiesRecomendadas : [],
+            edades_recomendadas: Array.isArray(producto.edadesRecomendadas) ? producto.edadesRecomendadas : [],
+            tamanos_recomendados: Array.isArray(producto.tamanosRecomendados) ? producto.tamanosRecomendados : [],
+            actividades_recomendadas: Array.isArray(producto.actividadesRecomendadas) ? producto.actividadesRecomendadas : []
 
         };
 
 
         const columnas =
-            'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url';
+            'idProducto:id_producto, nombre, categoria, precio, stock, imagenUrl:imagen_url, activo, especiesRecomendadas:especies_recomendadas, edadesRecomendadas:edades_recomendadas, tamanosRecomendados:tamanos_recomendados, actividadesRecomendadas:actividades_recomendadas';
 
 
         if (producto.idProducto) {

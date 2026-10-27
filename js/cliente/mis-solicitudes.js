@@ -89,12 +89,20 @@ async function cargarAdopciones() {
 
                 <td>
                     ${solicitud.estado === 'APROBADA' ? `
-                        <a
-                            href="ficha-adopcion.html?id=${encodeURIComponent(solicitud.idSolicitud)}"
-                            class="btn btn-primary-ps btn-sm">
-                            <i class="bi bi-file-earmark-text"></i>
-                            Ver ficha
-                        </a>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a
+                                href="ficha-adopcion.html?id=${encodeURIComponent(solicitud.idSolicitud)}"
+                                class="btn btn-primary-ps btn-sm">
+                                <i class="bi bi-file-earmark-text"></i>
+                                Ver ficha
+                            </a>
+                            <a
+                                href="recomendaciones.html?id=${encodeURIComponent(solicitud.idSolicitud)}"
+                                class="btn btn-sm btn-recomendaciones">
+                                <i class="bi bi-stars"></i>
+                                Recomendaciones
+                            </a>
+                        </div>
                     ` : `
                         <span class="text-muted">Aún no disponible</span>
                     `}

@@ -3777,3 +3777,379 @@ html {
         transition: none;
     }
 }
+
+
+/* ==========================================================================
+   RECOMENDACIONES DE PRODUCTOS PARA MASCOTAS ADOPTADAS
+   Adaptado al tema claro/oscuro y a los colores de MascotICA's.
+   Mismos nombres de clase de antes; solo cambian los valores.
+   ========================================================================== */
+
+:root {
+    --reco-hero-from: oklch(0.56 0.17 38);
+    --reco-hero-to: oklch(0.63 0.17 48);
+    --reco-hero-fg: #fff;
+    --reco-chip-fg: oklch(0.45 0.13 38);
+    --reco-chip-bg: oklch(0.687 0.178 42 / 0.14);
+    --reco-chip-border: oklch(0.687 0.178 42 / 0.28);
+    /* Fondo claro y cálido para fotos de producto con fondo blanco */
+    --reco-img-bg: oklch(0.978 0.012 75);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --reco-hero-from: oklch(0.38 0.08 40);
+        --reco-hero-to: oklch(0.27 0.045 40);
+        --reco-hero-fg: oklch(0.968 0.004 270);
+        --reco-chip-fg: oklch(0.86 0.11 58);
+        --reco-chip-bg: oklch(0.735 0.168 45 / 0.20);
+        --reco-chip-border: oklch(0.735 0.168 45 / 0.38);
+        --reco-img-bg: oklch(0.955 0.014 75);
+    }
+}
+
+:root[data-theme="dark"] {
+    --reco-hero-from: oklch(0.38 0.08 40);
+    --reco-hero-to: oklch(0.27 0.045 40);
+    --reco-hero-fg: oklch(0.968 0.004 270);
+    --reco-chip-fg: oklch(0.86 0.11 58);
+    --reco-chip-bg: oklch(0.735 0.168 45 / 0.20);
+    --reco-chip-border: oklch(0.735 0.168 45 / 0.38);
+    --reco-img-bg: oklch(0.955 0.014 75);
+}
+
+/* Botón «Recomendaciones» (junto a «Ver ficha») */
+.btn-recomendaciones {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    color: var(--reco-chip-fg);
+    background: var(--reco-chip-bg);
+    border: 1px solid var(--reco-chip-border);
+    box-shadow: var(--specular);
+    transition:
+        transform var(--fast) var(--ease-out),
+        background var(--base) var(--ease-out),
+        color var(--base) var(--ease-out),
+        box-shadow var(--base) var(--ease-out);
+}
+
+.btn-recomendaciones:hover,
+.btn-recomendaciones:focus {
+    color: var(--primary-foreground);
+    background: linear-gradient(175deg, var(--primary), var(--primary-active));
+    border-color: transparent;
+    box-shadow: var(--glow);
+    transform: translateY(-1px);
+}
+
+/* Cabecera de la página de recomendaciones */
+.recomendaciones-hero {
+    position: relative;
+    overflow: hidden;
+    color: var(--reco-hero-fg);
+    background:
+        radial-gradient(28rem 16rem at 100% 0%, oklch(1 0 0 / 0.16), transparent 70%),
+        linear-gradient(135deg, var(--reco-hero-from), var(--reco-hero-to));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    box-shadow: var(--specular-strong), var(--shadow-lg);
+}
+
+.recomendaciones-hero::before {
+    content: "";
+    position: absolute;
+    right: -1.5rem;
+    bottom: -2rem;
+    width: 11rem;
+    height: 11rem;
+    background: var(--paw) center / contain no-repeat;
+    opacity: 0.16;
+    transform: rotate(-14deg);
+    pointer-events: none;
+}
+
+.recomendaciones-hero::after {
+    content: "✦";
+    position: absolute;
+    right: 1.5rem;
+    top: -0.7rem;
+    font-size: 8rem;
+    opacity: 0.12;
+    pointer-events: none;
+}
+
+.recomendaciones-hero > * {
+    position: relative;
+    z-index: 1;
+}
+
+.recomendaciones-hero h1,
+.recomendaciones-hero h2,
+.recomendaciones-hero h3,
+.recomendaciones-hero h4,
+.recomendaciones-hero h5 {
+    color: inherit;
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+}
+
+.recomendaciones-hero .text-muted,
+.recomendaciones-hero .text-white-50,
+.recomendaciones-hero small {
+    color: inherit !important;
+    opacity: 0.85;
+}
+
+/* Etiquetas dentro de la cabecera: sobre fondo propio, no sobre el naranja */
+.recomendaciones-hero .recomendacion-chip {
+    color: var(--reco-hero-fg);
+    background: oklch(1 0 0 / 0.18);
+    border-color: oklch(1 0 0 / 0.34);
+}
+
+/* Tarjeta de producto recomendado */
+.recomendacion-card {
+    height: 100%;
+    overflow: hidden;
+    color: var(--foreground);
+    background: var(--card-solid);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    transition:
+        transform var(--base) var(--spring),
+        box-shadow var(--base) var(--ease-out),
+        border-color var(--base) var(--ease-out);
+}
+
+.recomendacion-card:hover {
+    transform: translateY(-4px);
+    border-color: oklch(0.687 0.178 42 / 0.5);
+    box-shadow: var(--shadow-lg), var(--glow) !important;
+}
+
+.recomendacion-img {
+    display: block;
+    width: 100%;
+    height: 190px;
+    padding: 1rem;
+    object-fit: contain;
+    background: var(--reco-img-bg);
+    border-bottom: 1px solid var(--border);
+}
+
+/* Etiquetas de coincidencia (especie, edad, tamaño, actividad) */
+.recomendacion-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: var(--radius-full);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--reco-chip-fg);
+    background: var(--reco-chip-bg);
+    border: 1px solid var(--reco-chip-border);
+}
+
+@media (max-width: 575.98px) {
+    .recomendacion-img {
+        height: 155px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .recomendacion-card,
+    .btn-recomendaciones {
+        transition: none;
+    }
+
+    .recomendacion-card:hover,
+    .btn-recomendaciones:hover {
+        transform: none;
+    }
+}
+
+/* Recomendaciones de productos para mascotas adoptadas */
+/* Respaldo de la versión anterior (puedes borrar este bloque):
+.btn-recomendaciones { background: linear-gradient(135deg, #fff4d6, #ffe2a3); color: #654600; border: 1px solid #f2cf75; font-weight: 600; }
+.btn-recomendaciones:hover, .btn-recomendaciones:focus { background: #ffdf8a; color: #4b3300; border-color: #e8bd4f; }
+.recomendaciones-hero { background: linear-gradient(135deg, #173f35, #2f7560); color: #fff; border-radius: 1.25rem; padding: clamp(1.25rem, 3vw, 2.25rem); position: relative; overflow: hidden; }
+.recomendaciones-hero::after { content: "✦"; position: absolute; right: 1.5rem; top: -.7rem; font-size: 8rem; opacity: .12; }
+.recomendacion-card { border: 1px solid #e8eee9; border-radius: 1rem; overflow: hidden; transition: transform .18s ease, box-shadow .18s ease; height: 100%; }
+.recomendacion-card:hover { transform: translateY(-3px); box-shadow: 0 .75rem 1.8rem rgba(28,65,48,.12)!important; }
+.recomendacion-img { height: 190px; width: 100%; object-fit: contain; padding: 1rem; background: #f8faf8; }
+.recomendacion-chip { display: inline-flex; align-items: center; gap: .35rem; border-radius: 99px; padding: .35rem .65rem; background: #edf6ef; color: #276347; font-size: .78rem; font-weight: 600; }
+@media (max-width: 575.98px) { .recomendacion-img { height: 155px; } }
+*/
+
+
+/* ==========================================================================
+   20. REFINAMIENTOS DE LA WEB DE ADOPCIÓN
+   Solo añade o sobrescribe detalles visuales; el resto del archivo
+   permanece igual. Todo usa las variables del tema (claro/oscuro).
+   ========================================================================== */
+
+/* Títulos de sección con icono en burbuja cálida */
+.container-fluid > h3.fw-bold,
+.container-fluid section > h4.fw-bold {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-family: var(--font-display);
+    letter-spacing: -0.022em;
+}
+
+.container-fluid > h3.fw-bold > i.bi:first-child,
+.container-fluid section > h4.fw-bold > i.bi:first-child {
+    flex: 0 0 auto;
+    display: inline-grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: var(--radius-md);
+    font-size: 1.15rem;
+    background: var(--primary-soft);
+    border: 1px solid oklch(0.687 0.178 42 / 0.22);
+    box-shadow: var(--specular);
+}
+
+/* Fotos de mascota: encuadre pensado para rostros */
+.card-mascota .img-top {
+    object-position: center 30%;
+}
+
+/* Datos de la mascota con más aire y jerarquía */
+.card-mascota .card-body {
+    gap: 0.1rem;
+}
+
+.card-mascota .card-title {
+    font-size: 1.2rem;
+}
+
+/* Personalidad: etiquetas cálidas en lugar del azul de Bootstrap */
+.card-mascota .badge.rounded-pill {
+    color: var(--reco-chip-fg) !important;
+    background: var(--reco-chip-bg) !important;
+    border: 1px solid var(--reco-chip-border) !important;
+    font-weight: 600;
+}
+
+/* Categoría del producto como etiqueta suave */
+.card-producto .badge.bg-secondary {
+    color: var(--reco-chip-fg) !important;
+    background: var(--reco-chip-bg) !important;
+    border: 1px solid var(--reco-chip-border);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.68rem;
+}
+
+.card-producto .card-body > .fw-bold {
+    color: var(--primary-active);
+}
+
+/* Carrito flotante: aro suave cuando tiene productos */
+.btn-carrito-flotante {
+    box-shadow: var(--specular), var(--shadow-lg), var(--glow);
+}
+
+.btn-carrito-flotante:has(.badge:not(.d-none))::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: inherit;
+    border: 2px solid oklch(0.687 0.178 42 / 0.55);
+    animation: carrito-aro 2.4s var(--ease-out) infinite;
+    pointer-events: none;
+}
+
+@keyframes carrito-aro {
+    0%   { transform: scale(0.92); opacity: 0.9; }
+    70%  { transform: scale(1.22); opacity: 0; }
+    100% { transform: scale(1.22); opacity: 0; }
+}
+
+/* Ventanas emergentes más redondeadas y cálidas */
+.modal-content {
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--specular-strong), var(--shadow-xl);
+}
+
+.modal-header {
+    background: linear-gradient(180deg, var(--primary-soft), transparent);
+}
+
+.modal-title {
+    font-family: var(--font-display);
+    font-weight: 650;
+    letter-spacing: -0.02em;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+/* Portada opcional para páginas del cliente (añadir class="hero-adopcion") */
+.hero-adopcion {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    padding: clamp(1.5rem, 4vw, 2.75rem);
+    color: var(--reco-hero-fg);
+    background:
+        radial-gradient(30rem 18rem at 100% 0%, oklch(1 0 0 / 0.16), transparent 70%),
+        linear-gradient(135deg, var(--reco-hero-from), var(--reco-hero-to));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--specular-strong), var(--shadow-lg);
+}
+
+.hero-adopcion::before {
+    content: "";
+    position: absolute;
+    right: -1rem;
+    bottom: -2.5rem;
+    width: 14rem;
+    height: 14rem;
+    background: var(--paw) center / contain no-repeat;
+    opacity: 0.16;
+    transform: rotate(-12deg);
+    pointer-events: none;
+}
+
+.hero-adopcion > * {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-adopcion h1,
+.hero-adopcion h2 {
+    margin: 0 0 0.5rem;
+    color: inherit;
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    font-size: clamp(1.7rem, 4.4vw, 2.6rem);
+    line-height: 1.05;
+}
+
+.hero-adopcion p {
+    max-width: 38rem;
+    margin: 0 0 1.1rem;
+    color: inherit;
+    opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-carrito-flotante:has(.badge:not(.d-none))::after {
+        animation: none;
+        opacity: 0.6;
+    }
+}

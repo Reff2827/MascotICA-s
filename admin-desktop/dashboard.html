@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panel de administración | MascotICA's</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="dashboard-page">
+
+    <div class="app-shell">
+
+        <!-- MENÚ LATERAL -->
+        <aside class="sidebar">
+
+            <a href="dashboard.html" class="brand text-decoration-none">
+                <div class="brand-logo">
+                    <img
+                    src="../img/logo.png"
+                    alt="Logo de MascotICA's"
+                    class="dashboard-logo-img">
+                </div>
+
+                <div class="brand-text">
+                    <strong>MascotICA's</strong>
+                    <small>Panel administrativo</small>
+                </div>
+            </a>
+
+            <div class="sidebar-label">MENÚ PRINCIPAL</div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active" data-section="inicio">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Inicio</span>
+                </a>
+
+                <a href="#" class="nav-link" data-section="mascotas">
+                    <i class="bi bi-heart-fill"></i>
+                    <span>Mascotas</span>
+                </a>
+
+                <a href="#" class="nav-link" data-section="productos">
+                    <i class="bi bi-box-seam-fill"></i>
+                    <span>Productos</span>
+                </a>
+
+                <a href="#" class="nav-link" data-section="compras">
+                    <i class="bi bi-receipt"></i>
+                    <span>Compras</span>
+                </a>
+
+                <a href="#" class="nav-link" data-section="adopciones">
+                    <i class="bi bi-house-heart-fill"></i>
+                    <span>Adopciones</span>
+                </a>
+
+                <a href="#" class="nav-link" data-section="inventario">
+                    <i class="bi bi-clipboard2-data-fill"></i>
+                    <span>Inventario</span>
+                </a>
+
+                <a href="#" class="nav-link" data-section="reportes">
+                    <i class="bi bi-bar-chart-fill"></i>
+                    <span>Reportes</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="sidebar-help">
+                    <i class="bi bi-shield-check"></i>
+                    <div>
+                        <strong>Área segura</strong>
+                        <small>Acceso administrativo</small>
+                    </div>
+                </div>
+
+                <button id="btnCerrarSesion" class="sidebar-logout">
+                    <i class="bi bi-box-arrow-left"></i>
+                    <span>Cerrar sesión</span>
+                </button>
+            </div>
+
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+
+            <header class="topbar">
+                <div>
+                    <div class="topbar-eyebrow">MASCOTICA'S / ADMINISTRACIÓN</div>
+                    <h1 id="tituloPagina">Panel general</h1>
+                </div>
+
+                <div class="topbar-actions">
+                    <button
+                        id="btnTema"
+                        class="theme-toggle"
+                        type="button"
+                        aria-label="Cambiar tema"
+                        title="Cambiar tema"
+                    >
+                        <i class="bi bi-moon-stars-fill"></i>
+                    </button>
+
+                    <div class="user-profile">
+                        <div class="user-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+
+                        <div class="user-info">
+                            <strong id="nombreAdministrador">Administrador</strong>
+                            <small id="correoAdministrador">Verificando sesión...</small>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="page-content">
+
+                <!-- INICIO -->
+                <div id="seccionInicio" class="dashboard-section">
+
+                    <div class="welcome-banner">
+                        <div>
+                            <span class="welcome-tag">
+                                <i class="bi bi-stars"></i>
+                                CENTRO DE CONTROL
+                            </span>
+
+                            <h2>¡Bienvenido a MascotICA's!</h2>
+
+                            <p>
+                                Administra la información de tu plataforma
+                                desde un solo lugar.
+                            </p>
+                        </div>
+
+                        <div class="welcome-illustration">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                        </div>
+                    </div>
+
+                    <div class="section-heading">
+                        <div>
+                            <h2>Resumen general</h2>
+                            <p>Indicadores del sistema</p>
+                        </div>
+
+                        <span class="date-label" id="fechaActual"></span>
+                    </div>
+
+                    <div class="stats-grid">
+
+                        <article class="stat-card">
+                            <div class="stat-icon stat-icon-teal">
+                                <i class="bi bi-heart-fill"></i>
+                            </div>
+
+                            <div class="stat-label">Mascotas registradas</div>
+                            <div class="stat-value" id="totalMascotas">—</div>
+                            <div class="stat-description">Registros de mascotas</div>
+                        </article>
+
+                        <article class="stat-card">
+                            <div class="stat-icon stat-icon-blue">
+                                <i class="bi bi-box-seam-fill"></i>
+                            </div>
+
+                            <div class="stat-label">Productos</div>
+                            <div class="stat-value" id="totalProductos">—</div>
+                            <div class="stat-description">Catálogo de productos</div>
+                        </article>
+
+                        <article class="stat-card">
+                            <div class="stat-icon stat-icon-orange">
+                                <i class="bi bi-receipt"></i>
+                            </div>
+
+                            <div class="stat-label">Compras</div>
+                            <div class="stat-value" id="totalCompras">—</div>
+                            <div class="stat-description">Registros de compras</div>
+                        </article>
+
+                        <article class="stat-card">
+                            <div class="stat-icon stat-icon-purple">
+                                <i class="bi bi-house-heart-fill"></i>
+                            </div>
+
+                            <div class="stat-label">Solicitudes de adopción</div>
+                            <div class="stat-value" id="totalAdopciones">—</div>
+                            <div class="stat-description">Solicitudes registradas</div>
+                        </article>
+
+                    </div>
+
+                    <div class="content-grid">
+
+                        <article class="card dashboard-info-card">
+                            <div class="card-heading">
+                                <div>
+                                    <h3>Accesos rápidos</h3>
+                                    <p>Ve directamente a un módulo</p>
+                                </div>
+
+                                <i class="bi bi-lightning-charge-fill heading-icon"></i>
+                            </div>
+
+                            <div class="quick-actions">
+
+                                <button class="quick-action" data-section="mascotas">
+                                    <span class="quick-action-icon">
+                                        <i class="bi bi-heart-fill"></i>
+                                    </span>
+                                    <span>
+                                        <strong>Mascotas</strong>
+                                        <small>Gestionar registros</small>
+                                    </span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+
+                                <button class="quick-action" data-section="productos">
+                                    <span class="quick-action-icon">
+                                        <i class="bi bi-box-seam-fill"></i>
+                                    </span>
+                                    <span>
+                                        <strong>Productos</strong>
+                                        <small>Administrar catálogo</small>
+                                    </span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+
+                                <button class="quick-action" data-section="compras">
+                                    <span class="quick-action-icon">
+                                        <i class="bi bi-receipt"></i>
+                                    </span>
+                                    <span>
+                                        <strong>Compras</strong>
+                                        <small>Consultar operaciones</small>
+                                    </span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+
+                                <button class="quick-action" data-section="reportes">
+                                    <span class="quick-action-icon">
+                                        <i class="bi bi-bar-chart-fill"></i>
+                                    </span>
+                                    <span>
+                                        <strong>Reportes</strong>
+                                        <small>Consultar información</small>
+                                    </span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+
+                            </div>
+                        </article>
+
+                        <article class="card system-card">
+                            <div class="card-heading">
+                                <div>
+                                    <h3>Estado del sistema</h3>
+                                    <p>Información de esta sesión</p>
+                                </div>
+
+                                <i class="bi bi-activity heading-icon"></i>
+                            </div>
+
+                            <div class="system-status-row">
+                                <span class="system-status-dot"></span>
+                                <div>
+                                    <strong>Panel de escritorio</strong>
+                                    <small>Aplicación iniciada</small>
+                                </div>
+                                <span class="status status-success">Activo</span>
+                            </div>
+
+                            <div class="system-status-row">
+                                <span class="system-status-dot"></span>
+                                <div>
+                                    <strong>Sesión administrativa</strong>
+                                    <small id="estadoSesion">Verificando...</small>
+                                </div>
+                                <span id="etiquetaSesion" class="status">Verificando</span>
+                            </div>
+
+                            <div class="system-note">
+                                <i class="bi bi-info-circle-fill"></i>
+                                <p>
+                                    Los indicadores muestran los registros disponibles según
+                                    la sesión y los permisos configurados en Supabase
+                                </p>
+                            </div>
+                        </article>
+
+                    </div>
+
+                    <div class="overview-grid">
+                        <article class="card overview-card overview-card-wide">
+                            <div class="card-heading">
+                                <div>
+                                    <h3>Compras recientes</h3>
+                                    <p>Últimas operaciones registradas</p>
+                                </div>
+                                <i class="bi bi-receipt heading-icon"></i>
+                            </div>
+                            <div id="listaComprasRecientes" class="overview-list" aria-live="polite">
+                                <p class="overview-empty">Cargando compras recientes…</p>
+                            </div>
+                            <button class="overview-link" type="button" data-open-module="compras">
+                                Ver todas las compras <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </article>
+
+                        <article class="card overview-card">
+                            <div class="card-heading">
+                                <div>
+                                    <h3>Adopciones por revisar</h3>
+                                    <p>Solicitudes pendientes de evaluación</p>
+                                </div>
+                                <i class="bi bi-house-heart heading-icon"></i>
+                            </div>
+                            <div id="listaSolicitudesPendientes" class="overview-list" aria-live="polite">
+                                <p class="overview-empty">Cargando solicitudes…</p>
+                            </div>
+                            <button class="overview-link" type="button" data-open-module="adopciones">
+                                Revisar solicitudes <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </article>
+
+                        <article class="card overview-card">
+                            <div class="card-heading">
+                                <div>
+                                    <h3>Inventario por atender</h3>
+                                    <p>Productos con cinco unidades o menos</p>
+                                </div>
+                                <i class="bi bi-exclamation-diamond heading-icon"></i>
+                            </div>
+                            <div id="listaStockBajo" class="overview-list" aria-live="polite">
+                                <p class="overview-empty">Revisando existencias…</p>
+                            </div>
+                            <button class="overview-link" type="button" data-open-module="inventario">
+                                Abrir inventario <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </article>
+
+                        <article class="card overview-card overview-card-wide">
+                            <div class="card-heading">
+                                <div>
+                                    <h3>Estado de las compras</h3>
+                                    <p>Distribución de las últimas compras consultadas</p>
+                                </div>
+                                <i class="bi bi-bar-chart-line heading-icon"></i>
+                            </div>
+                            <div id="graficoEstadosPedidos" class="status-chart" aria-live="polite">
+                                <p class="overview-empty">Preparando resumen…</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO DE MÓDULOS -->
+                 <div id="seccionModulo" class="dashboard-section" hidden>
+                    <article class="card module-placeholder module-data-card">
+                        <div class="module-data-header">
+                            <div class="module-placeholder-icon">
+                                <i id="iconoModulo" class="bi bi-grid"></i>
+                            </div>
+                            <div>
+                                <h2 id="tituloModulo">Módulo</h2>
+                                <p id="descripcionModulo">
+                                    Consulta los registros existentes.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div id="accionesModulo" class="module-actions"></div>
+                        <div id="filtrosModulo" class="module-filters" hidden></div>
+                        
+                        <div id="estadoModulo" class="module-state" role="status">
+                            Selecciona un apartado para consultar sus datos.
+                        </div>
+                        
+                        <div class="module-table-wrapper">
+                            <table class="table module-table">
+                                <thead id="encabezadoTablaModulo"></thead>
+                                <tbody id="cuerpoTablaModulo"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="module-load-more-row">
+                            <button id="btnCargarMasRegistros" class="btn btn-outline-primary btn-sm" type="button" hidden>
+                                <i class="bi bi-arrow-down-circle me-2"></i>
+                                Cargar más registros
+                            </button>
+                        </div>
+                        
+                        <button id="btnVolverInicio" class="btn btn-primary mt-4">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Volver al panel general
+                        </button>
+                    </article>
+                </div>
+
+
+                <div id="mensajeSistema" class="system-message" hidden></div>
+
+                <footer class="app-footer">
+                    <span>© <span id="anioActual"></span> MascotICA's</span>
+                    <span>Panel administrativo de escritorio</span>
+                </footer>
+
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
