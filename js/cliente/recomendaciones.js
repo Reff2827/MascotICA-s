@@ -53,23 +53,87 @@ function especieMascotaGrupo(especie) {
     return valor ? 'OTRO' : null;
 }
 
-function compatibleCampo(producto, propiedad, valorMascota) {
-    const opciones = listaValores(producto[propiedad]);
+function inferirEspeciesProducto(producto) {
+    const configuradas = listaValores(producto.especiesRecomendadas);
+    if (configuradas.length) return configuradas;
 
-    // Edad, tamaño y actividad solo restringen la recomendación cuando ambos
-    // lados tienen datos. Si el producto no define ese filtro, aplica a toda
-    // la especie marcada; si la mascota no tiene el dato, no lo inventamos.
+    // Los productos existentes no tenían compatibilidad configurada. Aprovechamos
+    // el nombre del catálogo para inferir las especies sin obligar a editar cada fila.
+    const nombre = normalizarRecomendacion(producto.nombre);
+    const esPerro = /\bPERROS?\b|\bPERRITOS?\b|\bCANIN[OA]S?\b/.test(nombre);
+    const esGato = /\bGATOS?\b|\bGATITOS?\b|\bFELIN[OA]S?\b/.test(nombre);
+    const esOtraEspecie = /\bCABALLOS?\b|\bEQUINOS?\b|\bAVES?\b|\bCONEJOS?\b|\bROEDORES?\b|\bPECES?\b/.test(nombre);
+
+    if (esPerro && esGato) return ['PERRO', 'GATO'];
+    if (esPerro) return ['PERRO'];
+    if (esGato) return ['GATO'];
+    if (esOtraEspecie) return ['OTRO'];
+
+    // Los artículos que dicen explícitamente "para mascotas/animales" se tratan
+    // como genéricos para perros y gatos. Otros productos de higiene sin especie
+    // identificable (por ejemplo, un antipulgas) quedan fuera hasta que el admin
+    // marque la especie, porque la fórmula puede no ser segura para todas.
+    if (normalizarRecomendacion(producto.categoria) === 'HIGIENE' &&
+        /\bPARA MASCOTAS?\b|\bPARA ANIMALES?\b/.test(nombre)) {
+        return ['PERRO', 'GATO'];
+    }
+
+    return [];
+}
+
+function inferirEdadesProducto(producto) {
+    const configuradas = listaValores(producto.edadesRecomendadas);
+    if (configuradas.length) return configuradas;
+
+    const nombre = normalizarRecomendacion(producto.nombre);
+    if (/\bSENIOR\b|\bGERIATRIC[OA]S?\b|\bMAYORES?\b/.test(nombre)) return ['SENIOR'];
+    if (/\bCACHORR[OA]S?\b|\bPUPPY\b|\bGATITOS?\b|\bKITTENS?\b/.test(nombre)) return ['CACHORRO'];
+    if (/\bJOVEN(?:ES)?\b/.test(nombre)) return ['JOVEN'];
+    if (/\bADULT[OA]S?\b/.test(nombre)) return ['ADULTO'];
+    return [];
+}
+
+function inferirTamanosProducto(producto) {
+    const configurados = listaValores(producto.tamanosRecomendados);
+    if (configurados.length) return configurados;
+
+    const nombre = normalizarRecomendacion(producto.nombre);
+    if (/\b(?:RAZAS?|PERROS?|GATOS?|TAMANO)\s+PEQUEN[OA]S?\b/.test(nombre)) return ['PEQUENO'];
+    if (/\b(?:RAZAS?|PERROS?|GATOS?|TAMANO)\s+MEDIAN[OA]S?\b/.test(nombre)) return ['MEDIANO'];
+    if (/\b(?:RAZAS?|PERROS?|GATOS?|TAMANO)\s+GRANDES?\b/.test(nombre)) return ['GRANDE'];
+    return [];
+}
+
+function inferirActividadesProducto(producto) {
+    const configuradas = listaValores(producto.actividadesRecomendadas);
+    if (configuradas.length) return configuradas;
+
+    const nombre = normalizarRecomendacion(producto.nombre);
+    if (/\bBAJA ACTIVIDAD\b|\bPOCO ACTIV[OA]S?\b|\bTRANQUIL[OA]S?\b/.test(nombre)) return ['BAJA'];
+    if (/\bACTIVIDAD MODERADA\b|\bMODERAD[OA]S? ACTIV[OA]S?\b/.test(nombre)) return ['MODERADA'];
+    if (/\bALTA ACTIVIDAD\b|\bMUY ACTIV[OA]S?\b|\bALTA ENERGIA\b/.test(nombre)) return ['ALTA'];
+    return [];
+}
+
+function opcionesCompatibilidadProducto(producto, propiedad) {
+    if (propiedad === 'especiesRecomendadas') return inferirEspeciesProducto(producto);
+    if (propiedad === 'edadesRecomendadas') return inferirEdadesProducto(producto);
+    if (propiedad === 'tamanosRecomendados') return inferirTamanosProducto(producto);
+    if (propiedad === 'actividadesRecomendadas') return inferirActividadesProducto(producto);
+    return listaValores(producto[propiedad]);
+}
+
+function compatibleCampo(producto, propiedad, valorMascota) {
+    const opciones = opcionesCompatibilidadProducto(producto, propiedad);
     return !opciones.length || !valorMascota || opciones.includes(normalizarRecomendacion(valorMascota));
 }
 
 function compatibleConMascota(producto, mascota) {
     const especie = especieMascotaGrupo(mascota.especie);
-    const especiesProducto = listaValores(producto.especiesRecomendadas);
+    const especiesProducto = inferirEspeciesProducto(producto);
 
-    // La especie es obligatoria para recomendar. Antes, una lista vacía se
-    // trataba como comodín y por eso aparecía casi todo el catálogo. Los
-    // productos sin especie configurada permanecen en la tienda, pero no se
-    // muestran como recomendación hasta que el administrador los clasifique.
+    // La especie debe coincidir. Si no puede inferirse ni está configurada,
+    // el producto no se recomienda; así evitamos sugerencias alimentarias inseguras.
     if (!especie || !especiesProducto.length || !especiesProducto.includes(especie)) {
         return false;
     }

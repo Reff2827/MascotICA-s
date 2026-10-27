@@ -55,13 +55,13 @@
 
             <div class="border rounded-3 p-3 mb-3 bg-light-subtle">
                 <h6 class="fw-bold mb-1"><i class="bi bi-stars text-warning me-1"></i>Compatibilidad para recomendaciones</h6>
-                <p class="small text-muted mb-3">Para que este producto aparezca en recomendaciones, marca al menos una especie compatible. Edad, tamaño y actividad son filtros opcionales: si los dejas vacíos, el producto puede recomendarse a cualquier mascota de las especies seleccionadas para esas características.</p>
+                <p class="small text-muted mb-3">El sistema puede inferir la especie a partir del nombre de productos existentes (por ejemplo, “Comida Perro Adulto”). Para precisar o corregir esa inferencia, selecciona aquí las especies compatibles. Edad, tamaño y actividad son filtros adicionales opcionales.</p>
                 <div class="mb-3">
                     <label class="form-label" for="especiesRecomendadas">Especies</label>
                     <select id="especiesRecomendadas" class="form-select" multiple size="2">
                         <option value="PERRO">Perro</option><option value="GATO">Gato</option><option value="OTRO">Otra especie</option>
                     </select>
-                    <small class="text-muted">Selecciona Perro, Gato u otra especie compatible. Puedes seleccionar más de una con Ctrl (Windows). Si no marcas ninguna, el producto no aparecerá en recomendaciones.</small>
+                    <small class="text-muted">Selecciona Perro, Gato u otra especie compatible para establecer la compatibilidad de forma explícita. Puedes seleccionar más de una con Ctrl (Windows). Si lo dejas vacío, el sistema intentará inferirla del nombre y la categoría; los alimentos sin una especie identificable no se recomendarán automáticamente.</small>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
