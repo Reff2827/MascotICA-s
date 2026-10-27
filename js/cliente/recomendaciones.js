@@ -55,16 +55,30 @@ function especieMascotaGrupo(especie) {
 
 function compatibleCampo(producto, propiedad, valorMascota) {
     const opciones = listaValores(producto[propiedad]);
+
+    // Edad, tamaño y actividad solo restringen la recomendación cuando ambos
+    // lados tienen datos. Si el producto no define ese filtro, aplica a toda
+    // la especie marcada; si la mascota no tiene el dato, no lo inventamos.
     return !opciones.length || !valorMascota || opciones.includes(normalizarRecomendacion(valorMascota));
 }
 
 function compatibleConMascota(producto, mascota) {
     const especie = especieMascotaGrupo(mascota.especie);
+    const especiesProducto = listaValores(producto.especiesRecomendadas);
+
+    // La especie es obligatoria para recomendar. Antes, una lista vacía se
+    // trataba como comodín y por eso aparecía casi todo el catálogo. Los
+    // productos sin especie configurada permanecen en la tienda, pero no se
+    // muestran como recomendación hasta que el administrador los clasifique.
+    if (!especie || !especiesProducto.length || !especiesProducto.includes(especie)) {
+        return false;
+    }
+
     const edad = edadMascotaGrupo(mascota.edad);
     const tamano = normalizarRecomendacion(mascota.tamano) || null;
     const actividad = actividadMascotaGrupo(mascota.nivelActividad);
-    return compatibleCampo(producto, 'especiesRecomendadas', especie) &&
-        compatibleCampo(producto, 'edadesRecomendadas', edad) &&
+
+    return compatibleCampo(producto, 'edadesRecomendadas', edad) &&
         compatibleCampo(producto, 'tamanosRecomendados', tamano) &&
         compatibleCampo(producto, 'actividadesRecomendadas', actividad);
 }
@@ -135,7 +149,7 @@ function pintarProductosRecomendados() {
     if (!productosRecomendaciones.length) {
         lista.innerHTML = '';
         aviso.classList.remove('d-none');
-        aviso.innerHTML = '<i class="bi bi-info-circle me-2"></i>Por ahora no hay productos activos con stock que coincidan con los filtros de compatibilidad de esta mascota. Puedes revisar el catálogo más adelante.';
+        aviso.innerHTML = '<i class="bi bi-info-circle me-2"></i>Todavía no hay productos activos con stock que coincidan con las características registradas de esta mascota. Puedes revisar la tienda y volver a consultar más adelante.';
         return;
     }
 
