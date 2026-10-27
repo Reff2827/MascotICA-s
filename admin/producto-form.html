@@ -55,35 +55,113 @@
 
             <div class="border rounded-3 p-3 mb-3 bg-light-subtle">
                 <h6 class="fw-bold mb-1"><i class="bi bi-stars text-warning me-1"></i>Compatibilidad para recomendaciones</h6>
-                <p class="small text-muted mb-3">El sistema puede inferir la especie a partir del nombre de productos existentes (por ejemplo, “Comida Perro Adulto”). Para precisar o corregir esa inferencia, selecciona aquí las especies compatibles. Edad, tamaño y actividad son filtros adicionales opcionales.</p>
-                <div class="mb-3">
-                    <label class="form-label" for="especiesRecomendadas">Especies</label>
-                    <select id="especiesRecomendadas" class="form-select" multiple size="2">
-                        <option value="PERRO">Perro</option><option value="GATO">Gato</option><option value="OTRO">Otra especie</option>
-                    </select>
-                    <small class="text-muted">Selecciona Perro, Gato u otra especie compatible para establecer la compatibilidad de forma explícita. Puedes seleccionar más de una con Ctrl (Windows). Si lo dejas vacío, el sistema intentará inferirla del nombre y la categoría; los alimentos sin una especie identificable no se recomendarán automáticamente.</small>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label" for="edadesRecomendadas">Edad</label>
-                        <select id="edadesRecomendadas" class="form-select" multiple size="3">
-                            <option value="CACHORRO">Cachorro / gatito</option><option value="JOVEN">Joven</option><option value="ADULTO">Adulto</option><option value="SENIOR">Senior</option>
-                        </select>
+                <p class="small text-muted mb-3">Marca las opciones con casillas; no necesitas mantener presionada ninguna tecla. Si dejas edad, tamaño o actividad sin marcar, ese criterio no restringirá el producto. La especie se infiere del nombre cuando no marques ninguna.</p>
+
+                <fieldset id="especiesRecomendadas" class="row g-2 border-0 p-0 m-0 mb-3">
+                    <legend class="form-label fw-semibold mb-1">Especies compatibles</legend>
+                    <div class="col-6 col-md-4">
+                        <label class="form-check border rounded-3 p-3 h-100 d-flex align-items-center gap-2">
+                            <input class="form-check-input mt-0 ms-0 flex-shrink-0" type="checkbox" value="PERRO">
+                            <span class="form-check-label">🐶 Perro</span>
+                        </label>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label" for="tamanosRecomendados">Tamaño</label>
-                        <select id="tamanosRecomendados" class="form-select" multiple size="3">
-                            <option value="PEQUENO">Pequeño</option><option value="MEDIANO">Mediano</option><option value="GRANDE">Grande</option>
-                        </select>
+                    <div class="col-6 col-md-4">
+                        <label class="form-check border rounded-3 p-3 h-100 d-flex align-items-center gap-2">
+                            <input class="form-check-input mt-0 ms-0 flex-shrink-0" type="checkbox" value="GATO">
+                            <span class="form-check-label">🐱 Gato</span>
+                        </label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-check border rounded-3 p-3 h-100 d-flex align-items-center gap-2">
+                            <input class="form-check-input mt-0 ms-0 flex-shrink-0" type="checkbox" value="OTRO">
+                            <span class="form-check-label">Otra especie</span>
+                        </label>
+                    </div>
+                    <small class="text-muted">Para comida o productos específicos, marca únicamente las especies confirmadas en la etiqueta.</small>
+                </fieldset>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <fieldset id="edadesRecomendadas" class="row g-2 border-0 p-0 m-0 h-100">
+                            <legend class="form-label fw-semibold mb-1">Etapa de vida</legend>
+                            <div class="col-6">
+                                <label class="form-check border rounded-3 p-2 h-100 d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0 ms-0" type="checkbox" value="CACHORRO">
+                                    <span class="form-check-label">Cachorro / gatito</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-check border rounded-3 p-2 h-100 d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0 ms-0" type="checkbox" value="JOVEN">
+                                    <span class="form-check-label">Joven</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-check border rounded-3 p-2 h-100 d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0 ms-0" type="checkbox" value="ADULTO">
+                                    <span class="form-check-label">Adulto</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-check border rounded-3 p-2 h-100 d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0 ms-0" type="checkbox" value="SENIOR">
+                                    <span class="form-check-label">Senior</span>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div class="col-md-6">
+                        <fieldset id="tamanosRecomendados" class="row g-2 border-0 p-0 m-0 h-100">
+                            <legend class="form-label fw-semibold mb-1">Tamaño compatible</legend>
+                            <div class="col-6">
+                                <label class="form-check border rounded-3 p-2 h-100 d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0 ms-0" type="checkbox" value="PEQUENO">
+                                    <span class="form-check-label">Pequeño</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-check border rounded-3 p-2 h-100 d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0 ms-0" type="checkbox" value="MEDIANO">
+                                    <span class="form-check-label">Mediano</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-check border rounded-3 p-2 h-100 d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0 ms-0" type="checkbox" value="GRANDE">
+                                    <span class="form-check-label">Grande</span>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div class="col-12">
+                        <fieldset id="actividadesRecomendadas" class="row g-2 border-0 p-0 m-0">
+                            <legend class="form-label fw-semibold mb-1">Nivel de actividad (si aplica)</legend>
+                            <div class="col-6 col-md-4">
+                                <label class="form-check border rounded-3 p-2 h-100 d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0 ms-0" type="checkbox" value="BAJA">
+                                    <span class="form-check-label">Baja / tranquila</span>
+                                </label>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <label class="form-check border rounded-3 p-2 h-100 d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0 ms-0" type="checkbox" value="MODERADA">
+                                    <span class="form-check-label">Moderada</span>
+                                </label>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <label class="form-check border rounded-3 p-2 h-100 d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0 ms-0" type="checkbox" value="ALTA">
+                                    <span class="form-check-label">Alta / enérgica</span>
+                                </label>
+                            </div>
+                            <small class="text-muted">Si un producto no depende de la actividad de la mascota, deja estas casillas vacías.</small>
+                        </fieldset>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label" for="actividadesRecomendadas">Actividad</label>
-                    <select id="actividadesRecomendadas" class="form-select" multiple size="3">
-                        <option value="BAJA">Baja / tranquila</option><option value="MODERADA">Moderada</option><option value="ALTA">Alta / enérgica</option>
-                    </select>
-                </div>
-                <div class="form-check form-switch">
+
+                <div class="form-check form-switch mt-3">
                     <input class="form-check-input" type="checkbox" id="productoActivo" checked>
                     <label class="form-check-label" for="productoActivo">Producto activo y visible en la tienda</label>
                 </div>

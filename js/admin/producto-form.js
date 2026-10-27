@@ -40,14 +40,19 @@ async function cargarSiEsEdicion() {
 }
 
 function seleccionarMultiples(id, valores) {
-    const seleccionados = Array.isArray(valores) ? valores : [];
-    document.querySelectorAll(`#${id} option`).forEach(opcion => {
-        opcion.selected = seleccionados.includes(opcion.value);
+    const seleccionados = Array.isArray(valores)
+        ? valores.map(valor => String(valor).toUpperCase())
+        : [];
+
+    document.querySelectorAll(`#${id} input[type="checkbox"]`).forEach(casilla => {
+        casilla.checked = seleccionados.includes(casilla.value.toUpperCase());
     });
 }
 
 function valoresSeleccionados(id) {
-    return Array.from(document.getElementById(id).selectedOptions).map(opcion => opcion.value);
+    return Array.from(
+        document.querySelectorAll(`#${id} input[type="checkbox"]:checked`)
+    ).map(casilla => casilla.value);
 }
 
 function mostrarPreview(src) {
