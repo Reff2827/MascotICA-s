@@ -21,29 +21,70 @@ function normalizarRecomendacion(valor) {
 }
 
 function listaValores(valor) {
-    if (Array.isArray(valor)) return valor.map(normalizarRecomendacion);
-    if (!valor) return [];
-    return [normalizarRecomendacion(valor)];
+    if (Array.isArray(valor)) return valor.map(normalizarRecomendacion).filter(Boolean);
+    if (valor === null || valor === undefined || valor === '') return [];
+    return [normalizarRecomendacion(valor)].filter(Boolean);
+}
+
+/*
+ * La tabla mascotas guarda edad como texto (por ejemplo, "8 meses" o "2 años").
+ * Calculamos los meses aquí sin añadir una columna ni cambiar el esquema.
+ * También interpreta formatos mixtos como "1 año y 6 meses".
+ */
+function edadMascotaEnMeses(edad) {
+    const texto = normalizarRecomendacion(edad);
+    if (!texto) return null;
+
+    const coincidenciaAnios = texto.match(/(\d+(?:[.,]\d+)?)\s*ANOS?\b/);
+    const coincidenciaMeses = texto.match(/(\d+(?:[.,]\d+)?)\s*MES(?:ES)?\b/);
+
+    let mesesTotales = 0;
+    let unidadEncontrada = false;
+
+    if (coincidenciaAnios) {
+        const anios = Number(coincidenciaAnios[1].replace(',', '.'));
+        if (!Number.isFinite(anios) || anios < 0) return null;
+        mesesTotales += anios * 12;
+        unidadEncontrada = true;
+    }
+
+    if (coincidenciaMeses) {
+        const meses = Number(coincidenciaMeses[1].replace(',', '.'));
+        if (!Number.isFinite(meses) || meses < 0) return null;
+        mesesTotales += meses;
+        unidadEncontrada = true;
+    }
+
+    // No adivinamos la unidad si el valor contiene únicamente un número.
+    if (!unidadEncontrada) return null;
+    return Math.round(mesesTotales);
 }
 
 function edadMascotaGrupo(edad) {
-    const texto = normalizarRecomendacion(edad);
-    const numero = Number((texto.match(/[0-9]+(?:[.,][0-9]+)?/) || [])[0]?.replace(',', '.'));
-    if (!Number.isFinite(numero)) return null;
-    const meses = texto.includes('MES') ? numero : numero * 12;
+    const meses = edadMascotaEnMeses(edad);
+    if (meses === null) return null;
     if (meses < 12) return 'CACHORRO';
     if (meses < 24) return 'JOVEN';
-    if (meses >= 96) return 'SENIOR';
-    return 'ADULTO';
+    if (meses < 84) return 'ADULTO';
+    return 'SENIOR';
+}
+
+function actividadCanonica(valor) {
+    const actividad = normalizarRecomendacion(valor);
+    if (!actividad) return null;
+
+    if (actividad.includes('TRANQU') || actividad.includes('POCO') || actividad === 'BAJA') {
+        return 'TRANQUILO';
+    }
+    if (actividad.includes('MODER')) return 'MODERADO';
+    if (actividad.includes('ACTIV') || actividad.includes('ENERG') || actividad === 'ALTA') {
+        return 'ACTIVO';
+    }
+    return actividad;
 }
 
 function actividadMascotaGrupo(actividad) {
-    const valor = normalizarRecomendacion(actividad);
-    if (!valor) return null;
-    if (valor.includes('TRANQU') || valor.includes('POCO') || valor.includes('BAJA')) return 'BAJA';
-    if (valor.includes('MODER')) return 'MODERADA';
-    if (valor.includes('ACTIV') || valor.includes('ENERG')) return 'ALTA';
-    return null;
+    return actividadCanonica(actividad);
 }
 
 function especieMascotaGrupo(especie) {
@@ -57,8 +98,7 @@ function inferirEspeciesProducto(producto) {
     const configuradas = listaValores(producto.especiesRecomendadas);
     if (configuradas.length) return configuradas;
 
-    // Los productos existentes no tenían compatibilidad configurada. Aprovechamos
-    // el nombre del catálogo para inferir las especies sin obligar a editar cada fila.
+    // Solo inferimos especie a partir del nombre si el administrador no configuró especies.
     const nombre = normalizarRecomendacion(producto.nombre);
     const esPerro = /\bPERROS?\b|\bPERRITOS?\b|\bCANIN[OA]S?\b/.test(nombre);
     const esGato = /\bGATOS?\b|\bGATITOS?\b|\bFELIN[OA]S?\b/.test(nombre);
@@ -69,10 +109,7 @@ function inferirEspeciesProducto(producto) {
     if (esGato) return ['GATO'];
     if (esOtraEspecie) return ['OTRO'];
 
-    // Los artículos que dicen explícitamente "para mascotas/animales" se tratan
-    // como genéricos para perros y gatos. Otros productos de higiene sin especie
-    // identificable (por ejemplo, un antipulgas) quedan fuera hasta que el admin
-    // marque la especie, porque la fórmula puede no ser segura para todas.
+    // En productos genéricos de higiene, el nombre debe indicar que son para mascotas/animales.
     if (normalizarRecomendacion(producto.categoria) === 'HIGIENE' &&
         /\bPARA MASCOTAS?\b|\bPARA ANIMALES?\b/.test(nombre)) {
         return ['PERRO', 'GATO'];
@@ -81,59 +118,33 @@ function inferirEspeciesProducto(producto) {
     return [];
 }
 
-function inferirEdadesProducto(producto) {
-    const configuradas = listaValores(producto.edadesRecomendadas);
-    if (configuradas.length) return configuradas;
-
-    const nombre = normalizarRecomendacion(producto.nombre);
-    if (/\bSENIOR\b|\bGERIATRIC[OA]S?\b|\bMAYORES?\b/.test(nombre)) return ['SENIOR'];
-    if (/\bCACHORR[OA]S?\b|\bPUPPY\b|\bGATITOS?\b|\bKITTENS?\b/.test(nombre)) return ['CACHORRO'];
-    if (/\bJOVEN(?:ES)?\b/.test(nombre)) return ['JOVEN'];
-    if (/\bADULT[OA]S?\b/.test(nombre)) return ['ADULTO'];
-    return [];
-}
-
-function inferirTamanosProducto(producto) {
-    const configurados = listaValores(producto.tamanosRecomendados);
-    if (configurados.length) return configurados;
-
-    const nombre = normalizarRecomendacion(producto.nombre);
-    if (/\b(?:RAZAS?|PERROS?|GATOS?|TAMANO)\s+PEQUEN[OA]S?\b/.test(nombre)) return ['PEQUENO'];
-    if (/\b(?:RAZAS?|PERROS?|GATOS?|TAMANO)\s+MEDIAN[OA]S?\b/.test(nombre)) return ['MEDIANO'];
-    if (/\b(?:RAZAS?|PERROS?|GATOS?|TAMANO)\s+GRANDES?\b/.test(nombre)) return ['GRANDE'];
-    return [];
-}
-
-function inferirActividadesProducto(producto) {
-    const configuradas = listaValores(producto.actividadesRecomendadas);
-    if (configuradas.length) return configuradas;
-
-    const nombre = normalizarRecomendacion(producto.nombre);
-    if (/\bBAJA ACTIVIDAD\b|\bPOCO ACTIV[OA]S?\b|\bTRANQUIL[OA]S?\b/.test(nombre)) return ['BAJA'];
-    if (/\bACTIVIDAD MODERADA\b|\bMODERAD[OA]S? ACTIV[OA]S?\b/.test(nombre)) return ['MODERADA'];
-    if (/\bALTA ACTIVIDAD\b|\bMUY ACTIV[OA]S?\b|\bALTA ENERGIA\b/.test(nombre)) return ['ALTA'];
-    return [];
-}
-
-function opcionesCompatibilidadProducto(producto, propiedad) {
-    if (propiedad === 'especiesRecomendadas') return inferirEspeciesProducto(producto);
-    if (propiedad === 'edadesRecomendadas') return inferirEdadesProducto(producto);
-    if (propiedad === 'tamanosRecomendados') return inferirTamanosProducto(producto);
-    if (propiedad === 'actividadesRecomendadas') return inferirActividadesProducto(producto);
-    return listaValores(producto[propiedad]);
+function valoresConfiguradosProducto(producto, propiedad) {
+    const valores = listaValores(producto[propiedad]);
+    if (propiedad === 'actividadesRecomendadas') {
+        return valores.map(actividadCanonica).filter(Boolean);
+    }
+    return valores;
 }
 
 function compatibleCampo(producto, propiedad, valorMascota) {
-    const opciones = opcionesCompatibilidadProducto(producto, propiedad);
-    return !opciones.length || !valorMascota || opciones.includes(normalizarRecomendacion(valorMascota));
+    const opciones = valoresConfiguradosProducto(producto, propiedad);
+
+    // Una lista vacía en el producto significa "sin restricción" para ese criterio.
+    // Si el dato de la mascota no está registrado, tampoco lo usamos para excluirla.
+    if (!opciones.length || !valorMascota) return true;
+
+    const valorNormalizado = propiedad === 'actividadesRecomendadas'
+        ? actividadCanonica(valorMascota)
+        : normalizarRecomendacion(valorMascota);
+
+    return opciones.includes(valorNormalizado);
 }
 
 function compatibleConMascota(producto, mascota) {
     const especie = especieMascotaGrupo(mascota.especie);
     const especiesProducto = inferirEspeciesProducto(producto);
 
-    // La especie debe coincidir. Si no puede inferirse ni está configurada,
-    // el producto no se recomienda; así evitamos sugerencias alimentarias inseguras.
+    // La especie debe coincidir para evitar recomendaciones potencialmente inadecuadas.
     if (!especie || !especiesProducto.length || !especiesProducto.includes(especie)) {
         return false;
     }
@@ -145,6 +156,36 @@ function compatibleConMascota(producto, mascota) {
     return compatibleCampo(producto, 'edadesRecomendadas', edad) &&
         compatibleCampo(producto, 'tamanosRecomendados', tamano) &&
         compatibleCampo(producto, 'actividadesRecomendadas', actividad);
+}
+
+function mostrarImagenMascota(src, nombre) {
+    const imagen = document.getElementById('imagenMascota');
+    const icono = document.getElementById('iconoMascota');
+    const url = String(src ?? '').trim();
+
+    // Deja visible la huella como alternativa hasta confirmar que la foto carga.
+    imagen.classList.add('d-none');
+    icono.classList.remove('d-none');
+    imagen.onload = null;
+    imagen.onerror = null;
+
+    if (!url) {
+        imagen.removeAttribute('src');
+        imagen.alt = '';
+        return;
+    }
+
+    imagen.alt = `Foto de ${nombre || 'tu mascota'}`;
+    imagen.onload = function () {
+        imagen.classList.remove('d-none');
+        icono.classList.add('d-none');
+    };
+    imagen.onerror = function () {
+        imagen.classList.add('d-none');
+        icono.classList.remove('d-none');
+        imagen.removeAttribute('src');
+    };
+    imagen.src = url;
 }
 
 async function iniciarRecomendaciones() {
@@ -178,20 +219,27 @@ async function iniciarRecomendaciones() {
         }
 
         const productos = await Productos.listar();
-        productosRecomendaciones = (productos || []).filter(p =>
-            p.activo !== false && Number(p.stock) > 0 &&
-            ['ALIMENTO', 'HIGIENE'].includes(normalizarRecomendacion(p.categoria)) &&
-            compatibleConMascota(p, mascotaRecomendaciones)
+        productosRecomendaciones = (productos || []).filter(producto =>
+            producto.activo !== false && Number(producto.stock) > 0 &&
+            ['ALIMENTO', 'HIGIENE'].includes(normalizarRecomendacion(producto.categoria)) &&
+            compatibleConMascota(producto, mascotaRecomendaciones)
         );
 
-        document.getElementById('nombreMascota').textContent = mascotaRecomendaciones.nombre || ficha.nombre_mascota || 'Tu mascota';
+        const nombreMascota = mascotaRecomendaciones.nombre || ficha.nombre_mascota || 'Tu mascota';
+        document.getElementById('nombreMascota').textContent = nombreMascota;
+        mostrarImagenMascota(mascotaRecomendaciones.imagenUrl, nombreMascota);
+
         const chips = [
             mascotaRecomendaciones.especie,
             mascotaRecomendaciones.edad,
             mascotaRecomendaciones.tamano ? `Tamaño ${mascotaRecomendaciones.tamano.toLowerCase()}` : null,
             mascotaRecomendaciones.nivelActividad ? `Actividad ${mascotaRecomendaciones.nivelActividad.toLowerCase()}` : null
         ].filter(Boolean);
-        document.getElementById('datosMascota').innerHTML = chips.map(c => `<span class="recomendacion-chip"><i class="bi bi-check2"></i>${escaparRecomendacion(c)}</span>`).join('');
+
+        document.getElementById('datosMascota').innerHTML = chips
+            .map(chip => `<span class="recomendacion-chip"><i class="bi bi-check2"></i>${escaparRecomendacion(chip)}</span>`)
+            .join('');
+
         const botonFicha = document.getElementById('btnFicha');
         botonFicha.href = `ficha-adopcion.html?id=${encodeURIComponent(solicitud.idSolicitud)}`;
         botonFicha.classList.remove('d-none');
@@ -208,6 +256,7 @@ async function iniciarRecomendaciones() {
 function pintarProductosRecomendados() {
     const lista = document.getElementById('listaRecomendaciones');
     const aviso = document.getElementById('avisoProductos');
+
     document.getElementById('contadorProductos').innerHTML = `<i class="bi bi-check-circle"></i>${productosRecomendaciones.length} producto${productosRecomendaciones.length === 1 ? '' : 's'} disponible${productosRecomendaciones.length === 1 ? '' : 's'}`;
 
     if (!productosRecomendaciones.length) {
@@ -221,6 +270,7 @@ function pintarProductosRecomendados() {
     lista.innerHTML = productosRecomendaciones.map(producto => {
         const imagen = producto.imagenUrl || '../img/logo.png';
         const categoria = normalizarRecomendacion(producto.categoria) === 'ALIMENTO' ? 'Alimentación' : 'Higiene';
+
         return `<div class="col-12 col-sm-6 col-xl-4">
             <article class="card recomendacion-card shadow-sm">
                 <img class="recomendacion-img" src="${escaparRecomendacion(imagen)}" alt="${escaparRecomendacion(producto.nombre)}" loading="lazy" onerror="this.onerror=null;this.src='../img/logo.png'">
@@ -262,6 +312,7 @@ function agregarProductoRecomendado(id, boton) {
     } catch {
         carrito = {};
     }
+
     const actual = Number(carrito[producto.idProducto]) || 0;
     if (actual + cantidad > Number(producto.stock)) {
         UI.setFlash('error', `Solo hay ${Math.max(0, Number(producto.stock) - actual)} unidad(es) disponibles para ${producto.nombre}, contando las que ya tienes en el carrito.`);
@@ -275,6 +326,7 @@ function agregarProductoRecomendado(id, boton) {
     boton.classList.replace('btn-success', 'btn-outline-success');
     UI.setFlash('exito', `${producto.nombre} se añadió a tu carrito habitual.`);
     UI.mostrarFlash();
+
     window.setTimeout(() => {
         if (document.body.contains(boton)) {
             boton.innerHTML = '<i class="bi bi-cart-plus me-1"></i>Agregar';

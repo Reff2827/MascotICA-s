@@ -74,11 +74,9 @@ function ocultarPreview() {
 document.getElementById('btnUrl').addEventListener('click', function () {
     document.getElementById('contenedorUrl').classList.remove('d-none');
     document.getElementById('contenedorArchivo').classList.add('d-none');
-
     document.getElementById('imagenArchivo').value = '';
 
     const url = document.getElementById('imagenUrl').value.trim();
-
     if (url) {
         mostrarPreview(url);
     } else {
@@ -89,14 +87,12 @@ document.getElementById('btnUrl').addEventListener('click', function () {
 document.getElementById('btnArchivo').addEventListener('click', function () {
     document.getElementById('contenedorUrl').classList.add('d-none');
     document.getElementById('contenedorArchivo').classList.remove('d-none');
-
     document.getElementById('imagenUrl').value = '';
     ocultarPreview();
 });
 
 document.getElementById('imagenUrl').addEventListener('input', function () {
     const url = this.value.trim();
-
     if (url) {
         mostrarPreview(url);
     } else {
@@ -120,11 +116,9 @@ document.getElementById('imagenArchivo').addEventListener('change', function () 
     }
 
     const lector = new FileReader();
-
     lector.onload = function (e) {
         mostrarPreview(e.target.result);
     };
-
     lector.readAsDataURL(archivo);
 });
 
@@ -137,13 +131,9 @@ document.getElementById('formProducto').addEventListener('submit', async functio
     const stock = document.getElementById('stock').value;
 
     let valido = true;
-
     const marcar = (id, condicionError) => {
         document.getElementById(id).classList.toggle('d-none', !condicionError);
-
-        if (condicionError) {
-            valido = false;
-        }
+        if (condicionError) valido = false;
     };
 
     marcar('errNombre', nombre === '');
@@ -156,7 +146,6 @@ document.getElementById('formProducto').addEventListener('submit', async functio
     const boton = document.getElementById('btnGuardar');
     const estado = document.getElementById('estadoSubida');
     let imagenUrl = document.getElementById('imagenUrl').value.trim();
-
     const archivo = document.getElementById('imagenArchivo').files[0];
 
     if (archivo) {
@@ -164,7 +153,6 @@ document.getElementById('formProducto').addEventListener('submit', async functio
         estado.textContent = 'Subiendo imagen...';
 
         const nombreArchivo = Date.now() + '-' + archivo.name;
-
         const { error: errorSubida } = await db.storage
             .from('productos')
             .upload(nombreArchivo, archivo);
