@@ -1,4 +1,3 @@
-
 const usuario = Auth.usuarioActual();
 
 /* El nombre de contacto solo admite letras (también al pegar) */
@@ -843,18 +842,15 @@ function iniciar() {
        ============================================================ */
 
     // Auditoría H-09: el listado público NO trae teléfono, nombre de contacto ni user_id.
-    // Se consulta la vista pública `pet_reports_publico`; si aún no existe en la base,
-    // se usa la tabla pidiendo únicamente columnas no sensibles.
+    // Se consulta la función pública `reportes_publicos()` (RPC), que solo devuelve
+    // columnas no sensibles; si falla, se usa la tabla pidiendo únicamente esas columnas.
     const COLUMNAS_PUBLICAS =
         'id,pet_name,species,status,description,zone,lat,lng,' +
         'photo_url_1,photo_url_2,photo_url_3,created_at';
 
     async function cargarReportes() {
 
-        let respuesta = await db
-            .from('pet_reports_publico')
-            .select(COLUMNAS_PUBLICAS)
-            .order('created_at', { ascending: false });
+        let respuesta = await db.rpc('reportes_publicos');
 
         if (respuesta.error) {
 
