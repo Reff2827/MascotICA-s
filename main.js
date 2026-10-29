@@ -19,6 +19,14 @@ function crearVentana() {
         }
     });
 
+    // Endurecimiento: la ventana solo muestra archivos locales de la app.
+    ventana.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+    ventana.webContents.on('will-navigate', (evento, destino) => {
+        if (!destino.startsWith('file://')) {
+            evento.preventDefault();
+        }
+    });
+
     ventana.loadFile(
         path.join(__dirname, 'admin-desktop', 'login.html')
     );

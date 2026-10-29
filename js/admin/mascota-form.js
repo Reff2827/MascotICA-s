@@ -387,7 +387,7 @@ document
     .getElementById('imagenArchivo')
     .addEventListener(
         'change',
-        function () {
+        async function () {
 
             const archivo =
                 this.files[0];
@@ -402,14 +402,13 @@ document
             }
 
 
-            if (
-                !archivo.type.startsWith(
-                    'image/'
-                )
-            ) {
+            const validacionImagen =
+                await Archivos.validarImagen(archivo);
+
+            if (!validacionImagen.ok) {
 
                 alert(
-                    'Selecciona un archivo de imagen válido.'
+                    validacionImagen.error
                 );
 
                 this.value =
@@ -633,11 +632,30 @@ document
                     'Subiendo imagen...';
 
 
+                const validacionImagen =
+                    await Archivos.validarImagen(archivo);
+
+                if (!validacionImagen.ok) {
+
+                    estado.textContent =
+                        '';
+
+                    boton.disabled =
+                        false;
+
+                    alert(
+                        validacionImagen.error
+                    );
+
+                    return;
+
+                }
+
                 const extension =
-                archivo.name.split('.').pop().toLowerCase();
-                
+                    validacionImagen.extension;
+
                 const nombreArchivo =
-                `${Date.now()}-${crypto.randomUUID()}.${extension}`;
+                    `${Date.now()}-${crypto.randomUUID()}.${extension}`;
 
                 const {
                     error: errorSubida
@@ -646,7 +664,12 @@ document
                         .from('mascotas')
                         .upload(
                             nombreArchivo,
-                            archivo
+                            archivo,
+                            {
+                                contentType:
+                                    validacionImagen.tipo,
+                                upsert: false
+                            }
                         );
 
 

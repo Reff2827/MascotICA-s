@@ -1,6 +1,7 @@
 const SESSION_KEY = 'ps_session';
 
 const PASSWORD_POLICY_VERSION = 2;
+const PRIVACY_POLICY_VERSION = '1.0';
 
 const Auth = {
 
@@ -53,7 +54,9 @@ const Auth = {
                 data: {
                     nombre: nombre,
                     password_policy_version:
-                        PASSWORD_POLICY_VERSION
+                        PASSWORD_POLICY_VERSION,
+                    privacy_policy_version: PRIVACY_POLICY_VERSION,
+                    privacy_consent_at: new Date().toISOString()
                 }
             }
         });
@@ -340,6 +343,99 @@ const Auth = {
 
 
     /* =========================
+       VERIFICACIÓN DEL ROL EN EL SERVIDOR (auditoría H-10)
+
+       El rol guardado en sessionStorage es solo una ayuda para la
+       interfaz y puede ser alterado por el usuario desde las
+       herramientas del navegador. Por eso, al entrar a una página
+       protegida se vuelve a consultar el rol real en Supabase.
+       Si no coincide, se corrige la sesión local y se redirige.
+       La autorización real de los datos la aplican las políticas
+       RLS del servidor, no esta comprobación.
+    ========================= */
+
+    async verificarRolEnServidor(rolEsperado) {
+
+        const ocultar =
+            rolEsperado === 'ADMIN';
+
+        if (ocultar) {
+            document.documentElement.style.visibility = 'hidden';
+        }
+
+        const mostrar = () => {
+            document.documentElement.style.visibility = '';
+        };
+
+        try {
+
+            const {
+                data: { user },
+                error: errorUsuario
+            } = await db.auth.getUser();
+
+            if (errorUsuario || !user) {
+
+                sessionStorage.removeItem(SESSION_KEY);
+
+                window.location.replace(
+                    Auth.raiz() + 'login.html'
+                );
+
+                return;
+            }
+
+            const { data: perfil, error: errorPerfil } =
+                await db
+                    .from('perfiles')
+                    .select('rol')
+                    .eq('id', user.id)
+                    .maybeSingle();
+
+            if (errorPerfil || !perfil) {
+
+                // No se pudo confirmar: no se concede nada extra,
+                // los datos siguen protegidos por RLS.
+                mostrar();
+
+                return;
+            }
+
+            const local = Auth.usuarioActual();
+
+            if (
+                !local ||
+                local.idUsuario !== user.id ||
+                local.rol !== perfil.rol
+            ) {
+
+                sessionStorage.setItem(
+                    SESSION_KEY,
+                    JSON.stringify({
+                        ...(local || {}),
+                        idUsuario: user.id,
+                        rol: perfil.rol
+                    })
+                );
+            }
+
+            if (perfil.rol !== rolEsperado) {
+
+                Auth.redirigirSegunRol(perfil.rol);
+
+                return;
+            }
+
+            mostrar();
+
+        } catch {
+
+            mostrar();
+        }
+    },
+
+
+    /* =========================
        PROTEGER ADMIN
     ========================= */
 
@@ -368,6 +464,8 @@ const Auth = {
             return null;
         }
 
+
+        Auth.verificarRolEnServidor('ADMIN');
 
         return usuario;
     },
@@ -402,6 +500,8 @@ const Auth = {
             return null;
         }
 
+
+        Auth.verificarRolEnServidor('CLIENTE');
 
         return usuario;
     }

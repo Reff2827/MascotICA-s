@@ -766,6 +766,16 @@ document
             }
 
 
+            // Consentimiento informado (Ley N.º 29733)
+            if (!document.getElementById('regConsentimiento').checked) {
+
+                mostrarMensaje(
+                    'Debes aceptar el aviso de privacidad para crear tu cuenta.'
+                );
+
+                return;
+            }
+
             const btn =
                 document.getElementById(
                     'btnRegistrar'

@@ -1048,78 +1048,43 @@ const Solicitudes = {
         idSolicitud
     ) {
 
-        const solicitud =
-            await Solicitudes.buscarPorId(
-                idSolicitud
-            );
+        // Auditoría H-06: el rechazo se ejecuta en una sola transacción en la base
+        // de datos (función rechazar_adopcion), que actualiza la solicitud y libera
+        // la mascota juntas. Si algo falla, no queda ninguna de las dos a medias.
+        const id = Number(idSolicitud);
 
-
-        if (!solicitud) {
+        if (!Number.isInteger(id) || id <= 0) {
             return 'La solicitud no existe.';
         }
 
-
-        if (
-            solicitud.estado !==
-            'PENDIENTE'
-        ) {
-
-            return 'Esta solicitud ya fue procesada.';
-
-        }
-
-
-        if (
-            solicitud.tipo ===
-            'ADOPCION'
-        ) {
-
-            const mascota =
-                await Mascotas.buscarPorId(
-                    solicitud.refId
-                );
-
-
-            if (
-                mascota &&
-                mascota.estado ===
-                    'EN_PROCESO'
-            ) {
-
-                await Mascotas.cambiarEstado(
-                    solicitud.refId,
-                    'DISPONIBLE'
-                );
-
-            }
-
-        }
-
-
         const { error } =
-            await db.from('solicitudes')
-                .update({
-                    estado: 'RECHAZADA'
-                })
-                .eq(
-                    'id_solicitud',
-                    Number(idSolicitud)
-                );
-
+            await db.rpc(
+                'rechazar_adopcion',
+                {
+                    p_id_solicitud: id
+                }
+            );
 
         if (error) {
 
-            console.error(error);
+            console.error(
+                'Error al rechazar la solicitud:',
+                error.message
+            );
+
+            if (/ya fue procesada/i.test(error.message || '')) {
+                return 'Esta solicitud ya fue procesada.';
+            }
+
+            if (/no existe/i.test(error.message || '')) {
+                return 'La solicitud no existe.';
+            }
 
             return 'No se pudo rechazar la solicitud.';
-
         }
 
-
         return null;
-
     }
-
 };
 
 
@@ -1143,10 +1108,6 @@ const FichasAdopcion = {
         }
 
 
-        console.log(
-            'Buscando ficha para solicitud:',
-            id
-        );
 
 
         const { data, error } =
@@ -1188,10 +1149,6 @@ const FichasAdopcion = {
         }
 
 
-        console.log(
-            'Ficha encontrada:',
-            data
-        );
 
 
         return data;

@@ -1929,7 +1929,7 @@ function crearCampoFormulario(campo, registro = {}) {
         const bucket = campo.bucket || '';
         const archivo = document.createElement('input');
         archivo.type = 'file';
-        archivo.accept = 'image/*';
+        archivo.accept = Archivos.ACCEPT;
         archivo.className = 'form-control record-image-file';
         archivo.name = 'image_file';
         archivo.dataset.bucket = bucket;
@@ -1968,16 +1968,12 @@ function crearCampoFormulario(campo, registro = {}) {
             });
         });
 
-        archivo.addEventListener('change', () => {
+        archivo.addEventListener('change', async () => {
             const fichero = archivo.files?.[0];
             if (!fichero) return;
-            if (!fichero.type.startsWith('image/')) {
-                mostrarMensaje('Selecciona un archivo de imagen válido.', 'error');
-                archivo.value = '';
-                return;
-            }
-            if (fichero.size > 5 * 1024 * 1024) {
-                mostrarMensaje('La imagen no puede superar los 5 MB.', 'error');
+            const validacion = await Archivos.validarImagen(fichero);
+            if (!validacion.ok) {
+                mostrarMensaje(validacion.error, 'error');
                 archivo.value = '';
                 return;
             }
@@ -2161,9 +2157,13 @@ function abrirFormularioRegistro(nombreSeccion, registro = null) {
         const archivoImagen = campoImagen?.files?.[0] || null;
         const bucketImagen = campoImagen?.dataset.bucket || '';
 
-        if (archivoImagen && (!archivoImagen.type.startsWith('image/') || archivoImagen.size > 5 * 1024 * 1024)) {
-            mostrarMensaje('La imagen debe ser un archivo válido y no superar los 5 MB.', 'error');
-            return;
+        let validacionImagen = null;
+        if (archivoImagen) {
+            validacionImagen = await Archivos.validarImagen(archivoImagen);
+            if (!validacionImagen.ok) {
+                mostrarMensaje(validacionImagen.error, 'error');
+                return;
+            }
         }
 
         formularioGuardando = true;
@@ -2175,15 +2175,14 @@ function abrirFormularioRegistro(nombreSeccion, registro = null) {
             const configuracion = configuracionDatos[nombreSeccion];
 
             if (archivoImagen) {
-                const extension = (archivoImagen.name.split('.').pop() || 'jpg')
-                    .toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+                const extension = validacionImagen.extension;
                 const nombreArchivo = `${Date.now()}-${crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)}.${extension}`;
                 const { error: errorSubida } = await supabaseClient.storage
                     .from(bucketImagen)
                     .upload(nombreArchivo, archivoImagen, {
                         cacheControl: '3600',
                         upsert: false,
-                        contentType: archivoImagen.type
+                        contentType: validacionImagen.tipo
                     });
                 if (errorSubida) throw new Error(`No se pudo subir la imagen: ${errorSubida.message}`);
                 const { data: urlPublica } = supabaseClient.storage

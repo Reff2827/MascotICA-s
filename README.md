@@ -67,7 +67,7 @@ Variables de entorno (secretos) que necesitan las funciones de Izipay:
 
 Se configuran con `npx supabase secrets set NOMBRE=valor`. Actualmente el pago funciona con las credenciales de **prueba** de Izipay. Ambas funciones tienen `verify_jwt = false` en `supabase/config.toml`, porque `izipay-resultado-pago` recibe la notificación de Izipay; por eso valida la firma (`kr-hash`, HMAC-SHA256) antes de confirmar o rechazar un pago.
 
-La consulta de documentos (`intifact-consultar-documento`) también es una función Edge de Supabase; su código no está en esta carpeta, así que debe estar desplegada en el proyecto de Supabase.
+La consulta de documentos (`intifact-consultar-documento`) es una función Edge incluida en `supabase/functions/`. Requiere los secretos `INTIFACT_API_URL` y `INTIFACT_API_TOKEN`; revisa que el contrato con el proveedor coincida con `normalizar()` antes de desplegarla.
 
 ## Autenticación
 
@@ -168,6 +168,7 @@ Decisión del cliente ante la invitación a MascotICA's Match.
 - `solicitar_adopcion`, `aprobar_adopcion`: registran y aprueban solicitudes de adopción.
 - `obtener_ficha_publica`: devuelve solo los datos públicos de una ficha.
 - `crear_pedido`: registra un pedido con sus productos.
+- `rechazar_adopcion`: rechaza una solicitud y libera la mascota en una sola transacción.
 - `obtener_boleta_publica`: devuelve los datos de una boleta a partir de su código.
 - Funciones que confirman o rechazan el pago de un pedido, usadas por `izipay-resultado-pago`.
 
@@ -179,13 +180,16 @@ El proyecto utiliza **Row Level Security (RLS)** de Supabase. Las principales re
 - Las mascotas y los productos se consultan públicamente; solo los administradores los modifican.
 - Los clientes crean y consultan sus propias solicitudes; los administradores las consultan y gestionan.
 - Cada cliente consulta solo sus propios pedidos, ítems y fichas de adopción; los administradores ven todos.
-- Los reportes de mascotas son públicos para consulta; cada usuario crea los suyos y puede borrarlos (o el administrador).
+- Los reportes de mascotas se consultan públicamente solo mediante la vista `pet_reports_publico`, que no incluye teléfono, nombre de contacto ni `user_id`; la tabla solo la leen su dueño y los administradores.
 - Cada cliente consulta, registra y actualiza solo su propia invitación a Match.
 
 Además:
 
 - Los datos de la tarjeta se ingresan en el formulario de Izipay y no se almacenan en el sistema.
-- El resultado del pago se valida en el servidor mediante firma antes de marcar el pedido como pagado.
+- El monto del pago lo determina el servidor a partir del pedido (no el navegador) y el webhook valida firma, monto y moneda antes de marcar el pedido como pagado.
+- Las imágenes se validan por tipo, tamaño y firma real (`js/archivos.js`) y los buckets tienen límites en el servidor.
+- Las librerías externas están fijadas a una versión exacta y cargan con SRI.
+- Las operaciones críticas quedan registradas en la tabla `auditoria`.
 - La ficha pública (QR / NFC) no expone nombre ni documento del adoptante.
 
 ## Estructura del proyecto
@@ -194,6 +198,9 @@ Mascoticas/
 ├── index.html
 ├── login.html
 ├── README.md
+├── privacidad.html
+├── docs/
+├── tests/
 ├── package.json
 │
 ├── admin/
@@ -220,6 +227,7 @@ Mascoticas/
 │   └── match.css
 │
 ├── js/
+│   ├── archivos.js
 │   ├── auth.js
 │   ├── login.js
 │   ├── otp.js
@@ -234,9 +242,13 @@ Mascoticas/
 │
 ├── supabase/
 │   ├── config.toml
+│   ├── migrations/
+│   ├── seed.sql
 │   └── functions/
+│       ├── _shared/
 │       ├── izipay-crear-pago/
-│       └── izipay-resultado-pago/
+│       ├── izipay-resultado-pago/
+│       └── intifact-consultar-documento/
 │
 └── img/
     ├── logo.png
@@ -247,3 +259,12 @@ Mascoticas/
 
 - Recomendación de productos según la mascota adoptada.
 - Selector de aplicación de mapas (Google Maps, Waze o Apple Maps); hoy se abre OpenStreetMap.
+## Despliegue y seguridad
+
+1. Aplicar `supabase/migrations/` (respaldo previo, ver `docs/PLAN_CONTINGENCIA.md`).
+2. Desplegar las funciones Edge y configurar sus secretos (`IZIPAY_*`, `INTIFACT_*`).
+3. En el panel de Supabase (producción) aplicar lo mismo que `config.toml`: contraseña mínima de 8 con mayúscula, minúscula y número, confirmación de correo y MFA TOTP.
+4. Completar los datos del titular en `privacidad.html`.
+5. Ejecutar las pruebas con `npm test`. Ver `docs/PLAN_PRUEBAS.md`.
+
+Ver `docs/AUDITORIA_CAMBIOS.md` para el estado de cada hallazgo.

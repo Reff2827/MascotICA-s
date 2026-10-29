@@ -100,7 +100,7 @@ document.getElementById('imagenUrl').addEventListener('input', function () {
     }
 });
 
-document.getElementById('imagenArchivo').addEventListener('change', function () {
+document.getElementById('imagenArchivo').addEventListener('change', async function () {
     const archivo = this.files[0];
 
     if (!archivo) {
@@ -108,8 +108,10 @@ document.getElementById('imagenArchivo').addEventListener('change', function () 
         return;
     }
 
-    if (!archivo.type.startsWith('image/')) {
-        alert('Selecciona un archivo de imagen válido.');
+    const validacionImagen = await Archivos.validarImagen(archivo);
+
+    if (!validacionImagen.ok) {
+        alert(validacionImagen.error);
         this.value = '';
         ocultarPreview();
         return;
@@ -152,10 +154,22 @@ document.getElementById('formProducto').addEventListener('submit', async functio
         boton.disabled = true;
         estado.textContent = 'Subiendo imagen...';
 
-        const nombreArchivo = Date.now() + '-' + archivo.name;
+        const validacionImagen = await Archivos.validarImagen(archivo);
+
+        if (!validacionImagen.ok) {
+            estado.textContent = '';
+            boton.disabled = false;
+            alert(validacionImagen.error);
+            return;
+        }
+
+        const nombreArchivo = `${Date.now()}-${crypto.randomUUID()}.${validacionImagen.extension}`;
         const { error: errorSubida } = await db.storage
             .from('productos')
-            .upload(nombreArchivo, archivo);
+            .upload(nombreArchivo, archivo, {
+                contentType: validacionImagen.tipo,
+                upsert: false
+            });
 
         if (errorSubida) {
             estado.textContent = '';

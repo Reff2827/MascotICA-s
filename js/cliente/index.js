@@ -1660,13 +1660,10 @@ async function confirmarCompra() {
             await db.functions.invoke(
                 'izipay-crear-pago',
                 {
+                    // El monto, el correo y el documento los resuelve el servidor
+                    // a partir del pedido; el navegador solo indica cuál pedido pagar.
                     body: {
-                        amount: total,
-                        currency: 'PEN',
-                        orderId: String(resultado.idPedido),
-                        email: email,
-                        identityType: tipoDocumentoPago,
-                        identityCode: numeroDocumentoPago
+                        orderId: String(resultado.idPedido)
                     }
                 }
             );
@@ -2140,10 +2137,6 @@ async function finalizarCompraExitosa(pedido, idPedido, total) {
             correctLevel: QRCode.CorrectLevel.M
         });
 
-        console.log(
-            'QR de la boleta generado correctamente:',
-            urlBoleta.href
-        );
 
     }, 150);
 
@@ -2339,12 +2332,5 @@ function obtenerFechaTransaccion() {
         minutos +
         segundos
     );
-
-}
-
-
-function respuestaPagoIzipay(respuesta) {
-
-    console.log('Respuesta de Izipay:', respuesta);
 
 }

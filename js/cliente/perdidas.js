@@ -467,24 +467,6 @@ function iniciar() {
 
     const popup = r => {
 
-        const telefono =
-            String(r.contact_phone || '')
-                .replace(/\D/g, '');
-
-        const codigoPais =
-            String(r.contact_phone_country || '')
-                .replace(/\D/g, '');
-
-        const telefonoCompleto =
-            codigoPais && telefono
-                ? `${codigoPais}${telefono}`
-                : '';
-
-        const telWhatsApp =
-            telefonoCompleto
-                ? telefonoCompleto
-                : '';
-
         const foto = primeraFoto(r);
 
         const estado =
@@ -539,24 +521,12 @@ function iniciar() {
 
                 <br>
 
-                ${
-                    telWhatsApp
-                        ? `
-                            <a
-                                class="btn btn-sm btn-primary-ps mt-2 w-100"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                href="https://wa.me/${telWhatsApp}">
-
-                                <i class="bi bi-whatsapp"></i>
-                                ${UI.esc(
-                                    r.contact_name || 'Contactar'
-                                )}
-
-                            </a>
-                          `
-                        : ''
-                }
+                <small class="text-muted d-block mt-2">
+                    <i class="bi bi-shield-lock"></i>
+                    Por privacidad, el contacto del reportante lo gestiona
+                    el equipo de MascotICA's. Si tienes información,
+                    escríbenos.
+                </small>
 
                 <button
                     type="button"
@@ -757,7 +727,16 @@ function iniciar() {
        AGREGAR REPORTE
        ============================================================ */
 
-    function agregar(r) {
+    function agregar(registro) {
+
+        // Se descartan los datos de contacto: no deben quedar en memoria ni en el DOM público.
+        const {
+            contact_name,
+            contact_phone,
+            contact_phone_country,
+            user_id,
+            ...r
+        } = registro;
 
         const existe = reportes.some(
             x => String(x.id) === String(r.id)
@@ -863,25 +842,31 @@ function iniciar() {
        CARGAR REPORTES
        ============================================================ */
 
-    (async () => {
+    // Auditoría H-09: el listado público NO trae teléfono, nombre de contacto ni user_id.
+    // Se consulta la vista pública `pet_reports_publico`; si aún no existe en la base,
+    // se usa la tabla pidiendo únicamente columnas no sensibles.
+    const COLUMNAS_PUBLICAS =
+        'id,pet_name,species,status,description,zone,lat,lng,' +
+        'photo_url_1,photo_url_2,photo_url_3,created_at';
 
-        const {
-            data,
-            error
-        } = await db
-            .from('pet_reports')
-            .select('*')
-            .order(
-                'created_at',
-                {
-                    ascending: false
-                }
-            );
+    async function cargarReportes() {
 
+        let respuesta = await db
+            .from('pet_reports_publico')
+            .select(COLUMNAS_PUBLICAS)
+            .order('created_at', { ascending: false });
 
-        if (error) {
+        if (respuesta.error) {
 
-            console.error(error);
+            respuesta = await db
+                .from('pet_reports')
+                .select(COLUMNAS_PUBLICAS)
+                .order('created_at', { ascending: false });
+        }
+
+        if (respuesta.error) {
+
+            console.error(respuesta.error.message);
 
             document.getElementById('lista').innerHTML = `
                 <div class="alert alert-danger">
@@ -892,75 +877,47 @@ function iniciar() {
             return;
         }
 
-
-        reportes = data || [];
+        reportes = respuesta.data || [];
 
         pintar();
+    }
 
-    })();
+    cargarReportes();
 
 
     /* ============================================================
        TIEMPO REAL
        ============================================================ */
 
+    let temporizadorRecarga = null;
+
+    function recargarConRetardo() {
+
+        clearTimeout(temporizadorRecarga);
+
+        temporizadorRecarga =
+            setTimeout(cargarReportes, 600);
+    }
+
+    // El payload de tiempo real no se usa: solo avisa que hubo un cambio.
     db.channel('pet_reports_live')
-
         .on(
             'postgres_changes',
-            {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'pet_reports'
-            },
-            payload => {
-
-                agregar(payload.new);
-
-            }
+            { event: '*', schema: 'public', table: 'pet_reports' },
+            recargarConRetardo
         )
-
-        .on(
-            'postgres_changes',
-            {
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'pet_reports'
-            },
-            payload => {
-
-                reportes =
-                    reportes.map(r =>
-                        String(r.id) === String(payload.new.id)
-                            ? payload.new
-                            : r
-                    );
-
-                pintar();
-
-            }
-        )
-
-        .on(
-            'postgres_changes',
-            {
-                event: 'DELETE',
-                schema: 'public',
-                table: 'pet_reports'
-            },
-            payload => {
-
-                reportes =
-                    reportes.filter(
-                        r => String(r.id) !== String(payload.old.id)
-                    );
-
-                pintar();
-
-            }
-        )
-
         .subscribe();
+
+    // Respaldo: con RLS el tiempo real solo notifica cambios propios,
+    // así que se refresca periódicamente.
+    setInterval(() => {
+
+        if (!document.hidden) {
+
+            cargarReportes();
+        }
+
+    }, 60000);
 
 
     /* ============================================================
@@ -992,7 +949,7 @@ function iniciar() {
         document.getElementById('previewFotos');
 
     const TIPOS_FOTO_PERMITIDOS =
-        ['image/jpeg', 'image/jpg', 'image/png'];
+        ['image/jpeg', 'image/png', 'image/webp'];
 
     const TAMANO_MAX_FOTO =
         5 * 1024 * 1024;
@@ -1030,7 +987,7 @@ function iniciar() {
             if (fotoInvalidaPreview) {
 
                 err(
-                    'Cada foto debe ser JPG, JPEG o PNG y pesar como máximo 5 MB.'
+                    'Cada foto debe ser JPG, PNG o WebP y pesar como máximo 5 MB.'
                 );
 
                 inputFotos.value = '';
@@ -1458,7 +1415,7 @@ function iniciar() {
                 if (fotoInvalidaEnvio) {
 
                     err(
-                        'Cada foto debe ser JPG, JPEG o PNG y pesar como máximo 5 MB.'
+                        'Cada foto debe ser JPG, PNG o WebP y pesar como máximo 5 MB.'
                     );
 
                     return;
@@ -1501,19 +1458,25 @@ function iniciar() {
                         if (!fotoEsValida(archivo)) {
 
                             throw new Error(
-                                'Cada foto debe ser JPG, JPEG o PNG y pesar como máximo 5 MB.'
+                                'Cada foto debe ser JPG, PNG o WebP y pesar como máximo 5 MB.'
                             );
 
                         }
 
 
+                        const validacionFoto =
+                            await Archivos.validarImagen(archivo);
+
+                        if (!validacionFoto.ok) {
+
+                            throw new Error(
+                                validacionFoto.error
+                            );
+
+                        }
+
                         const extension =
-                            (
-                                archivo.name
-                                    .split('.')
-                                    .pop() || 'jpg'
-                            )
-                            .toLowerCase();
+                            validacionFoto.extension;
 
 
                         const path =
@@ -1529,8 +1492,7 @@ function iniciar() {
                                     archivo,
                                     {
                                         contentType:
-                                            archivo.type ||
-                                            'image/jpeg'
+                                            validacionFoto.tipo
                                     }
                                 );
 
